@@ -16,6 +16,7 @@ from app.api.v1.endpoints import admin as admin_endpoints
 from app.api.v1.endpoints import audit as audit_endpoints
 from app.api.v1.endpoints import auth as auth_endpoints
 from app.api.v1.endpoints import children as children_endpoints
+from app.api.v1.endpoints import credentials as credentials_endpoints
 from app.api.v1.endpoints import flags as flags_endpoints
 from app.api.v1.endpoints import reasoning as reasoning_endpoints
 from app.api.v1.endpoints import referrals as referrals_endpoints
@@ -84,6 +85,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_endpoints.router, prefix="/api/v1")
     app.include_router(audit_endpoints.router, prefix="/api/v1")
     app.include_router(children_endpoints.router, prefix="/api/v1")
+    app.include_router(credentials_endpoints.router, prefix="/api/v1")
     app.include_router(flags_endpoints.router, prefix="/api/v1")
     app.include_router(sessions_endpoints.router, prefix="/api/v1")
     app.include_router(reasoning_endpoints.router, prefix="/api/v1")

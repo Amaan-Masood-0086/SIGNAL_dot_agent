@@ -40,6 +40,7 @@ from app.schemas.admin import (
     UsageTotals,
 )
 from app.services.audit import AuditService
+from app.services.credential_service import CredentialConfigError, CredentialService
 from app.services.provider_checks import (
     provider_statuses,
     test_llm_connection,
@@ -169,18 +170,38 @@ def set_staff_active(
     return envelope(StaffRead.model_validate(staff).model_dump(mode="json"))
 
 
-# ── Provider status (ADR-09: env-var-only keys — status cards, no forms) ──
+# ── Provider status (ADR-09 controls + ADR-10 stored credentials) ──────
+
+
+def _credential_sources(db: Session, settings: Settings) -> tuple[str | None, str | None]:
+    """Where the ACTIVE key for each provider lives (ADR-10 precedence):
+    "ui" when a provider_credentials row is active, else None (the caller
+    then checks the env path). Never returns the key itself."""
+    try:
+        service = CredentialService(db, settings)
+    except CredentialConfigError:
+        return None, None
+    stt_source = "ui" if service.resolve("stt") else None
+    llm_source = "ui" if service.resolve("llm") else None
+    return stt_source, llm_source
 
 
 @router.get("/providers")
 def provider_status(
     admin: CurrentStaff = Depends(get_current_admin_staff),
     settings: Settings = Depends(get_settings),
+    db: Session = Depends(get_db),
 ):
-    """Configured/not-configured per provider, derived from env-var presence
-    at startup. ADR-09: the key VALUES are never displayed — the response
-    schema has no field that could carry them."""
-    cards = [ProviderStatus(**card) for card in provider_statuses(settings)]
+    """Configured/not-configured per provider + the SOURCE of the active
+    credential (ui / env). Key VALUES are never displayed — the response
+    schema has no field that could carry them (ADR-09/10)."""
+    stt_source, llm_source = _credential_sources(db, settings)
+    cards = [
+        ProviderStatus(**card)
+        for card in provider_statuses(
+            settings, stt_key_source=stt_source, llm_key_source=llm_source
+        )
+    ]
     return envelope({"providers": [card.model_dump() for card in cards]})
 
 
@@ -191,9 +212,10 @@ def provider_test_connection(
     settings: Settings = Depends(get_settings),
     db: Session = Depends(get_db),
 ):
-    """Fire ONE minimal real call (Azure issueToken / 1-token LLM ping) and
-    report success/failure only. Never returns or logs key material.
-    Deliberately NO key-entry counterpart exists (ADR-09)."""
+    """Fire ONE minimal real call (Azure issueToken / 1-token LLM ping)
+    against whichever credential source is ACTIVE per the ADR-10 precedence
+    rule, and report success/failure only. Never returns or logs key
+    material."""
     if provider not in {"stt", "llm"}:
         raise HTTPException(status_code=404, detail="Unknown provider")
     if not PROVIDER_TEST_LIMITER.allow(str(admin.staff_id)):
@@ -202,10 +224,15 @@ def provider_test_connection(
             detail="Too many provider tests; try again later",
         )
 
+    try:
+        stored = CredentialService(db, settings).resolve(provider)
+    except CredentialConfigError:
+        stored = None
+
     if provider == "stt":
-        success, detail = test_stt_connection(settings)
+        success, detail = test_stt_connection(settings, key=stored)
     else:
-        success, detail = test_llm_connection(settings)
+        success, detail = test_llm_connection(settings, key=stored)
 
     # Every admin action is audit-chained — including this one.
     AuditService(db).append(

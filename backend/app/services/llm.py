@@ -70,6 +70,13 @@ class OpenAICompatibleLLM:
         self._output_rate = Decimal(str(cost_per_million_output))
         self.last_call_cost: Decimal | None = None
 
+    @property
+    def api_key(self) -> str:
+        """In-process access only (precedence checks in tests / test-call
+        seam). Never serialized into any API response — response schemas
+        have no field for it (ADR-09/10)."""
+        return self._api_key
+
     def complete(self, *, agent: str, tier: str, system: str, user: str) -> str:
         try:
             response = httpx.post(
@@ -114,18 +121,12 @@ class OpenAICompatibleLLM:
         return cost.quantize(Decimal("0.000001"))
 
 
-def provider_from_settings(settings: Settings) -> LLMProvider | None:
-    """Resolve the configured provider; None = no LLM configured. The
-    pipeline then falls back to the deterministic synthetic reasoner when
-    (and only when) ENVIRONMENT=synthetic_only.
-
-    When a fallback endpoint is configured, the primary is wrapped in
-    ResilientLLM (circuit breaker + failover, ai-agent-development.md).
-    """
-    if settings.LLM_PROVIDER == "none" or not settings.LLM_API_KEY:
-        return None
+def build_llm_provider(settings: Settings, *, api_key: str) -> "LLMProvider":
+    """Construct the (optionally resilient) provider around ONE key. Shared
+    by the env path and the ADR-10 stored-credential path so both get the
+    identical cost model + fallback wiring."""
     primary = OpenAICompatibleLLM(
-        api_key=settings.LLM_API_KEY,
+        api_key=api_key,
         model=settings.LLM_MODEL or "gpt-4o-mini",
         base_url=settings.LLM_BASE_URL or DEFAULT_LLM_BASE_URL,
         cost_per_million_input=settings.LLM_COST_PER_MILLION_INPUT,
@@ -143,3 +144,16 @@ def provider_from_settings(settings: Settings) -> LLMProvider | None:
         cost_per_million_output=settings.LLM_COST_PER_MILLION_OUTPUT,
     )
     return ResilientLLM(primary, fallback=fallback)
+
+
+def provider_from_settings(settings: Settings) -> LLMProvider | None:
+    """Resolve the ENV-VAR provider; None = no LLM configured via env.
+
+    ADR-10 precedence lives at the call sites (reasoning endpoint): an
+    active stored credential wins over this env path, which stays the
+    bootstrap/CI mechanism exactly as FEAT-05 shipped it (the FEAT-05
+    smoke script uses this function directly — unchanged).
+    """
+    if settings.LLM_PROVIDER == "none" or not settings.LLM_API_KEY:
+        return None
+    return build_llm_provider(settings, api_key=settings.LLM_API_KEY)

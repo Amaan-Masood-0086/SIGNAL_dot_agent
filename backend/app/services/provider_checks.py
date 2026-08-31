@@ -31,38 +31,82 @@ def llm_configured(settings: Settings) -> bool:
     return settings.LLM_PROVIDER != "none" and bool(settings.LLM_API_KEY)
 
 
-def provider_statuses(settings: Settings) -> list[dict]:
-    """Status cards for the admin panel — env presence only, never values."""
-    stt_ok = stt_configured(settings)
-    llm_ok = llm_configured(settings)
+def provider_statuses(
+    settings: Settings,
+    *,
+    stt_key_source: str | None = None,
+    llm_key_source: str | None = None,
+) -> list[dict]:
+    """Status cards for the admin panel — presence + source only, NEVER
+    values. `*_key_source` says where the ACTIVE key lives (ADR-10
+    precedence): "ui" = provider_credentials row, "env" = env var, None =
+    not configured. With no stored credential the env logic is exactly the
+    ADR-09 behavior."""
+    if stt_key_source is not None:
+        # Stored credential: region still comes from env.
+        stt_ok = bool(settings.AZURE_SPEECH_REGION)
+        stt_backend = "azure"
+        stt_source = stt_key_source if stt_ok else None
+        stt_detail = (
+            f"Azure Speech configured via {stt_key_source}"
+            if stt_ok
+            else "Stored STT credential present but AZURE_SPEECH_REGION is missing"
+        )
+    else:
+        stt_ok = stt_configured(settings)
+        stt_backend = "azure" if settings.STT_PROVIDER == "azure" else "none"
+        stt_source = "env" if stt_ok else None
+        stt_detail = (
+            "Azure Speech configured via env"
+            if stt_ok
+            else "Speech-to-text is not configured (text fallback active)"
+        )
+
+    if llm_key_source is not None:
+        llm_ok = True
+        llm_backend = (
+            settings.LLM_PROVIDER if settings.LLM_PROVIDER != "none"
+            else "openai_compatible"
+        )
+        llm_source = llm_key_source
+        llm_detail = f"{llm_backend} configured via {llm_key_source}"
+    else:
+        llm_ok = llm_configured(settings)
+        llm_backend = settings.LLM_PROVIDER if settings.LLM_PROVIDER != "none" else "none"
+        llm_source = "env" if llm_ok else None
+        llm_detail = (
+            f"{settings.LLM_PROVIDER} configured via env"
+            if llm_ok
+            else "LLM provider is not configured"
+        )
+
     return [
         {
             "provider": "stt",
-            "backend": "azure" if settings.STT_PROVIDER == "azure" else "none",
+            "backend": stt_backend,
             "configured": stt_ok,
-            "detail": (
-                "Azure Speech configured"
-                if stt_ok
-                else "Speech-to-text is not configured (text fallback active)"
-            ),
+            "detail": stt_detail,
+            "source": stt_source,
         },
         {
             "provider": "llm",
-            "backend": settings.LLM_PROVIDER if settings.LLM_PROVIDER != "none" else "none",
+            "backend": llm_backend,
             "configured": llm_ok,
-            "detail": (
-                f"{settings.LLM_PROVIDER} configured"
-                if llm_ok
-                else "LLM provider is not configured"
-            ),
+            "detail": llm_detail,
+            "source": llm_source,
         },
     ]
 
 
-def test_stt_connection(settings: Settings) -> tuple[bool, str]:
+def test_stt_connection(settings: Settings, *, key: str | None = None) -> tuple[bool, str]:
     """One minimal authenticated call: Azure issueToken proves the Speech key
-    works without uploading any audio. Returns (success, sanitized detail)."""
-    if not stt_configured(settings):
+    works without uploading any audio. `key` overrides the env value (ADR-10
+    precedence — callers pass whichever source is active). Returns
+    (success, sanitized detail)."""
+    if key is None and not stt_configured(settings):
+        return False, "STT provider is not configured"
+    effective_key = key if key is not None else settings.AZURE_SPEECH_KEY
+    if not effective_key or not settings.AZURE_SPEECH_REGION:
         return False, "STT provider is not configured"
     url = (
         f"https://{settings.AZURE_SPEECH_REGION}.api.cognitive.microsoft.com"
@@ -71,7 +115,7 @@ def test_stt_connection(settings: Settings) -> tuple[bool, str]:
     try:
         response = httpx.post(
             url,
-            headers={"Ocp-Apim-Subscription-Key": settings.AZURE_SPEECH_KEY or ""},
+            headers={"Ocp-Apim-Subscription-Key": effective_key},
             timeout=TEST_TIMEOUT_SECONDS,
         )
     except httpx.HTTPError:
@@ -82,15 +126,19 @@ def test_stt_connection(settings: Settings) -> tuple[bool, str]:
     return False, f"Provider rejected the credentials (HTTP {response.status_code})"
 
 
-def test_llm_connection(settings: Settings) -> tuple[bool, str]:
-    """One trivial OpenAI-compatible chat completion (max_tokens=1)."""
-    if not llm_configured(settings):
+def test_llm_connection(settings: Settings, *, key: str | None = None) -> tuple[bool, str]:
+    """One trivial OpenAI-compatible chat completion (max_tokens=1). `key`
+    overrides the env value (ADR-10 precedence)."""
+    if key is None and not llm_configured(settings):
+        return False, "LLM provider is not configured"
+    effective_key = key if key is not None else settings.LLM_API_KEY
+    if not effective_key:
         return False, "LLM provider is not configured"
     base_url = (settings.LLM_BASE_URL or DEFAULT_LLM_BASE_URL).rstrip("/")
     try:
         response = httpx.post(
             f"{base_url}/chat/completions",
-            headers={"Authorization": f"Bearer {settings.LLM_API_KEY}"},
+            headers={"Authorization": f"Bearer {effective_key}"},
             json={
                 "model": settings.LLM_MODEL or "gpt-4o-mini",
                 "messages": [{"role": "user", "content": "ping"}],

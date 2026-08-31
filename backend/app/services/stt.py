@@ -37,6 +37,13 @@ class AzureSpeechProvider:
         self._region = region
         self.language = language
 
+    @property
+    def key(self) -> str:
+        """In-process access only (provider construction / test calls).
+        Never serialized into any API response — the response schemas have
+        no field for it (ADR-09/10)."""
+        return self._key
+
     def transcribe(self, audio: bytes) -> str:
         url = (
             f"https://{self._region}.stt.speech.microsoft.com"

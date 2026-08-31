@@ -9,6 +9,7 @@ from app.models.flag import Flag
 from app.models.institution import Institution
 from app.models.milestone import Milestone
 from app.models.observation import Observation
+from app.models.provider_credential import ProviderCredential
 from app.models.referral import Referral
 from app.models.safeguarding_escalation import SafeguardingEscalation
 from app.models.session import Session
@@ -22,6 +23,7 @@ __all__ = [
     "Institution",
     "Milestone",
     "Observation",
+    "ProviderCredential",
     "Referral",
     "SafeguardingEscalation",
     "Session",

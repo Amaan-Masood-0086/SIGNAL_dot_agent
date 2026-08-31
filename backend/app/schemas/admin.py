@@ -9,9 +9,9 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 StaffRole = Literal["caretaker", "admin"]
 
@@ -76,19 +76,41 @@ class AuditChainStatus(BaseModel):
 
 
 class ProviderStatus(BaseModel):
-    """ADR-09: configured/not-configured from env presence at startup.
-    Key VALUES are never serialized — no field for them exists."""
+    """ADR-09/10: configured/not-configured status. Key VALUES are never
+    serialized — no field for them exists. `source` says WHERE the active
+    credential came from: "ui" (provider_credentials row), "env" (env var),
+    or None (not configured)."""
 
     provider: Literal["stt", "llm"]
     backend: str  # e.g. "azure", "openai_compatible", "none"
     configured: bool
     detail: str
+    source: Literal["ui", "env"] | None = None
 
 
 class ProviderTestResult(BaseModel):
     provider: Literal["stt", "llm"]
     success: bool
     detail: str
+
+
+class CredentialWrite(BaseModel):
+    """ADR-10 PUT body. The value is accepted once, encrypted, and then can
+    never be read back through any API surface."""
+
+    value: Annotated[
+        str, StringConstraints(min_length=1, max_length=2000, strip_whitespace=True)
+    ]
+
+
+class CredentialStatusRead(BaseModel):
+    """The ONLY credential shape that ever leaves the API — deliberately
+    missing any field that could carry the raw or encrypted value."""
+
+    provider: str
+    is_active: bool
+    masked_suffix: str | None = None
+    updated_at: datetime.datetime | None = None
 
 
 class UsageTotals(BaseModel):

@@ -18,6 +18,13 @@ class Settings(BaseSettings):
     # Required — fail secure if absent. Phase 1 value: "synthetic_only".
     ENVIRONMENT: str
 
+    # Required (ADR-10) — Fernet master key for provider_credentials
+    # encryption at rest. No default on purpose: the credential surface must
+    # fail secure, not fail open. Same protection rigor as the JWT keys —
+    # never committed, never logged. Generate: python -m
+    # cryptography.fernet  (or Fernet.generate_key()).
+    CREDENTIAL_ENCRYPTION_KEY: str
+
     # Postgres connection. The app role connects unprivileged; RLS policies
     # are enforced at the DB role level (see alembic migration 0001).
     DATABASE_URL: str = (

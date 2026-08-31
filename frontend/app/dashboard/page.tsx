@@ -38,6 +38,16 @@ export default async function DashboardPage() {
           <Button aria-label="Register a child">Register a child</Button>
         </Link>
       </div>
+      <div className="mt-2">
+        {/* Admin surface (system-level role): provider status + credential
+            management. Non-admins see an access-error state on the page. */}
+        <Link
+          href="/dashboard/admin"
+          className="text-sm font-medium text-pine hover:underline"
+        >
+          Admin: providers & credentials →
+        </Link>
+      </div>
 
       <div className="mt-6">
         {roster === null ? (

@@ -13,7 +13,7 @@ export class ApiError extends Error {
 }
 
 interface BackendInit {
-  method?: "GET" | "POST";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: string;
 }
 

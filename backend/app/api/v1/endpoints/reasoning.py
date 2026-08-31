@@ -28,11 +28,12 @@ from app.core.config import Settings, get_settings
 from app.core.envelope import envelope
 from app.core.rate_limit import FixedWindowRateLimiter
 from app.core.synthetic_gate import assert_synthetic_write
+from app.services.credential_service import CredentialConfigError, CredentialService
 from app.models.institution import Institution
 from app.models.observation import Observation
 from app.models.session import Session as ConversationSession
 from app.services.audit import AuditService
-from app.services.llm import LLMProvider, provider_from_settings
+from app.services.llm import LLMProvider, build_llm_provider, provider_from_settings
 from app.services.pipeline_agents import AgentContractError, GroundingError
 from app.services.llm import LLMError
 from app.services.risk_pipeline import (
@@ -77,9 +78,19 @@ def rate_limited_reason(
 
 def get_reasoning_provider(
     settings: Settings = Depends(get_settings),
+    db: Session | None = Depends(get_db),
 ) -> LLMProvider | None:
-    """Configured LLM wins; synthetic_only gets the deterministic fallback
-    reasoner (demo + tests without paid keys); otherwise nothing."""
+    """ADR-10 precedence: an ACTIVE stored LLM credential beats the env var;
+    with no stored row the env path runs unchanged (FEAT-05's bootstrap/CI
+    mechanism — the smoke script depends on it). Only when NEITHER exists
+    does synthetic_only fall back to the deterministic reasoner."""
+    if db is not None:
+        try:
+            stored = CredentialService(db, settings).resolve("llm")
+        except CredentialConfigError:
+            stored = None
+        if stored:
+            return build_llm_provider(settings, api_key=stored)
     provider = provider_from_settings(settings)
     if provider is not None:
         return provider

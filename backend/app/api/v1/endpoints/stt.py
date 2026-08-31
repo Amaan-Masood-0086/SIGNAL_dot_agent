@@ -23,7 +23,8 @@ from app.api.deps import (
 from app.core.config import Settings, get_settings
 from app.core.envelope import envelope
 from app.core.rate_limit import FixedWindowRateLimiter
-from app.services.stt import SttProvider, provider_from_settings
+from app.services.credential_service import CredentialConfigError, CredentialService
+from app.services.stt import AzureSpeechProvider, SttProvider, provider_from_settings
 from app.services.usage import UsageService, estimate_stt_cost
 
 router = APIRouter(prefix="/stt", tags=["stt"])
@@ -50,7 +51,24 @@ def rate_limited_transcribe(
         )
 
 
-def get_stt_provider(settings: Settings = Depends(get_settings)) -> SttProvider | None:
+def get_stt_provider(
+    settings: Settings = Depends(get_settings),
+    db: Session | None = Depends(get_db),
+) -> SttProvider | None:
+    """ADR-10 precedence: an ACTIVE stored STT credential beats the env var.
+    The region stays env-only. With no stored row the env path (FEAT-03)
+    runs exactly as before."""
+    if db is not None:
+        try:
+            stored = CredentialService(db, settings).resolve("stt")
+        except CredentialConfigError:
+            stored = None
+        if stored and settings.AZURE_SPEECH_REGION:
+            return AzureSpeechProvider(
+                key=stored,
+                region=settings.AZURE_SPEECH_REGION,
+                language=settings.STT_LANGUAGE,
+            )
     return provider_from_settings(settings)
 
 

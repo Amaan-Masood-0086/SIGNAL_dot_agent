@@ -32,7 +32,8 @@ def test_configured_llm_wins_over_synthetic_fallback():
             LLM_PROVIDER="openai_compatible",
             LLM_API_KEY="sk-real",
             LLM_MODEL="gpt-4o-mini",
-        )
+        ),
+        None,  # no DB: env path only
     )
     assert isinstance(provider, OpenAICompatibleLLM)
 
@@ -41,14 +42,14 @@ def test_synthetic_fallback_only_when_unconfigured_and_synthetic_only():
     from app.api.v1.endpoints.reasoning import get_reasoning_provider
     from app.services.synthetic_llm import SyntheticRuleLLM
 
-    provider = get_reasoning_provider(_settings())  # LLM_PROVIDER defaults "none"
+    provider = get_reasoning_provider(_settings(), None)  # LLM_PROVIDER defaults "none"
     assert isinstance(provider, SyntheticRuleLLM)
 
 
 def test_no_provider_outside_synthetic_only_when_unconfigured():
     from app.api.v1.endpoints.reasoning import get_reasoning_provider
 
-    provider = get_reasoning_provider(_settings(ENVIRONMENT="staging"))
+    provider = get_reasoning_provider(_settings(ENVIRONMENT="staging"), None)
     assert provider is None
 
 
@@ -60,6 +61,6 @@ def test_synthetic_fallback_never_engages_with_partial_config():
     from app.services.llm import OpenAICompatibleLLM
     from app.services.synthetic_llm import SyntheticRuleLLM
 
-    provider = get_reasoning_provider(_settings(LLM_PROVIDER="openai_compatible"))
+    provider = get_reasoning_provider(_settings(LLM_PROVIDER="openai_compatible"), None)
     assert not isinstance(provider, OpenAICompatibleLLM)
     assert isinstance(provider, SyntheticRuleLLM)

@@ -4,7 +4,9 @@
 # (PyJWT[crypto] — RS256 per sdlc-security.md OWASP A02), multipart parsing
 # for the FEAT-03 audio-upload STT endpoint (python-multipart), HTTP client
 # (httpx2 — successor of httpx, preferred by current starlette/TestClient),
-# test tooling.
+# cryptography (Fernet encryption at rest for ADR-10 provider_credentials —
+# already transitive via PyJWT[crypto], declared explicitly because SIGNAL
+# code imports it directly), test tooling.
 fastapi>=0.115
 uvicorn[standard]>=0.30
 sqlalchemy>=2.0.30
@@ -13,6 +15,7 @@ psycopg[binary]>=3.2
 pydantic>=2.7
 pydantic-settings>=2.3
 PyJWT[crypto]>=2.8
+cryptography>=42
 httpx>=0.27
 httpx2>=2.12
 python-multipart>=0.0.20

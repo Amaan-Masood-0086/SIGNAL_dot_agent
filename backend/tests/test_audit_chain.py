@@ -9,7 +9,25 @@ from __future__ import annotations
 
 import uuid
 
+import pytest
+
 from app.services.audit import AuditService, verify_audit_chain
+
+
+@pytest.fixture(autouse=True)
+def _clean_audit_table(db_session):
+    """These tests COMMIT (the chain must be durable to verify), and pooled
+    connections persist committed rows across tests. Give every test a
+    clean chain (GENESIS semantics) and leak nothing into later modules."""
+    from sqlalchemy import delete
+
+    from app.models.audit_log import AuditLogEntry
+
+    db_session.execute(delete(AuditLogEntry))
+    db_session.commit()
+    yield
+    db_session.execute(delete(AuditLogEntry))
+    db_session.commit()
 
 
 def _staff_and_institution_ids() -> tuple[str, str]:
