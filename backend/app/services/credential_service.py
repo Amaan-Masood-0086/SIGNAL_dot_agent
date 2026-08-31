@@ -18,7 +18,7 @@ import uuid
 
 from cryptography.fernet import Fernet, InvalidToken
 from sqlalchemy import select, update
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
 
 from app.core.config import Settings
 from app.models.provider_credential import CREDENTIAL_PROVIDERS, ProviderCredential
@@ -105,12 +105,22 @@ class CredentialService:
             return None
 
     def status_rows(self) -> dict[str, ProviderCredential | None]:
-        """Latest row per provider for the status list. NOTE: returns ORM
-        rows, but the endpoint schema selects ONLY provider/is_active/
-        masked_suffix/updated_at — encrypted_value is never serialized."""
+        """Latest row per provider for the status list. ADR-10 write-only
+        contract at the SQL level: the query selects ONLY the display
+        columns — encrypted_value is never part of this query, not merely
+        omitted by the serializer."""
         out: dict[str, ProviderCredential | None] = {p: None for p in CREDENTIAL_PROVIDERS}
         rows = self._session.execute(
-            select(ProviderCredential).order_by(ProviderCredential.created_at.desc())
+            select(ProviderCredential)
+            .options(
+                load_only(
+                    ProviderCredential.provider,
+                    ProviderCredential.is_active,
+                    ProviderCredential.masked_suffix,
+                    ProviderCredential.updated_at,
+                )
+            )
+            .order_by(ProviderCredential.created_at.desc())
         ).scalars().all()
         for row in rows:
             if out.get(row.provider) is None:
