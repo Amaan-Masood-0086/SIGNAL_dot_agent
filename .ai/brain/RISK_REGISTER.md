@@ -1,0 +1,22 @@
+# Risk Register — SIGNAL
+**Date created:** 2026-08-28
+**Review cadence:** Update at every phase-gate transition and whenever an Open Item (PROJECT_BRIEF §10) resolves
+
+| ID | Risk | Category | Likelihood | Impact | Mitigation | Owner | Status |
+|---|---|---|---|---|---|---|---|
+| R1 | Hackathon team eligibility for external commercial partner unconfirmed | Delivery/Legal | Medium | High | Confirm via Discord/organizers today | Akasha | 🔴 Open |
+| R2 | DLD + Hearing knowledge-base data not yet delivered by Ayesha/Sami | Delivery | High | High | Blocks Quest/Claude Code spec for the reasoning pipeline — do not scaffold agent prompt logic until received | Akasha/Ayesha | 🟢 **Resolved 2026-08-30** — knowledge base + 10 synthetic conversations delivered. 2 minor scenario-type gaps tracked separately, non-blocking for FEAT-04/05 start |
+| R3 | Consent/guardianship structural conflict unresolved | Ethics/Legal | Medium | Critical | Synthetic-data-only env gate removes the threat surface for Phase 1; real ethics review required before Track B real-data use | Ayesha/Sami | 🟡 Open, non-blocking for Phase 1 |
+| R4 | Mandatory-reporting pathway (abuse/neglect) undefined | Ethics/Legal | Medium | Critical | Same as R3 — engineering ships routing/separation only (feature #10), not the legal process | Ayesha/Sami + legal counsel | 🟡 Open, non-blocking for Phase 1 |
+| R5 | LLM hallucination/ungrounded clinical claims | Technical/Security | Medium | Critical | Hard RAG-grounding + mandatory reasoning-trail citation (ADR-03) | NextaSol | 🟢 Mitigated by design — verify via test plan |
+| R6 | Urdu/Roman-Urdu code-mixed STT accuracy unknown at scale | Technical | Medium | Medium | Day 1–2 accuracy spot-test against real-style samples; text fallback as safety net | NextaSol | 🔴 Open — needs early validation |
+| R7 | Referral/audit record tampering undermines liability-protection value proposition | Security/Business | Low | Critical | Append-only, hash-chained audit log (THREAT_MODEL §1, §3) | NextaSol | 🟢 Mitigated by design |
+| R8 | Real child data accidentally used in hackathon/demo build | Security/Ethics | Low | Critical | Hard `ENVIRONMENT=synthetic_only` env gate, enforced at application layer not just UI | NextaSol | 🟢 Mitigated by design — verify at Definition of Done |
+| R9 | Single LLM provider dependency (Qwen via hackathon credits) | Technical/Delivery | Medium | Medium | Provider-agnostic wrapper + fallback provider (ADR-01) | NextaSol | 🟢 Mitigated by design |
+| R10 | DRAP medical-device classification risk if positioning drifts from "non-diagnostic" | Legal/Compliance | Low (Phase 1) / High (Track B commercial) | High | Maintain strict non-diagnostic framing + reasoning-trail transparency throughout | Ayesha/Sami + NextaSol | 🟡 Tracked, not Phase-1 blocking |
+| R11 | 6-day hackathon window vs. 13-item Phase 1 scope compression | Delivery | High | Medium | Tier-2 hackathon-cut scope defined separately from full Track B scope; Redis/model-tiering explicitly deferrable | NextaSol | 🟡 Managed — see ADR-01 follow-up note |
+| R12 | Interim IP/ownership note with Ayesha/Sami not yet written | Legal | Medium | Medium | Draft a one-paragraph interim note before any shared repo work begins | Akasha | 🔴 Open |
+| R13 | `signal_app` DB role can SELECT `audit_log` cross-institution — necessary because hash-chain append requires reading the prior entry's hash, but means the institution boundary on audit data currently rests entirely on app-layer correctness (no read endpoint exists yet in FEAT-01) | Security | Low | Medium | Accepted for Phase 1 (no read endpoint exists to exploit yet); planned fix is a dedicated audit-writer role (INSERT-only for the main app role) at FEAT-12, when `get_current_admin_staff` and the `GET /audit_log` endpoint are actually built | NextaSol | 🟡 Tracked, deferred to FEAT-12 by design |
+| R14 | ADR-06's literal count rule ("≥2 MODERATE same domain → HIGH") conflicts with the OME carve-out on a real test case (T6) — dataset expects MODERATE, literal rule computes HIGH | Correctness/Clinical | Medium | High | Do NOT implement a speculative fix. `grade()` must implement ADR-06's literal rule as written; T6 marked as documented known-divergence pending Ayesha/Sami clinical sign-off (ADR-06 Open Sub-Question, added 2026-08-31) | Ayesha/Sami (clinical judgment call, not engineering) | 🔴 Open — blocks full T6 pass, does not block FEAT-05 build |
+
+**Legend:** 🔴 Open/unaddressed · 🟡 Tracked/accepted, non-blocking · 🟢 Mitigated by design (verify via testing)

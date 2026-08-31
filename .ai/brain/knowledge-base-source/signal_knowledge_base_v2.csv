@@ -1,0 +1,95 @@
+citation_ref,entry_type,domain,age_min_months,age_max_months,description,severity,cross_check_domain,suggested_follow_up_question,source,phase_scope,provenance
+SL-M-001,milestone,Speech_Language,0,6,Coos,,,,NIDCD; ASHA,in scope,Added in validation
+SL-M-002,milestone,Speech_Language,0,6,Startles or reacts to loud sound,,Hearing,,NIDCD; ASHA; CDC 2-mo,in scope,Added in validation
+SL-M-003,milestone,Speech_Language,0,6,Different cries for different needs,,,,NIDCD; ASHA,in scope,Added in validation
+SL-M-004,milestone,Speech_Language,0,6,Smiles or quiets to a familiar voice,,,,CDC 2-mo/4-mo,in scope,Added in validation
+SL-M-005,milestone,Speech_Language,4,6,"Speech-like babble (pa, ba, mi) by 4–6 months",,,,NIDCD; ASHA,in scope,Added in validation
+SL-RF-001,red_flag,Speech_Language,0,6,No reaction to loud sound,HIGH,Hearing,"Does he react at all to a sudden loud sound, even without turning his head?",JCIH 2019; ASHA,in scope,Added in validation
+SL-RF-002,red_flag,Speech_Language,0,6,No social smile or engagement by 6 months,MODERATE,,,CDC 6-mo,in scope,Added in validation
+SL-M-006,milestone,Speech_Language,6,12,Canonical babbling (bababa) by ~7–9 months,,Hearing,Does he babble strings of sounds like 'ba-ba-ba' on his own?,CDC; NIDCD; ASHA,in scope,Added in validation
+SL-M-007,milestone,Speech_Language,9,12,Responds to own name by ~9–12 months,,Hearing,"Does he turn when you call his name, even from behind?",CDC 12-mo; ASHA,in scope,Added in validation
+SL-M-008,milestone,Speech_Language,6,12,"Uses gestures — points, waves — by 12 months",,,"Does he point or wave to communicate, even without words?",CDC 12-mo,in scope,Added in validation
+SL-M-009,milestone,Speech_Language,6,12,One to two meaningful words by ~12 months,,,,NIDCD; ASHA,in scope,Added in validation
+SL-M-010,milestone,Speech_Language,6,12,Understands 'no' and 'bye-bye',,,,NIDCD; ASHA,in scope,Added in validation
+SL-RF-003,red_flag,Speech_Language,12,12,No babbling by 12 months,HIGH,Hearing,,CDC 12-mo red flag,in scope,Added in validation
+SL-RF-004,red_flag,Speech_Language,12,12,"No gestures (pointing, waving) by 12 months",HIGH,,,CDC 12-mo red flag,in scope,Added in validation
+SL-RF-005,red_flag,Speech_Language,12,12,No response to own name by 12 months,HIGH,Hearing,"Does he respond when called from behind, out of sight?",CDC; ASHA,in scope,Added in validation
+SL-M-011,milestone,Speech_Language,15,18,Tries at least 1–2 words besides mama/dada by 15 months (CDC 75th percentile),,,,CDC 15-mo (75th pct),in scope,Ayesha original
+SL-M-012,milestone,Speech_Language,18,18,At least 3 words by 18 months (CDC 75th percentile),,,Roughly how many words does he use — even a rough guess?,CDC 18-mo (75th pct),in scope,Ayesha original — CORRECTED
+SL-M-013,milestone,Speech_Language,12,18,Follows a one-step direction accompanied by a gesture,,,,ASHA,in scope,Ayesha original
+SL-M-014,milestone,Speech_Language,12,18,Points to show interest,,,"Does he try to point or gesture to ask for things, even without words?",CDC; ASHA,in scope,Ayesha original
+SL-RF-006,red_flag,Speech_Language,16,16,No words by 16 months,HIGH,Hearing,,ASHA; late-talker literature,in scope,Ayesha original — CORRECTED
+SL-RF-007,red_flag,Speech_Language,12,18,No pointing or gesturing to communicate,HIGH,,,CDC 12-mo; ASHA,in scope,Ayesha original
+SL-RF-008,red_flag,Speech_Language,12,18,Regression — loss of previously acquired words or skills,HIGH,,Has he lost any words or skills he used to have?,CDC 'Learn the Signs. Act Early.',in scope,Added in validation
+SL-M-015,milestone,Speech_Language,18,18,"Vocabulary approaching ~50 words at ~18 months — this is an AVERAGE with a very wide normal range, not a cutoff",,,,MacArthur-Bates CDI norms (Fenson et al. 2007),in scope,Ayesha original — CORRECTED
+SL-M-016,milestone,Speech_Language,24,24,Roughly 200–300 words by 24 months,,,,MacArthur-Bates CDI norms,in scope,Added in validation
+SL-M-017,milestone,Speech_Language,18,24,Begins combining two words by ~24 months,,,"Does she put two words together, like 'more juice' or 'go outside'?",Rescorla; Paul; ASHA LLE,in scope,Ayesha original
+SL-M-018,milestone,Speech_Language,18,24,Follows simple commands without gestures,,,Does she understand simple instructions without you gesturing?,ASHA,in scope,Ayesha original
+SL-RF-009,red_flag,Speech_Language,24,24,No two-word phrases by 24 months,HIGH,,,Rescorla 1989; Paul 1991; ASHA LLE,in scope,Ayesha original — CORRECTED
+SL-RF-010,red_flag,Speech_Language,24,24,"Fewer than 50 words at 24 months — 'late talker' threshold; monitor, do not over-refer (roughly 70–80% resolve)",MODERATE,,,Rescorla 1989; Paul 1991; ASHA LLE,in scope,Ayesha original — CORRECTED
+SL-RF-011,red_flag,Speech_Language,18,24,Regression — loss of previously acquired skills,HIGH,,,CDC 'Learn the Signs. Act Early.',in scope,Added in validation
+SL-M-019,milestone,Speech_Language,24,36,Roughly 50–75% intelligible to unfamiliar listeners,,,,Coplan & Gleason 1988; Flipsen 2006 (parent-report based),in scope,Added in validation
+SL-M-020,milestone,Speech_Language,24,36,Uses 2–4 word sentences,,,"When she talks, does she use short sentences or mostly single words?",CDC 30-mo/3-yr; ASHA,in scope,Ayesha original
+SL-M-021,milestone,Speech_Language,24,36,Follows two-step directions,,,,CDC; ASHA,in scope,Added in validation
+SL-M-022,milestone,Speech_Language,30,30,Roughly 450 words by 30 months,,,,MacArthur-Bates CDI norms,in scope,Added in validation
+SL-RF-012,red_flag,Speech_Language,36,36,Speech not intelligible to a FAMILIAR caretaker by 3 years — note: difficulty being understood by unfamiliar staff at this age is within normal limits and is NOT this flag,HIGH,Hearing,,Coplan & Gleason; Flipsen; ASHA,in scope,Ayesha original — CORRECTED
+SL-RF-013,red_flag,Speech_Language,24,36,Still no two-word phrases,HIGH,Hearing,,Rescorla; Paul,in scope,Ayesha original
+SL-RF-014,red_flag,Speech_Language,24,36,"Only echoes speech, no spontaneous language",MODERATE,,,ASHA,in scope,Added in validation
+SL-M-023,milestone,Speech_Language,36,60,"Intelligible to strangers ~75% at age 3, ~100% by age 4 (parent-report norms; Hustad 2021 objective data places these ~1 year later)",,,,Coplan & Gleason 1988; Flipsen 2006; cf. Hustad et al. 2021 JSLHR,in scope,Ayesha original — CORRECTED
+SL-M-024,milestone,Speech_Language,48,60,Tells simple stories or recounts events by 4–5 years,,,"When she talks about her day, can she tell it in order — what happened first, next?",CDC 4-yr; ASHA,in scope,Ayesha original
+SL-M-025,milestone,Speech_Language,36,60,Asks questions,,,"Does she ask questions, like 'why' or 'what's that'?",CDC; ASHA,in scope,Ayesha original
+SL-M-026,milestone,Speech_Language,36,60,Uses multi-word sentences,,,,CDC; ASHA,in scope,Ayesha original
+SL-RF-015,red_flag,Speech_Language,48,60,Not understood by strangers at 4 years,HIGH,Hearing,,Flipsen; CDC 4-yr,in scope,Ayesha original
+SL-RF-016,red_flag,Speech_Language,36,36,Not using sentences at 3 years,HIGH,Hearing,,CDC 3-yr; ASHA,in scope,Added in validation
+SL-RF-017,red_flag,Speech_Language,36,60,Not understood by a familiar adult,HIGH,Hearing,,ASHA,in scope,Ayesha original
+SL-M-027,milestone,Speech_Language,60,72,Fully intelligible speech,,,,CDC 5-yr; ASHA,in scope,Added in validation
+SL-M-028,milestone,Speech_Language,60,72,Uses complex and compound sentences,,,,CDC 5-yr; NIDCD,in scope,Added in validation
+SL-M-029,milestone,Speech_Language,60,72,Tells a connected story or recounts her day in order,,,"Can she tell you about her day in order, what happened first and next?",CDC 5-yr; ASHA,in scope,Added in validation
+SL-M-030,milestone,Speech_Language,60,72,Answers 'why' and 'how' questions,,,,CDC 5-yr; ASHA,in scope,Added in validation
+SL-M-031,milestone,Speech_Language,60,72,Sustains a back-and-forth conversation,,,,ASHA,in scope,Added in validation
+SL-M-032,milestone,Speech_Language,60,72,Most speech sounds produced correctly,,,,ASHA,in scope,Added in validation
+SL-RF-018,red_flag,Speech_Language,60,72,Speech still hard to understand,HIGH,Hearing,,CDC 5-yr; ASHA,in scope,Added in validation
+SL-RF-019,red_flag,Speech_Language,60,72,Cannot produce sentences or tell a simple story,HIGH,,,CDC 5-yr; ASHA,in scope,Added in validation
+SL-RF-020,red_flag,Speech_Language,60,72,Marked word-finding or comprehension difficulty,MODERATE,,"When he can't find a word, does he substitute something vague like 'thing', or stop talking?",NIDCD; ASHA,in scope,Added in validation
+SL-RF-021,red_flag,Speech_Language,0,72,"Loss of previously acquired speech, language or social skills (regression) — always HIGH at any age",HIGH,,Has he lost any skills he used to have?,CDC 'Learn the Signs. Act Early.',in scope (any age),Added in validation
+SL-RF-022,red_flag,Speech_Language,0,72,Any caretaker concern about the child's speech or language,HIGH,Hearing,,JCIH 2019 (family concern → immediate referral),in scope (any age),Added in validation
+SL-M-033,milestone,Speech_Language,72,216,Follows multi-step spoken instructions,,,,ASHA,PHASE 2 (6+),Ayesha original
+SL-M-034,milestone,Speech_Language,72,216,Retells events in order,,,,ASHA,PHASE 2 (6+),Ayesha original
+SL-M-035,milestone,Speech_Language,72,216,Age-appropriate vocabulary for schoolwork,,,,ASHA,PHASE 2 (6+),Ayesha original
+SL-RF-023,red_flag,Speech_Language,72,216,Frequent word-finding difficulty,MODERATE,,,ASHA,PHASE 2 (6+),Ayesha original
+SL-RF-024,red_flag,Speech_Language,72,216,Trouble following multi-step instructions,MODERATE,,,ASHA,PHASE 2 (6+),Ayesha original
+SL-RF-025,red_flag,Speech_Language,72,216,Noticeably behind peers in classroom language use,MODERATE,,,CATALISE (Bishop et al. 2017),PHASE 2 (6+),Ayesha original
+SL-RF-026,red_flag,Speech_Language,72,216,Avoids talking in group settings,MODERATE,,,ASHA,PHASE 2 (6+),Ayesha original
+HEAR-M-001,milestone,Hearing,0,3,Startles to loud sound,,,,JCIH; ASHA; NIDCD,in scope,Ayesha original
+HEAR-M-002,milestone,Hearing,0,3,Quiets to or recognises caregiver's voice,,,,ASHA; NIDCD,in scope,Ayesha original
+HEAR-RF-001,red_flag,Hearing,0,3,No startle to loud sound,HIGH,,"Does he react at all to loud sounds, like a door slamming?",JCIH 2019; ASHA,in scope,Ayesha original — CORRECTED
+HEAR-M-003,milestone,Hearing,3,6,Turns eyes or head toward sound,,,,ASHA; NIDCD,in scope,Ayesha original
+HEAR-M-004,milestone,Hearing,3,6,Responds to changes in tone of voice,,,,ASHA; NIDCD,in scope,Ayesha original
+HEAR-M-005,milestone,Hearing,3,6,Notices sound-making toys,,,,ASHA; NIDCD,in scope,Ayesha original
+HEAR-RF-002,red_flag,Hearing,6,6,Not turning toward sound by 6 months,HIGH,,Does he turn or react when there's a sound behind him?,ASHA; NIDCD,in scope,Ayesha original — CORRECTED
+HEAR-M-006,milestone,Hearing,6,9,Turns toward sounds,,,,ASHA; NIDCD,in scope,Ayesha original
+HEAR-M-007,milestone,Hearing,6,9,Babbles,,Speech_Language,Does he babble sounds like 'ba-ba' on his own?,ASHA; NIDCD,in scope,Ayesha original
+HEAR-M-008,milestone,Hearing,6,9,Responds to changes in voice,,,,ASHA; NIDCD,in scope,Ayesha original
+HEAR-RF-003,red_flag,Hearing,6,9,"No babbling, or no response to voice",HIGH,Speech_Language,,ASHA; NIDCD,in scope,Ayesha original — CORRECTED
+HEAR-M-009,milestone,Hearing,9,12,Responds to own name,,Speech_Language,"Does he respond when called from behind, out of sight?",ASHA; CDC,in scope,Ayesha original
+HEAR-M-010,milestone,Hearing,9,12,Turns to both soft and loud sounds,,,,ASHA; CDC,in scope,Ayesha original
+HEAR-M-011,milestone,Hearing,9,12,Understands 'no',,,,ASHA; CDC,in scope,Ayesha original
+HEAR-RF-004,red_flag,Hearing,12,12,No response to name by 12 months,HIGH,Speech_Language,,ASHA; CDC 12-mo,in scope,Ayesha original — CORRECTED
+HEAR-RF-005,red_flag,Hearing,12,12,No babble by 12 months,HIGH,Speech_Language,,ASHA; CDC 12-mo,in scope,Ayesha original — CORRECTED
+HEAR-M-012,milestone,Hearing,12,36,Follows simple directions,,,,ASHA,in scope,Added in validation
+HEAR-M-013,milestone,Hearing,12,36,Points to named objects,,,,ASHA,in scope,Added in validation
+HEAR-RF-006,red_flag,Hearing,12,36,"Intermittent responsiveness — 'hears sometimes, not others' (suggests fluctuating conductive loss / OME)",MODERATE,,Does she seem to hear you fine some days and not others?,Hearing Health Fdn; NICE NG233 (OME),in scope,Added in validation
+HEAR-RF-007,red_flag,Hearing,12,36,Ear-pulling together with stalled speech development,MODERATE,Speech_Language,Has she had ear infections or earache before?,NICE CG60/NG233 (OME),in scope,Added in validation
+HEAR-RF-008,red_flag,Hearing,12,36,Delayed or absent speech — the single most important clue to possible hearing loss in a young child,HIGH,Speech_Language,Does she respond to sounds when she isn't looking at you?,Hearing Health Foundation,in scope,Added in validation
+HEAR-M-014,milestone,Hearing,36,72,Understands and holds a conversation,,,,ASHA,in scope,Added in validation
+HEAR-M-015,milestone,Hearing,36,72,Hears at normal volume,,,,ASHA,in scope,Added in validation
+HEAR-RF-009,red_flag,Hearing,36,72,"Says 'what?' or 'huh?' often — requires expressive speech, so minimum age 36 months",MODERATE,,,UPMC; Hearing Health Fdn,in scope,Ayesha original — CORRECTED
+HEAR-RF-010,red_flag,Hearing,36,72,"Sits very close to the TV or turns the volume up — requires self-directed media-seeking, so minimum age 36 months",MODERATE,,"Does she sit very close to the TV, or ask for it louder?",UPMC; Hearing Health Fdn,in scope,Ayesha original — CORRECTED
+HEAR-RF-011,red_flag,Hearing,36,72,Watches the speaker's mouth intently (lip-reading compensation),MODERATE,,"Does she watch your face very closely when you talk, more than other children?",Hearing Health Fdn; ASHA,in scope,Ayesha original — CORRECTED
+HEAR-RF-012,red_flag,Hearing,36,72,"Voice noticeably louder or quieter than peers — requires established voice control, so minimum age 36 months",MODERATE,,,UPMC; ASHA,in scope,Ayesha original — CORRECTED
+HEAR-RF-013,red_flag,Hearing,36,72,Does not respond when called,HIGH,Speech_Language,"Does she respond when you call her from behind, where she can't see you?",ASHA; JCIH,in scope,Ayesha original — CORRECTED
+HEAR-RF-014,red_flag,Hearing,0,72,Any caretaker concern about the child's hearing — immediate referral at any age,HIGH,,,JCIH 2019,in scope (any age),Added in validation
+HEAR-RF-015,red_flag,Hearing,0,72,Loss of previously acquired skills (regression),HIGH,Speech_Language,,JCIH 2019; CDC,in scope (any age),Added in validation
+HEAR-RF-016,red_flag,Hearing,0,72,Recurrent ear infections or ear pain (possible OME),MODERATE,,"Has she had ear infections before, that you know of?",NICE NG233; Patient.info,in scope (any age),Ayesha original — CORRECTED
+HEAR-RISK-01,risk_modifier,Hearing,0,72,"Family history of deafness, or parents are cousins (consanguinity) — raises the grade; relevant in Pakistan where consanguinity rates and congenital hearing loss are both elevated",MODIFIER,,Is there anyone else in the family with hearing problems? Are the parents related?,Naz et al. 2025; PMC4065008,in scope (any age),Added in validation
+HEAR-RISK-02,risk_modifier,Hearing,0,72,'Passed newborn hearing screening' must NOT lower a current hearing concern — 20–30% of childhood hearing loss is late-onset or progressive,MODIFIER,,,JCIH 2019; Doerfer et al. 2020,in scope (any age),Added in validation

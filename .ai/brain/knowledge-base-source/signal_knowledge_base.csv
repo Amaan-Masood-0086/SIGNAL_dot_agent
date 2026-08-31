@@ -1,0 +1,60 @@
+id,entry_type,domain,age_min_months,age_max_months,description,severity_if_absent,suggested_follow_up_question,source,phase_1_scope
+DLD-M-001,milestone,DLD,12,18,Says a few single words,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-002,milestone,DLD,12,18,Points to ask for things,,"Does he try to point or use gestures to ask for things, even without words?",Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-003,milestone,DLD,12,18,Responds to own name,,Does he respond when you call his name?,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-004,milestone,DLD,18,24,Uses 50+ words,,"Can you tell me roughly how many words she uses, even a rough guess?",Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-005,milestone,DLD,18,24,Starts combining two words (e.g. 'more milk'),,"Does she put two words together, like 'more juice' or 'go outside'?",Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-006,milestone,DLD,18,24,Follows simple one-step directions,,"If you ask her to do something simple, like 'bring me the cup', does she understand and do it?",Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-007,milestone,DLD,24,36,Uses short sentences,,"When she talks, does she use full sentences, or mostly single words and short phrases?",Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-008,milestone,DLD,24,36,Asks simple questions,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-009,milestone,DLD,24,36,Understood by familiar adults most of the time,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-010,milestone,DLD,36,60,Tells simple stories,,"When she talks about her day, can she tell it in order, what happened first, next, and so on?",Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-011,milestone,DLD,36,60,Asks 'why' and 'how' questions,,"Does she ask questions, like 'why' or 'what's that'?",Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-012,milestone,DLD,36,60,Understood by strangers most of the time,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-M-013,milestone,DLD,72,216,Follows multi-step spoken instructions,,"Does he do okay with a single instruction, like 'go get your bag'?",Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),PHASE 2 (6+)
+DLD-M-014,milestone,DLD,72,216,Retells events in order,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),PHASE 2 (6+)
+DLD-M-015,milestone,DLD,72,216,Age-appropriate vocabulary for schoolwork,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),PHASE 2 (6+)
+DLD-RF-001,red_flag,DLD,12,18,No single words yet,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-002,red_flag,DLD,12,18,Doesn't point or gesture to communicate,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-003,red_flag,DLD,12,18,Doesn't respond to own name,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-004,red_flag,DLD,18,24,Very few words,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-005,red_flag,DLD,18,24,No word combinations,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-006,red_flag,DLD,18,24,Doesn't follow simple spoken directions without gestures,,Does she understand simple instructions without you gesturing?,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-007,red_flag,DLD,24,36,Speech mostly unintelligible even to familiar caretakers,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-008,red_flag,DLD,24,36,Not forming short sentences,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-009,red_flag,DLD,24,36,Very limited vocabulary growth,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-010,red_flag,DLD,36,60,Difficulty being understood by unfamiliar adults,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-011,red_flag,DLD,36,60,Struggles to answer simple questions,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-012,red_flag,DLD,36,60,"Very short, simplified sentences for age",,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),in scope
+DLD-RF-013,red_flag,DLD,72,216,Frequent word-finding difficulty,,"When he can't find a word, does he substitute a vague word like 'thing', or stop talking altogether?",Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),PHASE 2 (6+)
+DLD-RF-014,red_flag,DLD,72,216,Trouble following multi-step instructions,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),PHASE 2 (6+)
+DLD-RF-015,red_flag,DLD,72,216,Noticeably behind peers in classroom language use,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),PHASE 2 (6+)
+DLD-RF-016,red_flag,DLD,72,216,Avoids talking in group settings,,,Ayesha KB — ASHA/NIDCD milestones; CATALISE consensus (Bishop et al. 2016/17),PHASE 2 (6+)
+HEAR-M-001,milestone,Hearing,0,3,Startles at sudden loud noises,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-M-002,milestone,Hearing,0,3,Recognizes caregiver's voice,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-M-003,milestone,Hearing,0,3,Calms to a familiar voice,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-M-004,milestone,Hearing,3,6,Turns head toward interesting sounds,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-M-005,milestone,Hearing,3,6,Coos and vocalizes,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-M-006,milestone,Hearing,3,6,Reacts to changes in tone of voice,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-M-007,milestone,Hearing,6,9,Responds to own name,,"Does he respond when called from behind, out of sight?",Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-M-008,milestone,Hearing,6,9,"Babbles (ba-ba, ma-ma)",,Does he babble sounds like 'ba-ba' or 'ma-ma' on his own?,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-M-009,milestone,Hearing,6,9,Enjoys sound-making toys and games,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-M-010,milestone,Hearing,9,12,"Understands simple words ('no', 'bye-bye')",,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-M-011,milestone,Hearing,9,12,Imitates sounds,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-M-012,milestone,Hearing,9,12,Points to ask for things,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-001,red_flag,Hearing,0,3,No startle response to loud sounds,,"Does he react at all to loud sounds, like a door slamming, even without turning his head?",Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-002,red_flag,Hearing,0,3,Doesn't seem to notice or calm to voices,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-003,red_flag,Hearing,3,6,Doesn't turn toward sound source,,"Does he turn or react when there's a loud sound behind him, even if he's not looking at you?",Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-004,red_flag,Hearing,3,6,Little to no vocal play,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-005,red_flag,Hearing,3,6,"Watches faces very intently, as if relying on visual cues instead of sound",,"Does he watch your face very closely when you're talking to him, more than other children his age?",Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-006,red_flag,Hearing,6,9,No response to name called from behind or out of sight,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-007,red_flag,Hearing,6,9,Little or no babbling,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-008,red_flag,Hearing,6,9,Indifferent to sound-making toys,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-009,red_flag,Hearing,9,12,Doesn't understand simple familiar words,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-010,red_flag,Hearing,9,12,Doesn't attempt to imitate sounds,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-011,red_flag,Hearing,9,12,Relies heavily on visual and gestural cues,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope
+HEAR-RF-012,red_flag,Hearing,0,72,Frequently pulls or points at ears,,"Has she had ear infections before, that you know of?",Ayesha KB — ASHA; Hearing Health Foundation,in scope (any age)
+HEAR-RF-013,red_flag,Hearing,0,72,Says 'what?' often,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope (any age)
+HEAR-RF-014,red_flag,Hearing,0,72,"Sits very close to sound sources (TV, speaker)",,Does she sit very close to the TV or speak louder than the other children?,Ayesha KB — ASHA; Hearing Health Foundation,in scope (any age)
+HEAR-RF-015,red_flag,Hearing,0,72,Noticeably louder or quieter voice than peers,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope (any age)
+HEAR-RF-016,red_flag,Hearing,0,72,History of frequent ear infections,,,Ayesha KB — ASHA; Hearing Health Foundation,in scope (any age)

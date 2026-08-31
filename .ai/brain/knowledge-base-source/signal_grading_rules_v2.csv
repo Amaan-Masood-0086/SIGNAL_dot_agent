@@ -1,0 +1,13 @@
+grade,trigger_rule,action,notes
+HIGH,"Any ONE confirmed HIGH-severity red flag, OR two or more confirmed MODERATE red flags within the same domain",Urgent clinician referral,Examples of always-HIGH: any caretaker hearing/speech concern; regression; no babbling by 12 mo; no words by 16 mo; no two-word phrases by 24 mo; no response to sound
+MODERATE,"One confirmed MODERATE red flag, OR a milestone missed at the 75th-percentile threshold plus one supporting observation, OR persistent caretaker worry not meeting a HIGH flag",Routine referral / short-interval recheck,"OME-pattern findings sit here — moderate, but still route, because the cause is treatable"
+LOW — monitor & recheck,"A single milestone at or just past the edge of normal WITH protective indicators present (e.g. good gesture use, responds to name)",Recheck in ~3 months,Never 'no concern and discharge' for a borderline case — mirrors the ASQ-3 monitoring zone
+INSUFFICIENT_INFORMATION,"Caretaker cannot answer the key discriminating items, or has known the child too briefly to judge",Cannot grade — re-administer when a caretaker with sustained daily contact is available,Never default to LOW when information is missing
+RULE: grade = maximum of,(highest single-flag severity) and (count-based rule),,Red flags outweigh missed milestones — a red flag is something that should never be present; a missed milestone is something not yet present
+RULE: auditability,Every grade must enumerate the exact citation_refs that produced it,,This is the regulatory requirement (ADR-03) — a clinician must be able to independently check the basis
+RULE: estimated age,Evaluate milestones against the YOUNGER bound of the estimated range before flagging a delay,,Conservative against over-referral
+RULE: estimated age,Widen the uncertainty band — a borderline delay under age uncertainty grades DOWN to monitor,,"But age-independent red flags (regression, no response to sound, caretaker concern) grade UNCHANGED"
+RULE: estimated age,Surface 'age uncertain' explicitly in every output,,So the reviewing clinician can weight it
+RULE: hearing first,"Whenever speech/language is limited, check hearing first or alongside",,Hearing loss produces the same surface symptom as language delay (ADR-05)
+RULE: no diagnosis,Never output a diagnostic label such as 'DLD',,"Name the observation ('expressive language below expectation for age'), grade urgency, route to clinician"
+RULE: safeguarding,Any possible safeguarding signal routes OUT of developmental grading entirely,,"Low escalation threshold — a single signal escalates, because the cost of a miss is severe"

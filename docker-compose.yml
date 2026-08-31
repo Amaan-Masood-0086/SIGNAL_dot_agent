@@ -1,0 +1,23 @@
+# SIGNAL local development infrastructure.
+# The migration creates the unprivileged `signal_app` role; the app connects
+# as that role so Postgres RLS applies. The superuser account below is for
+# migrations/administration only.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: signal
+      POSTGRES_PASSWORD: signal_dev_only
+      POSTGRES_DB: signal_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - signal_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U signal -d signal_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  signal_pgdata:

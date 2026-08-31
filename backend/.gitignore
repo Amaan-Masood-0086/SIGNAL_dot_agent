@@ -1,0 +1,6 @@
+# SIGNAL backend — never commit secrets or local state (MUST-NOT #7).
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/

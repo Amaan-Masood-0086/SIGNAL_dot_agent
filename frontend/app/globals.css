@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* SIGNAL design tokens — "clinical growth-chart record": calm pine green
+   on cool paper, warm amber for estimated-age caveats. Light-only until a
+   real theme system is designed (a dark body previously leaked white text
+   into light inputs). */
+:root {
+  --paper: #f5f7f6;
+  --surface: #ffffff;
+  --ink: #152825;
+  --ink-soft: #52655f;
+  --pine: #175e54;
+  --pine-deep: #0c423b;
+  --moss: #e4efea;
+  --line: #dbe5e0;
+  --amber: #965700;
+  --amber-soft: #fcf1df;
+  --red: #b3261e;
+  --red-soft: #fcebe9;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-pine: var(--pine);
+  --color-pine-deep: var(--pine-deep);
+  --color-moss: var(--moss);
+  --color-line: var(--line);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-red: var(--red);
+  --color-red-soft: var(--red-soft);
+  --font-display: var(--font-display-face);
+  --font-sans: var(--font-body-face);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Honor reduced motion across the app's few transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

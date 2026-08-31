@@ -1,0 +1,12 @@
+# SIGNAL — root ignores. Secrets live ONLY in environment variables
+# (backend/.env is ignored by backend/.gitignore; never commit keys).
+
+# Local verification screenshots (dev artifacts)
+/*.png
+
+# OS/editor noise
+Thumbs.db
+.DS_Store
+
+# Tooling caches
+.qoder/
