@@ -1,6 +1,6 @@
 # SIGNAL — Architecture Diagram (FEAT-13 deliverable)
 
-**Date:** 2026-08-31 · Phase 1 as-built (FEAT-01 → FEAT-12 + RBAC/Admin Panel)
+**Date:** 2026-09-01 · Phase 1 as-built (FEAT-01 → FEAT-12 + RBAC/Admin Panel + ADR-10 admin console)
 
 ## System overview
 
@@ -19,7 +19,7 @@ flowchart TB
 
     subgraph Backend["FastAPI (port 8002) — direct multi-call pipeline, NOT LangChain"]
         DEPS["Auth chain: JWT RS256 → verified staff →\nrequire_active_staff / get_current_admin_staff (system-level)"]
-        EP["Endpoints: sessions · reasoning · flags · referrals\nstt · usage · audit_log · admin/*"]
+        EP["Endpoints: sessions · reasoning · flags · referrals\nstt · usage · audit_log · admin/* (staff, children oversight,\ncredentials ADR-10, providers, usage)"]
         subgraph Agents["Three-agent pipeline (FEAT-05)"]
             OA["Observation Agent\n(cheap tier — extraction only,\ninput fenced as DATA)"]
             RA["Risk Reasoning Agent\n(strong tier — grounded,\nadaptive, max_turns=5)"]
@@ -93,6 +93,6 @@ sequenceDiagram
 | Tenant isolation | JWT-signed `institution_id` claim + app-layer scoping on EVERY endpoint + Postgres RLS (ENABLE+FORCE, fail-closed) for the unprivileged `signal_app` role |
 | Admin (system-level) | `get_current_admin_staff` — DB row is the privilege authority; cross-institution ONLY on marked admin endpoints |
 | Tamper-evidence | hash-chained append-only `audit_log` (UPDATE/DELETE revoked at DB level) + `/audit_log/integrity` |
-| Secrets | env-var only (ADR-09); no key storage surface anywhere |
+| Secrets | env-var only (ADR-09) — superseded for provider keys by ADR-10: Fernet-encrypted `provider_credentials`, write-only API, required `CREDENTIAL_ENCRYPTION_KEY`, DB→env precedence; master-key rotation = Track B |
 | Grounding | citations validated server-side against the injected knowledge universe; `grade()` deterministic (ADR-06) |
 | Cost/DoS | rate limits (30/min capture+reasoning, 5/5min provider tests) + `usage_log` visibility + max_turns=5 |

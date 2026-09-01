@@ -50,3 +50,14 @@ Both cases must pass through the full pipeline (not just the FEAT-04 retrieval l
 ## 5. Test Data
 
 Blocked on PROJECT_BRIEF Open Item #4 (5–10 synthetic caretaker conversations from Ayesha/Sami). Until received, use minimal internally-authored synthetic fixtures covering: a clear DLD signal, a clear Hearing signal, an ambiguous/insufficient-information case, and one abuse/neglect-pattern case for the safeguarding-separation test.
+
+## 6. Admin Console & Credentials Tests (added 2026-09-01 — ADR-10 + admin console)
+
+Implemented in `backend/tests/test_credentials.py` and `test_admin_console.py`:
+
+- **Write-only enforcement** — sentinel value asserted absent from every response across success/failure/error paths; `encrypted_value` never part of the status query (`load_only` display columns only).
+- **Encryption round-trip** — DB column ≠ plaintext; service resolves it only at provider construction; undecryptable token degrades to env fallback.
+- **Audit grep** — raw value (and even the masked suffix) absent from every audit row.
+- **Precedence** — active DB row beats env for key AND model; env used when no active row; deactivate falls back to env.
+- **Guards** — caretaker 403 on all admin surfaces incl. children oversight roster; PUT rate-limited 5/5min; unknown provider 404.
+- **Regression** — env-only setups unchanged (FEAT-03/FEAT-05 paths); suite-wide 360 tests vs real PostgreSQL.

@@ -32,6 +32,20 @@
 | Read `audit_log` | ❌ | ❌ | ✅ (system-level only) |
 | Cross-institution data access | ❌ (hard blocked, IDOR-tested) | ❌ | N/A |
 
+### 2026-09-01 addendum — Admin console (built; supersedes parts of the matrix above)
+
+The system-level admin now has a real console (`/dashboard/admin`, API `/api/v1/admin/*`), delivered with the RBAC/Admin-Panel and ADR-10 tickets. Matrix updates:
+
+| Resource / Action | NextaSol/Dev Admin |
+|---|---|
+| Staff management (list all institutions, promote/demote, soft deactivate) | ✅ (audit-logged; self-demotion/self-deactivation blocked) |
+| Children oversight roster (read-only, cross-institution) | ✅ — **owner-requested RBAC extension** (Akasha, 2026-09-01). Caretaker-facing surfaces remain strictly institution-scoped; the extension exists ONLY in the admin console. |
+| Provider credentials (ADR-10, supersedes ADR-09) | ✅ write-only: PUT stores a Fernet-encrypted key under required `CREDENTIAL_ENCRYPTION_KEY`; responses carry only `masked_suffix`/`updated_at`/`model_name`; DELETE is soft (env fallback). Precedence: active DB row → env var. |
+| Usage breakdown (staff / institution) | ✅ |
+| Provider status + test-connection | ✅ (honours the same precedence; reports success/failure only) |
+
+**New Information-Disclosure consideration (credentials at rest):** ADR-10 intentionally moves from ADR-09's "nothing to steal" to encrypted-at-rest storage. Mitigations in place: Fernet encryption, write-only API contract (encrypted column never selected for output), admin-only + rate-limited writes, audit trail without values, soft-delete only. Residual risks flagged for Track B (see PROGRESS.md): master-key rotation procedure undocumented, key shares the `.env` blast radius with JWT keys (KMS/Vault migration would shrink it), no MFA/second-admin approval on writes.
+
 **Note:** the safeguarding-escalation access model is deliberately left conservative (nobody has full read access yet) because the downstream mandatory-reporting duty is undefined (PROJECT_BRIEF Open Item #6). Do not widen this access without that decision being made first.
 
 ## 3. Why Tamper-Evidence Is a Product Requirement, Not Just Hardening

@@ -71,4 +71,12 @@
 
 ---
 
+## Delivered outside the original 13-ticket sequence (owner tickets)
+
+- **RBAC + Admin Panel** (2026-08-31, early FEAT-12 slice): `get_current_admin_staff` (DB row = privilege authority), staff management (soft delete, audit-logged, self-lockout rails), TRD §4 `GET /audit_log` viewer + `/integrity`, provider status cards + test-connection (ADR-09), `usage_log` ledger + my/all usage views, `seed_admin.py` bootstrap. Migration 0003.
+- **ADR-10 admin-UI-editable provider credentials** (2026-09-01, supersedes ADR-09): `provider_credentials` table (Fernet at rest under required `CREDENTIAL_ENCRYPTION_KEY`), write-only API, DB→env precedence wired into STT + LLM resolution, migration 0004.
+- **Admin console UI** (2026-09-01, owner request): tabbed `/dashboard/admin` — providers (+model name, migration 0005), cross-institution children oversight (documented RBAC extension), staff management, audit log + chain badge, usage. Caretaker surfaces unchanged.
+
+---
+
 **Explicitly not ticketed for Phase 1** (per PROJECT_BRIEF §4 out-of-scope): photo input, institution dashboard, donor/compliance reporting feed, in-the-moment guidance activity, DSED/autism/ADHD/vision domains, ages 6–18, multi-tenant SaaS, offline mode. Do not create tickets for these without an explicit scope-change decision from Akasha.
