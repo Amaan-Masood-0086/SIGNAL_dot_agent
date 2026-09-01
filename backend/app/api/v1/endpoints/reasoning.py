@@ -86,11 +86,11 @@ def get_reasoning_provider(
     does synthetic_only fall back to the deterministic reasoner."""
     if db is not None:
         try:
-            stored = CredentialService(db, settings).resolve("llm")
+            stored, stored_model = CredentialService(db, settings).resolve_with_model("llm")
         except CredentialConfigError:
-            stored = None
+            stored, stored_model = None, None
         if stored:
-            return build_llm_provider(settings, api_key=stored)
+            return build_llm_provider(settings, api_key=stored, model=stored_model)
     provider = provider_from_settings(settings)
     if provider is not None:
         return provider

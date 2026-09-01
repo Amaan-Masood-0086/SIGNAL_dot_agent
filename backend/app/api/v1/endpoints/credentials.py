@@ -46,6 +46,7 @@ def _status_read(provider: str, row) -> CredentialStatusRead:
         is_active=bool(row.is_active) if row else False,
         masked_suffix=row.masked_suffix if row else None,
         updated_at=row.updated_at if row else None,
+        model_name=row.model_name if row else None,
     )
 
 
@@ -67,7 +68,10 @@ def store_credential(
     service = _service(db, settings)
     try:
         row = service.store(
-            provider=provider, value=payload.value, staff_id=admin.staff_id
+            provider=provider,
+            value=payload.value,
+            staff_id=admin.staff_id,
+            model_name=payload.model,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))

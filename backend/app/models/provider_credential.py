@@ -38,3 +38,6 @@ class ProviderCredential(IdMixin, TimestampMixin, Base):
     created_by_staff_id: Mapped[uuid.UUID | None] = mapped_column(
         UuidType, nullable=True
     )
+    # Non-secret provider setting (e.g. LLM model name) — plaintext on
+    # purpose, displayable in the admin UI. The KEY stays encrypted.
+    model_name: Mapped[str | None] = mapped_column(String(120), nullable=True)

@@ -218,7 +218,9 @@ def test_get_lists_status_without_any_value_material(
     # Only the documented fields exist — the encrypted column is not even
     # selected by the query.
     for item in resp.json()["data"]["providers"]:
-        assert set(item.keys()) == {"provider", "is_active", "masked_suffix", "updated_at"}
+        assert set(item.keys()) == {
+            "provider", "is_active", "masked_suffix", "updated_at", "model_name",
+        }
     assert SENTINEL not in resp.text
 
 
@@ -244,8 +246,9 @@ def test_stored_column_is_encrypted_but_resolvable(
     assert row.encrypted_value != SENTINEL
     assert SENTINEL not in row.encrypted_value
     # …but the service decrypts it at the point of provider construction.
-    assert CredentialService(db_session, settings).resolve("llm") == SENTINEL
-    assert CredentialService(db_session, settings).resolve("stt") is None
+    key, _model = CredentialService(db_session, settings).resolve_with_model("llm")
+    assert key == SENTINEL
+    assert CredentialService(db_session, settings).resolve_with_model("stt")[0] is None
 
 
 # ── Audit log NEVER contains the value (grep-based) ─────────────────────────

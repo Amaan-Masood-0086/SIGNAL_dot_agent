@@ -101,6 +101,9 @@ class CredentialWrite(BaseModel):
     value: Annotated[
         str, StringConstraints(min_length=1, max_length=2000, strip_whitespace=True)
     ]
+    # Non-secret provider setting (LLM model name). Plaintext on purpose;
+    # the KEY above is the only encrypted field.
+    model: str | None = Field(default=None, max_length=120)
 
 
 class CredentialStatusRead(BaseModel):
@@ -111,6 +114,29 @@ class CredentialStatusRead(BaseModel):
     is_active: bool
     masked_suffix: str | None = None
     updated_at: datetime.datetime | None = None
+    model_name: str | None = None
+
+
+class AdminChildRead(BaseModel):
+    """Cross-institution child row for the admin console (owner-requested
+    oversight view, 2026-09-01). Read-only; no clinical detail beyond what
+    the roster shows."""
+
+    id: uuid.UUID
+    name: str
+    institution_id: uuid.UUID
+    institution_name: str
+    dob_confirmed: bool
+    dob: datetime.date | None = None
+    estimated_age_range: str | None = None
+    intake_date: datetime.date
+
+
+class AdminChildPage(BaseModel):
+    items: list[AdminChildRead]
+    total: int
+    page: int = Field(ge=1)
+    page_size: int = Field(ge=1, le=100)
 
 
 class UsageTotals(BaseModel):

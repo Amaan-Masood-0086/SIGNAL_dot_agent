@@ -60,7 +60,7 @@ def get_stt_provider(
     runs exactly as before."""
     if db is not None:
         try:
-            stored = CredentialService(db, settings).resolve("stt")
+            stored, _model = CredentialService(db, settings).resolve_with_model("stt")
         except CredentialConfigError:
             stored = None
         if stored and settings.AZURE_SPEECH_REGION:

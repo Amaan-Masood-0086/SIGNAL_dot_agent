@@ -24,11 +24,14 @@ from app.api.deps import CurrentStaff, get_current_admin_staff, get_db
 from app.core.config import Settings, get_settings
 from app.core.envelope import envelope
 from app.core.rate_limit import FixedWindowRateLimiter
+from app.models.child import Child
 from app.models.institution import Institution
 from app.models.staff import STAFF_ROLES, Staff
 from app.models.usage_log import UsageLog
 from app.schemas.admin import (
     AllUsage,
+    AdminChildPage,
+    AdminChildRead,
     ProviderStatus,
     ProviderTestResult,
     StaffActiveUpdate,
@@ -170,6 +173,46 @@ def set_staff_active(
     return envelope(StaffRead.model_validate(staff).model_dump(mode="json"))
 
 
+# ── Children oversight (owner-requested 2026-09-01) ─────────────────────
+
+
+@router.get("/children")
+def list_all_children(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    admin: CurrentStaff = Depends(get_current_admin_staff),
+    db: Session = Depends(get_db),
+):
+    """CROSS-INSTITUTION BYPASS (justified, owner-requested): system-level
+    oversight roster of every child across institutions, read-only. RBAC
+    matrix extension: admin sees children data in the admin console ONLY —
+    caretaker-facing surfaces remain strictly institution-scoped."""
+    total = db.execute(select(func.count(Child.id))).scalar_one()
+    rows = db.execute(
+        select(Child, Institution.name)
+        .join(Institution, Institution.id == Child.institution_id)
+        .order_by(Child.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    ).all()
+
+    items = [
+        AdminChildRead(
+            id=child.id,
+            name=child.name,
+            institution_id=child.institution_id,
+            institution_name=inst_name,
+            dob_confirmed=child.dob_confirmed,
+            dob=child.dob,
+            estimated_age_range=child.estimated_age_range,
+            intake_date=child.intake_date,
+        )
+        for child, inst_name in rows
+    ]
+    result = AdminChildPage(items=items, total=total, page=page, page_size=page_size)
+    return envelope(result.model_dump(mode="json"))
+
+
 # ── Provider status (ADR-09 controls + ADR-10 stored credentials) ──────
 
 
@@ -181,8 +224,10 @@ def _credential_sources(db: Session, settings: Settings) -> tuple[str | None, st
         service = CredentialService(db, settings)
     except CredentialConfigError:
         return None, None
-    stt_source = "ui" if service.resolve("stt") else None
-    llm_source = "ui" if service.resolve("llm") else None
+    stt_key, _ = service.resolve_with_model("stt")
+    llm_key, _ = service.resolve_with_model("llm")
+    stt_source = "ui" if stt_key else None
+    llm_source = "ui" if llm_key else None
     return stt_source, llm_source
 
 
@@ -225,7 +270,7 @@ def provider_test_connection(
         )
 
     try:
-        stored = CredentialService(db, settings).resolve(provider)
+        stored, _model = CredentialService(db, settings).resolve_with_model(provider)
     except CredentialConfigError:
         stored = None
 

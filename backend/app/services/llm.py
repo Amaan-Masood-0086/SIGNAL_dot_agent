@@ -77,6 +77,11 @@ class OpenAICompatibleLLM:
         have no field for it (ADR-09/10)."""
         return self._api_key
 
+    @property
+    def model(self) -> str:
+        """In-process access only (precedence assertions in tests)."""
+        return self._model
+
     def complete(self, *, agent: str, tier: str, system: str, user: str) -> str:
         try:
             response = httpx.post(
@@ -121,13 +126,16 @@ class OpenAICompatibleLLM:
         return cost.quantize(Decimal("0.000001"))
 
 
-def build_llm_provider(settings: Settings, *, api_key: str) -> "LLMProvider":
+def build_llm_provider(
+    settings: Settings, *, api_key: str, model: str | None = None
+) -> "LLMProvider":
     """Construct the (optionally resilient) provider around ONE key. Shared
     by the env path and the ADR-10 stored-credential path so both get the
-    identical cost model + fallback wiring."""
+    identical cost model + fallback wiring. `model` overrides the env
+    LLM_MODEL (stored model_name precedence, admin console)."""
     primary = OpenAICompatibleLLM(
         api_key=api_key,
-        model=settings.LLM_MODEL or "gpt-4o-mini",
+        model=model or settings.LLM_MODEL or "gpt-4o-mini",
         base_url=settings.LLM_BASE_URL or DEFAULT_LLM_BASE_URL,
         cost_per_million_input=settings.LLM_COST_PER_MILLION_INPUT,
         cost_per_million_output=settings.LLM_COST_PER_MILLION_OUTPUT,

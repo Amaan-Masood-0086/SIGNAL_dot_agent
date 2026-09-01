@@ -42,7 +42,12 @@ class CredentialService:
     # ── write path ─────────────────────────────────────────────────────────
 
     def store(
-        self, *, provider: str, value: str, staff_id: uuid.UUID | None
+        self,
+        *,
+        provider: str,
+        value: str,
+        staff_id: uuid.UUID | None,
+        model_name: str | None = None,
     ) -> ProviderCredential:
         if provider not in CREDENTIAL_PROVIDERS:
             raise ValueError(f"unknown provider {provider!r}")
@@ -67,6 +72,7 @@ class CredentialService:
             masked_suffix=masked_suffix,
             is_active=True,
             created_by_staff_id=staff_id,
+            model_name=(model_name or "").strip() or None,
         )
         self._session.add(row)
         self._session.flush()
@@ -86,10 +92,9 @@ class CredentialService:
 
     # ── read path (decryption happens ONLY here) ──────────────────────────
 
-    def resolve(self, provider: str) -> str | None:
-        """The active credential's plaintext, or None. A token that cannot
-        be decrypted (e.g. master key regenerated) degrades to None so the
-        caller falls back to the env var instead of crashing."""
+    def resolve_with_model(self, provider: str) -> tuple[str | None, str | None]:
+        """(plaintext key, model_name) for the active row — decryption and
+        the only place the plaintext exists transiently."""
         row = self._session.execute(
             select(ProviderCredential)
             .where(ProviderCredential.provider == provider)
@@ -98,11 +103,11 @@ class CredentialService:
             .limit(1)
         ).scalar_one_or_none()
         if row is None:
-            return None
+            return None, None
         try:
-            return self._fernet.decrypt(row.encrypted_value.encode()).decode()
+            return self._fernet.decrypt(row.encrypted_value.encode()).decode(), row.model_name
         except (InvalidToken, ValueError):
-            return None
+            return None, row.model_name
 
     def status_rows(self) -> dict[str, ProviderCredential | None]:
         """Latest row per provider for the status list. ADR-10 write-only
@@ -118,6 +123,7 @@ class CredentialService:
                     ProviderCredential.is_active,
                     ProviderCredential.masked_suffix,
                     ProviderCredential.updated_at,
+                    ProviderCredential.model_name,
                 )
             )
             .order_by(ProviderCredential.created_at.desc())
