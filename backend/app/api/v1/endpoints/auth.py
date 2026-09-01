@@ -24,6 +24,7 @@ from app.api.deps import CurrentStaff, get_current_verified_staff, get_db
 from app.core.config import Settings, get_settings
 from app.core.envelope import envelope
 from app.core.security import create_access_token
+from app.models.institution import Institution
 from app.models.staff import Staff
 from app.schemas.auth import TokenRequest
 
@@ -82,11 +83,33 @@ def issue_stub_token(
 
 
 @router.get("/me")
-def me(current_staff: CurrentStaff = Depends(get_current_verified_staff)):
+def me(
+    current_staff: CurrentStaff = Depends(get_current_verified_staff),
+    db: Session = Depends(get_db),
+):
+    """Identity for the signed-in caller.
+
+    The JWT claims are the authority for `role` on caretaker surfaces; the
+    staff row is read only to decorate the UI (own email, institution name)
+    and to expose the DB-authoritative role so the frontend can render the
+    same privilege the admin dependency would actually grant. Returning the
+    caller's OWN email is not a PII leak — it is their identity; no other
+    subject's data is exposed here, and nothing is logged.
+    """
+    staff = db.get(Staff, current_staff.staff_id)
+    institution = db.get(Institution, current_staff.institution_id)
     return envelope(
         {
             "staff_id": str(current_staff.staff_id),
             "institution_id": str(current_staff.institution_id),
             "role": current_staff.role,
+            "email": staff.email if staff is not None else None,
+            "institution_name": institution.name if institution is not None else None,
+            # DB-authoritative privilege: `get_current_admin_staff` refuses a
+            # JWT "admin" claim over a caretaker/deactivated row, so the UI
+            # must gate on the row too or it would offer dead links.
+            "is_admin": bool(
+                staff is not None and staff.is_active and staff.role == "admin"
+            ),
         }
     )

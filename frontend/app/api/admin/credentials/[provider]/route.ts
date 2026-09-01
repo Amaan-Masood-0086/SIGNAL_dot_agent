@@ -1,10 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { z } from "zod";
 
 import { SESSION_COOKIE } from "@/src/lib/auth/constants";
 import { isSameOrigin } from "@/src/lib/auth/csrf";
 import { ApiError } from "@/src/lib/api/client";
 import { deleteCredential, saveCredential } from "@/src/lib/api/admin";
-import { z } from "zod";
 
 interface Params {
   provider: string;
@@ -12,6 +12,10 @@ interface Params {
 
 const bodySchema = z.object({
   value: z.string().trim().min(1).max(2000),
+  // Optional model override (migration 0005). Bounded + trimmed here so an
+  // oversized or blank string never reaches the backend; empty means
+  // "no override" and is normalised to null.
+  model: z.string().trim().max(120).nullish(),
 });
 
 // ADR-10 write-only contract: the value goes IN, and the response carries
@@ -44,7 +48,12 @@ export async function PUT(
 
   const { provider } = await params;
   try {
-    const result = await saveCredential(token, provider, parsed.data.value);
+    const result = await saveCredential(
+      token,
+      provider,
+      parsed.data.value,
+      parsed.data.model?.trim() ? parsed.data.model.trim() : null,
+    );
     return NextResponse.json({ result });
   } catch (error) {
     if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {

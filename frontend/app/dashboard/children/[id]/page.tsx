@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { PageHeader } from "@/src/components/layout/PageHeader";
 import { Badge } from "@/src/components/ui/Badge";
 import { Button } from "@/src/components/ui/Button";
 import { Card, CardBody, CardTitle } from "@/src/components/ui/Card";
@@ -74,21 +75,24 @@ export default async function ChildProfilePage({
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl p-6 sm:p-8">
+    <main className="mx-auto w-full max-w-3xl p-5 sm:p-8">
       <Link
         href="/dashboard"
-        className="text-sm font-medium text-pine hover:underline"
+        className="inline-flex text-sm font-medium text-pine hover:underline"
       >
         ← All children
       </Link>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-ink">
-          {child.name}
-        </h1>
-        <Badge tone={child.dob_confirmed ? "neutral" : "warning"}>
-          {child.dob_confirmed ? "Confirmed DOB" : "Estimated age"}
-        </Badge>
+      <div className="mt-3">
+        <PageHeader
+          eyebrow="Child profile"
+          title={child.name}
+          actions={
+            <Badge tone={child.dob_confirmed ? "neutral" : "warning"}>
+              {child.dob_confirmed ? "Confirmed DOB" : "Estimated age"}
+            </Badge>
+          }
+        />
       </div>
 
       <Card className="mt-6">
