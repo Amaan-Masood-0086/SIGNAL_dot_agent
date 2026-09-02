@@ -26,6 +26,11 @@ const ACTIONS: { value: string; label: string }[] = [
   { value: "credential.deactivate", label: "Credential deactivated" },
   { value: "provider.test_connection", label: "Provider tested" },
   { value: "child.create", label: "Child registered" },
+  // Read access (audit F3) — "who opened this record" is now answerable.
+  { value: "child.read", label: "Child record opened" },
+  { value: "flag.read", label: "Flag opened" },
+  { value: "flag.list", label: "Screening history viewed" },
+  { value: "admin.children_list", label: "Cross-institution roster viewed" },
   { value: "session.create", label: "Session started" },
   { value: "session.complete", label: "Session completed" },
   { value: "flag.create", label: "Flag raised" },
@@ -37,6 +42,10 @@ const ACTION_LABELS = new Map(ACTIONS.map((action) => [action.value, action.labe
 
 function toneFor(action: string): "neutral" | "success" | "warning" | "danger" {
   if (action.startsWith("safeguarding")) return "danger";
+  // Reads are access events, not state changes — they must not wear the
+  // same warning colour as a role change or a stored credential.
+  if (action.endsWith(".read") || action.endsWith(".list") || action.endsWith("_list"))
+    return "neutral";
   if (action.startsWith("staff.") || action.startsWith("credential.")) return "warning";
   if (action.startsWith("flag.") || action.startsWith("referral.")) return "success";
   return "neutral";

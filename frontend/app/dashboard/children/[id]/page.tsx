@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { ArchiveChild } from "@/src/components/features/children/ArchiveChild";
+import { ReasoningTrail } from "@/src/components/features/reasoning/ReasoningTrail";
 import { PageHeader } from "@/src/components/layout/PageHeader";
 import { Badge } from "@/src/components/ui/Badge";
 import { Button } from "@/src/components/ui/Button";
@@ -10,23 +12,7 @@ import { listChildFlags } from "@/src/lib/api/flags";
 import type { FlagRead } from "@/src/lib/api/schemas";
 import { createSession } from "@/src/lib/api/sessions";
 import { getSessionToken } from "@/src/lib/auth/session";
-
-const GRADE_LABELS: Record<string, string> = {
-  high: "High — see a clinician soon",
-  moderate: "Moderate — have it checked",
-  low_monitor: "Low — monitor & recheck",
-  insufficient_information: "Not enough information yet",
-};
-
-function gradeTone(grade: string): "danger" | "warning" | "neutral" | "success" {
-  if (grade === "high") return "danger";
-  if (grade === "moderate") return "warning";
-  return "neutral";
-}
-
-function domainLabel(domain: string): string {
-  return domain === "Speech_Language" ? "Speech & language" : domain;
-}
+import { domainLabel, gradeBadgeTone, gradeMeta } from "@/src/lib/screening/grade";
 
 export const metadata = { title: "Child profile — SIGNAL" };
 
@@ -142,14 +128,18 @@ export default async function ChildProfilePage({
             input always works; voice needs microphone permission and a
             configured speech service.
           </p>
+          {/* Button defaults to type="button" (never an accidental submit), so
+              these two must opt into submit explicitly — otherwise the form's
+              server action is never invoked and the click is a silent no-op. */}
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <form action={startSession.bind(null, child.id, "voice")}>
-              <Button aria-label="Start a voice observation session">
+              <Button type="submit" aria-label="Start a voice observation session">
                 Start voice session
               </Button>
             </form>
             <form action={startSession.bind(null, child.id, "text")}>
               <Button
+                type="submit"
                 variant="secondary"
                 aria-label="Start a text observation session"
               >
@@ -159,6 +149,19 @@ export default async function ChildProfilePage({
           </div>
         </CardBody>
       </Card>
+
+      {/* Roster membership. Archive, never delete: the record and every
+          screening result behind it survive, because retention for a child's
+          health data is a policy decision, not a button. */}
+      <div className="mt-4">
+        {child.archived_reason ? (
+          <ArchiveChild
+            childId={child.id}
+            childName={child.name}
+            archivedReason={child.archived_reason}
+          />
+        ) : null}
+      </div>
 
       {/* FEAT-09: every displayed flag carries its visible, traceable basis
           (reasoning trail with knowledge-base descriptions + sources). */}
@@ -172,49 +175,71 @@ export default async function ChildProfilePage({
             </p>
           ) : (
             <ul className="space-y-4">
-              {flags.map((flag) => (
-                <li key={flag.id} className="rounded-xl border border-line p-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge tone={gradeTone(flag.confidence_grade)}>
-                      {GRADE_LABELS[flag.confidence_grade] ?? flag.confidence_grade}
-                    </Badge>
-                    <Badge tone="neutral">{domainLabel(flag.domain)}</Badge>
-                    <span className="ml-auto text-xs text-ink-soft">
-                      {flag.created_at.slice(0, 10)}
-                    </span>
-                  </div>
-                  {flag.explanation_text && (
-                    <p className="mt-2 text-sm leading-relaxed text-ink">
-                      {flag.explanation_text}
-                    </p>
-                  )}
-                  <details className="mt-3">
-                    <summary className="cursor-pointer text-xs font-semibold tracking-wide text-pine uppercase">
-                      Why — the cited basis ({flag.reasoning_trail.length})
-                    </summary>
-                    <ul className="mt-2 space-y-2">
-                      {flag.reasoning_trail.map((entry) => (
-                        <li
-                          key={entry.citation_ref}
-                          className="rounded-lg bg-moss/60 p-3 text-xs leading-relaxed text-ink"
-                        >
-                          <span className="font-semibold text-pine-deep">
-                            {entry.citation_ref}
-                          </span>{" "}
-                          — {entry.description ?? entry.basis ?? "cited basis"}
-                          {entry.source && (
-                            <span className="text-ink-soft"> · {entry.source}</span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                </li>
-              ))}
+              {flags.map((flag, index) => {
+                const meta = gradeMeta(flag.confidence_grade);
+                return (
+                  <li key={flag.id} className="rounded-xl border border-line p-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge tone={gradeBadgeTone(flag.confidence_grade)}>
+                        {meta ? `${meta.label} — ${meta.headline}` : flag.confidence_grade}
+                      </Badge>
+                      <Badge tone="neutral">
+                        {domainLabel(flag.domain) ?? flag.domain}
+                      </Badge>
+                      <span className="ml-auto text-xs text-ink-soft">
+                        {flag.created_at.slice(0, 10)}
+                      </span>
+                    </div>
+                    {flag.explanation_text && (
+                      <p className="mt-2 text-sm leading-relaxed text-ink">
+                        {flag.explanation_text}
+                      </p>
+                    )}
+                    {/* Same trail component the live conclusion renders, so a
+                        result looks identical whether it is read now or six
+                        months later during a review. */}
+                    {/* The newest result opens with its basis showing: the
+                        reviewable basis is the point of the record, not a
+                        detail to be clicked for. Older ones stay collapsed. */}
+                    <details className="group mt-3" open={index === 0}>
+                      <summary className="cursor-pointer list-none text-xs font-bold tracking-[0.12em] text-pine uppercase hover:underline">
+                        Why — the knowledge-base basis ({flag.reasoning_trail.length})
+                        <span aria-hidden="true" className="ml-1 inline-block group-open:hidden">
+                          ▸
+                        </span>
+                        <span aria-hidden="true" className="ml-1 hidden group-open:inline-block">
+                          ▾
+                        </span>
+                      </summary>
+                      <div className="mt-2">
+                        <ReasoningTrail entries={flag.reasoning_trail} />
+                      </div>
+                    </details>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </CardBody>
       </Card>
+
+      {/* Last, and quiet. Removing a child from the roster is a real action
+          with a real reason behind it, but it is not what anyone came to this
+          page to do. */}
+      {!child.archived_reason && (
+        <div className="mt-6 border-t border-line pt-5">
+          <ArchiveChild
+            childId={child.id}
+            childName={child.name}
+            archivedReason={null}
+          />
+          <p className="mt-2 max-w-prose text-xs leading-relaxed text-ink-soft">
+            Archiving takes a child off the active roster — for a duplicate
+            registration, or a child who has left. Nothing is deleted and it
+            can be undone.
+          </p>
+        </div>
+      )}
     </main>
   );
 }

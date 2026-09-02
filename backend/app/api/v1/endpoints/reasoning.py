@@ -21,7 +21,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import (
     CurrentStaff,
     get_current_verified_staff,
-    get_db,
+    get_tenant_db,
     require_active_staff,
 )
 from app.core.config import Settings, get_settings
@@ -78,7 +78,7 @@ def rate_limited_reason(
 
 def get_reasoning_provider(
     settings: Settings = Depends(get_settings),
-    db: Session | None = Depends(get_db),
+    db: Session | None = Depends(get_tenant_db),
 ) -> LLMProvider | None:
     """ADR-10 precedence: an ACTIVE stored LLM credential beats the env var;
     with no stored row the env path runs unchanged (FEAT-05's bootstrap/CI
@@ -113,7 +113,7 @@ def reason(
     _: None = Depends(rate_limited_reason),
     __: CurrentStaff = Depends(require_active_staff),
     settings: Settings = Depends(get_settings),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
     provider: LLMProvider | None = Depends(get_reasoning_provider),
 ):
     session = db.get(ConversationSession, session_id)

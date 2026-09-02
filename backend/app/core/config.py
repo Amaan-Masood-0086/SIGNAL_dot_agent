@@ -25,11 +25,24 @@ class Settings(BaseSettings):
     # cryptography.fernet  (or Fernet.generate_key()).
     CREDENTIAL_ENCRYPTION_KEY: str
 
-    # Postgres connection. The app role connects unprivileged; RLS policies
-    # are enforced at the DB role level (see alembic migration 0001).
+    # Postgres connection — PRIVILEGED path.
+    #
+    # Two paths exist on purpose (audit F1). This one is used where the work
+    # legitimately spans institutions and therefore cannot run under RLS:
+    #   - /auth/token, which finds a staff row by email BEFORE any
+    #     institution is known
+    #   - the admin console's documented cross-institution reads
     DATABASE_URL: str = (
         "postgresql+psycopg://signal_app:signal_app@localhost:5432/signal_dev"
     )
+
+    # Postgres connection — TENANT path. Connects as the unprivileged
+    # `signal_app` role (no superuser, no BYPASSRLS) so the RLS policies
+    # created in migration 0001 actually bind. Every caretaker-facing
+    # endpoint runs here, and the isolation no longer depends on a handler
+    # remembering its WHERE clause. Falls back to DATABASE_URL when unset so
+    # existing single-URL setups keep working.
+    TENANT_DATABASE_URL: str | None = None
 
     # JWT (RS256 per sdlc-security.md OWASP A02). Keys are PEM strings from
     # environment variables — secrets never live in code.
@@ -40,11 +53,18 @@ class Settings(BaseSettings):
 
     # Speech-to-text seam (FEAT-03). "none" = voice transcription disabled;
     # the text fallback never depends on this (FEAT-03 acceptance).
+    # "azure" | "knowlez" | "none" — decides which adapter wraps whichever
+    # key is active (env or ADR-10 stored credential); it does not itself
+    # carry a key.
     STT_PROVIDER: str = "none"
     STT_LANGUAGE: str = "ur-PK"
     # Azure Speech credentials — environment-only, never code (MUST #6).
     AZURE_SPEECH_KEY: str | None = None
     AZURE_SPEECH_REGION: str | None = None
+    # Info Inlet "Knowlez" Speech-to-Text (api-stt.knowlez.com) — a second
+    # OWASP-equivalent env-only credential path, added 2026-09-01. No region
+    # concept: one key is the whole credential.
+    KNOWLEZ_STT_API_KEY: str | None = None
 
     # LLM provider seam (consumed by FEAT-05's reasoning pipeline). Per
     # ADR-09 the keys stay environment-only: the admin panel shows status +

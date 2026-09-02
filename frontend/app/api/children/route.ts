@@ -13,8 +13,16 @@ export async function GET(request: NextRequest) {
   if (!token) {
     return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
   }
+  // Allowlisted, not forwarded blind: an unrecognised value falls back to
+  // "active" rather than reaching the backend. Without this the parameter was
+  // silently dropped and ?status=archived quietly returned the active roster
+  // — the worst kind of wrong, because it looks like it worked.
+  const requested = request.nextUrl.searchParams.get("status");
+  const status =
+    requested === "archived" || requested === "all" ? requested : "active";
+
   try {
-    const page = await listChildren(token, 1, 100);
+    const page = await listChildren(token, 1, 100, status);
     return NextResponse.json({ page });
   } catch (error) {
     if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {

@@ -17,14 +17,19 @@ from sqlalchemy.orm import Session
 from app.api.deps import (
     CurrentStaff,
     get_current_verified_staff,
-    get_db,
+    get_tenant_db,
     require_active_staff,
 )
 from app.core.config import Settings, get_settings
 from app.core.envelope import envelope
 from app.core.rate_limit import FixedWindowRateLimiter
 from app.services.credential_service import CredentialConfigError, CredentialService
-from app.services.stt import AzureSpeechProvider, SttProvider, provider_from_settings
+from app.services.stt import (
+    AzureSpeechProvider,
+    KnowlezSttProvider,
+    SttProvider,
+    provider_from_settings,
+)
 from app.services.usage import UsageService, estimate_stt_cost
 
 router = APIRouter(prefix="/stt", tags=["stt"])
@@ -53,22 +58,27 @@ def rate_limited_transcribe(
 
 def get_stt_provider(
     settings: Settings = Depends(get_settings),
-    db: Session | None = Depends(get_db),
+    db: Session | None = Depends(get_tenant_db),
 ) -> SttProvider | None:
     """ADR-10 precedence: an ACTIVE stored STT credential beats the env var.
-    The region stays env-only. With no stored row the env path (FEAT-03)
-    runs exactly as before."""
+    Which adapter wraps that stored key is decided by STT_PROVIDER — the
+    key itself carries no vendor identity, unlike an env-only credential
+    where the *_KEY var it came from is the tell. With no stored row the
+    env path (FEAT-03) runs exactly as before."""
     if db is not None:
         try:
             stored, _model = CredentialService(db, settings).resolve_with_model("stt")
         except CredentialConfigError:
             stored = None
-        if stored and settings.AZURE_SPEECH_REGION:
-            return AzureSpeechProvider(
-                key=stored,
-                region=settings.AZURE_SPEECH_REGION,
-                language=settings.STT_LANGUAGE,
-            )
+        if stored:
+            if settings.STT_PROVIDER == "knowlez":
+                return KnowlezSttProvider(key=stored, language=settings.STT_LANGUAGE)
+            if settings.AZURE_SPEECH_REGION:
+                return AzureSpeechProvider(
+                    key=stored,
+                    region=settings.AZURE_SPEECH_REGION,
+                    language=settings.STT_LANGUAGE,
+                )
     return provider_from_settings(settings)
 
 
@@ -79,7 +89,7 @@ def transcribe(
     _: None = Depends(rate_limited_transcribe),
     __: CurrentStaff = Depends(require_active_staff),
     provider: SttProvider | None = Depends(get_stt_provider),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     if provider is None:
         raise HTTPException(

@@ -60,6 +60,21 @@ class ChildRead(BaseModel):
     estimated_age_note: str | None
     is_synthetic: bool
     created_at: datetime.datetime
+    # Archive state (migration 0006). Present on reads so a profile can show
+    # the banner; the roster filters archived rows out entirely.
+    archived_at: datetime.datetime | None = None
+    archived_reason: str | None = None
+
+
+class ChildArchive(BaseModel):
+    """Why this child is leaving the active roster.
+
+    Required, and required to be meaningful: "why is this child no longer on
+    the roster" is exactly the question an auditor asks, and a blank answer
+    is not an answer. The DB enforces the same pairing as a check constraint.
+    """
+
+    reason: str = Field(min_length=3, max_length=200)
 
 
 class ChildPage(BaseModel):

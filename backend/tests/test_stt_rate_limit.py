@@ -28,12 +28,13 @@ class FakeProvider:
 
 
 def _client(settings, db_session, *, fake_stt=False):
-    from app.api.deps import get_db
+    from app.api.deps import get_db, get_tenant_db
     from app.main import create_app
 
     app = create_app(settings)
     # Endpoint DB session is the transaction-isolated test session.
     app.dependency_overrides[get_db] = lambda: db_session
+    app.dependency_overrides[get_tenant_db] = lambda: db_session
     if fake_stt:
         from app.api.v1.endpoints.stt import get_stt_provider
 

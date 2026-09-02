@@ -8,26 +8,42 @@ import { EmptyState } from "@/src/components/ui/EmptyState";
 import { Icon } from "@/src/components/ui/Icon";
 import type { Child } from "@/src/lib/api/schemas";
 
-// Filtering is purely client-side over the page the server already loaded —
+// Filtering is purely client-side over the pages the server already loaded —
 // it never issues a request, so a caretaker typing a child's name can never
 // leak that name into a URL, a log, or a query string.
-export function ChildRoster({ items }: { items: Child[] }) {
+//
+// Archived children are passed in alongside the active roster rather than
+// hidden: an archive nobody can open is a black hole, and the first thing a
+// caretaker wants after archiving the wrong child is to find them again.
+export function ChildRoster({
+  items,
+  archived = [],
+}: {
+  items: Child[];
+  archived?: Child[];
+}) {
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<"all" | "confirmed" | "estimated">("all");
+  const [filter, setFilter] = useState<"all" | "confirmed" | "estimated" | "archived">(
+    "all",
+  );
+
+  const showingArchived = filter === "archived";
+  const source = showingArchived ? archived : items;
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return items.filter((child) => {
+    return source.filter((child) => {
       if (filter === "confirmed" && !child.dob_confirmed) return false;
       if (filter === "estimated" && child.dob_confirmed) return false;
       return !needle || child.name.toLowerCase().includes(needle);
     });
-  }, [items, query, filter]);
+  }, [source, query, filter]);
 
   const filters = [
-    { id: "all", label: `All (${items.length})` },
+    { id: "all", label: `Active (${items.length})` },
     { id: "confirmed", label: "Confirmed DOB" },
     { id: "estimated", label: "Estimated age" },
+    { id: "archived", label: `Archived (${archived.length})` },
   ] as const;
 
   return (
@@ -73,9 +89,17 @@ export function ChildRoster({ items }: { items: Child[] }) {
       {visible.length === 0 ? (
         <div className="mt-4">
           <EmptyState
-            icon="search"
-            title="No children match this view"
-            description="Clear the search box or switch back to the All filter to see the full roster."
+            icon={showingArchived ? "children" : "search"}
+            title={
+              showingArchived
+                ? "Nothing is archived"
+                : "No children match this view"
+            }
+            description={
+              showingArchived
+                ? "Children taken off the roster appear here, with the reason given and a way to put them back."
+                : "Clear the search box or switch back to Active to see the full roster."
+            }
           />
         </div>
       ) : (
@@ -91,10 +115,31 @@ export function ChildRoster({ items }: { items: Child[] }) {
                   <span className="font-display text-lg font-semibold tracking-tight text-ink group-hover:text-pine-deep">
                     {child.name}
                   </span>
-                  <Badge tone={child.dob_confirmed ? "neutral" : "warning"}>
-                    {child.dob_confirmed ? "Confirmed DOB" : "Estimated age"}
+                  <Badge
+                    tone={
+                      child.archived_at
+                        ? "warning"
+                        : child.dob_confirmed
+                          ? "neutral"
+                          : "warning"
+                    }
+                  >
+                    {child.archived_at
+                      ? "Archived"
+                      : child.dob_confirmed
+                        ? "Confirmed DOB"
+                        : "Estimated age"}
                   </Badge>
                 </div>
+                {child.archived_at && (
+                  <p className="text-xs leading-relaxed text-ink-soft">
+                    <span className="font-semibold text-ink">Reason:</span>{" "}
+                    {child.archived_reason}
+                    <br />
+                    Archived {child.archived_at.slice(0, 10)} — open the profile
+                    to return them to the roster.
+                  </p>
+                )}
                 <div className="mt-auto flex items-end justify-between gap-2 text-xs text-ink-soft">
                   <span className="min-w-0">
                     {child.dob_confirmed

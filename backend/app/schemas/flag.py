@@ -18,6 +18,9 @@ class TrailEntryRead(BaseModel):
     basis: str | None = None
     description: str | None = None
     source: str | None = None
+    # The knowledge-base row has been edited since this flag was written.
+    # The basis shown is still the one the grade was made on (audit F11).
+    kb_drifted: bool = False
 
 
 class FlagRead(BaseModel):

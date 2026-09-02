@@ -1,0 +1,120 @@
+# SIGNAL CI — enforces the Definition of Done that CLAUDE.md already states.
+#
+# Audit finding F4/S3: the rules existed in writing and nothing ran them, so
+# unpinned dependencies and unscanned code reached main unchallenged. This
+# workflow is the enforcement half.
+#
+# Postgres is a service container, not SQLite: row-level security is a
+# FEAT-01 acceptance criterion and is Postgres-only, so the suite refuses to
+# run anywhere else (see tests/conftest.py).
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend — tests, SAST, dependency audit
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: signal
+          POSTGRES_PASSWORD: signal_dev_only
+          POSTGRES_DB: signal_dev
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.lock.txt
+          pip install bandit pip-audit
+
+      - name: Tests
+        working-directory: backend
+        env:
+          SIGNAL_TEST_DATABASE_URL: postgresql+psycopg://signal:signal_dev_only@localhost:5432/signal_dev
+          # TEST-ONLY Fernet key (ADR-10 requires CREDENTIAL_ENCRYPTION_KEY).
+          # Encrypts nothing real — throwaway test databases only.
+          CREDENTIAL_ENCRYPTION_KEY: MeogHhAdoVZ279u9hf3BlSQxH3rqq89e538bAoC8tQg=
+        # -ra keeps known-divergence markers (R14) visible in every run.
+        run: pytest -q -ra
+
+      - name: SAST (bandit)
+        working-directory: backend
+        run: bandit -r app/ -ll
+
+      - name: Dependency audit
+        working-directory: backend
+        run: pip-audit -r requirements.lock.txt
+
+  frontend:
+    name: Frontend — typecheck, lint, build, dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # `ci` not `install`: install may drift from the lockfile, which is the
+      # whole point of committing one.
+      - name: Install
+        working-directory: frontend
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Unit tests
+        working-directory: frontend
+        run: npm test
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Dependency audit
+        working-directory: frontend
+        run: npm audit --audit-level=high
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history: a secret committed and later removed is still a
+          # leaked secret, and a shallow clone cannot see it.
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

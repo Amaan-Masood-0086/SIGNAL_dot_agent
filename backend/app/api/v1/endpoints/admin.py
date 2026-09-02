@@ -209,6 +209,17 @@ def list_all_children(
         )
         for child, inst_name in rows
     ]
+    # This is the ONE read that crosses the tenant boundary, so it is the one
+    # that most needs a trail (audit F3). Recorded per query with the page
+    # actually returned — enough to reconstruct what an admin looked at
+    # without writing a row per child.
+    AuditService(db).append(
+        actor_id=str(admin.staff_id),
+        action="admin.children_list",
+        resource_type="child",
+        resource_id=f"page={page},size={page_size},returned={len(items)}",
+        institution_id=str(admin.institution_id),
+    )
     result = AdminChildPage(items=items, total=total, page=page, page_size=page_size)
     return envelope(result.model_dump(mode="json"))
 
@@ -270,14 +281,15 @@ def provider_test_connection(
         )
 
     try:
-        stored, _model = CredentialService(db, settings).resolve_with_model(provider)
+        stored, stored_model = CredentialService(db, settings).resolve_with_model(provider)
     except CredentialConfigError:
         stored = None
+        stored_model = None
 
     if provider == "stt":
         success, detail = test_stt_connection(settings, key=stored)
     else:
-        success, detail = test_llm_connection(settings, key=stored)
+        success, detail = test_llm_connection(settings, key=stored, model=stored_model)
 
     # Every admin action is audit-chained — including this one.
     AuditService(db).append(

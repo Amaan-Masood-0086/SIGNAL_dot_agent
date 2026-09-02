@@ -21,6 +21,10 @@ export const childSchema = z.object({
   estimated_age_note: z.string().nullable(),
   is_synthetic: z.boolean(),
   created_at: z.string(),
+  // Archive state (migration 0006). The roster never returns archived rows;
+  // the profile does, so it can show the banner.
+  archived_at: z.string().nullable().default(null),
+  archived_reason: z.string().nullable().default(null),
 });
 
 export type Child = z.infer<typeof childSchema>;
@@ -157,7 +161,12 @@ export const trailEntryReadSchema = z.object({
   basis: z.string().nullable(),
   description: z.string().nullable(),
   source: z.string().nullable(),
+  // The knowledge-base row was edited after this flag was written. The text
+  // shown is still the basis the grade was actually made on.
+  kb_drifted: z.boolean().default(false),
 });
+
+export type TrailEntryRead = z.infer<typeof trailEntryReadSchema>;
 
 export const flagReadSchema = z.object({
   id: z.string(),
@@ -183,6 +192,15 @@ export type FlagPage = z.infer<typeof flagPageSchema>;
 export const flagPageEnvelopeSchema = z.object({
   success: z.boolean(),
   data: flagPageSchema,
+  meta: envelopeMetaSchema,
+});
+
+// Single flag — the reasoning panel reads this after a conclusion so the
+// live result can show the SAME resolved knowledge-base trail the screening
+// history shows, instead of bare citation refs.
+export const flagReadEnvelopeSchema = z.object({
+  success: z.boolean(),
+  data: flagReadSchema,
   meta: envelopeMetaSchema,
 });
 

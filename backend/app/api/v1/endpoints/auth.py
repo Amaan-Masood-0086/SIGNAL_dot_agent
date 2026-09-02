@@ -23,12 +23,26 @@ from sqlalchemy.orm import Session
 from app.api.deps import CurrentStaff, get_current_verified_staff, get_db
 from app.core.config import Settings, get_settings
 from app.core.envelope import envelope
+from app.core.rate_limit import FixedWindowRateLimiter
 from app.core.security import create_access_token
 from app.models.institution import Institution
 from app.models.staff import Staff
 from app.schemas.auth import TokenRequest
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+# Login throttle (audit F2 / CLAUDE.md "Login: 5 req / 5 min").
+#
+# Keyed by EMAIL, deliberately not by IP. Every login reaches this endpoint
+# from the Next.js server, not from the browser — a per-IP limit here would
+# see one address for the entire user base and throttle everyone together
+# after five attempts by anyone. Email keying is what actually protects an
+# account from credential stuffing on this topology.
+#
+# 5 per 5 minutes is a throttle, not a lockout: it expires on its own, so it
+# cannot be used to lock a known account out indefinitely. A real lockout
+# with an unlock path is FEAT-12 scope, alongside password verification.
+LOGIN_LIMITER = FixedWindowRateLimiter(limit=5, window_seconds=300.0)
 
 # Fixed synthetic identity for Phase 1 — deterministic so tests/dev can rely
 # on it. Never used outside synthetic_only (guarded below).
@@ -45,6 +59,13 @@ def issue_stub_token(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Stub token minting is only available in synthetic_only",
+        )
+
+    if not LOGIN_LIMITER.allow(body.email.strip().lower()):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many sign-in attempts; try again in a few minutes",
+            headers={"Retry-After": "300"},
         )
 
     # Seeded/managed staff rows win over the fixed synthetic identity: the

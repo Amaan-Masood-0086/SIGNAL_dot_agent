@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { ChildRoster } from "@/src/components/features/children/ChildRoster";
 import { PageHeader } from "@/src/components/layout/PageHeader";
@@ -18,13 +19,32 @@ export const dynamic = "force-dynamic";
 // only from the Administration group in the sidebar.
 export default async function DashboardPage() {
   const me = await requireStaff();
+
+  // The system admin has no Care group in the sidebar, so this route is not
+  // their home — and their own institution is the system tenant, which holds
+  // no children. Landing them on an empty roster with no nav entry pointing
+  // back to it is a dead end; send them to the console they actually work in.
+  if (me.is_admin) {
+    redirect("/dashboard/admin");
+  }
+
   const token = await getSessionToken();
 
+  // Both lists are fetched here rather than lazily in the client: they are
+  // small, and an archive that needs a second round-trip to open is an
+  // archive people stop opening.
   let roster;
+  let archived;
   try {
-    roster = token ? await listChildren(token, 1, 100) : null;
+    [roster, archived] = token
+      ? await Promise.all([
+          listChildren(token, 1, 100),
+          listChildren(token, 1, 100, "archived"),
+        ])
+      : [null, null];
   } catch {
     roster = null;
+    archived = null;
   }
 
   const confirmed = roster?.items.filter((child) => child.dob_confirmed).length ?? 0;
@@ -97,7 +117,7 @@ export default async function DashboardPage() {
           </div>
 
           <div className="mt-6">
-            <ChildRoster items={roster.items} />
+            <ChildRoster items={roster.items} archived={archived?.items ?? []} />
           </div>
         </>
       )}

@@ -13,6 +13,7 @@ import {
   listProviderStatuses,
   listStaff,
 } from "@/src/lib/api/admin";
+import { requireStaff } from "@/src/lib/auth/rbac";
 import { getSessionToken } from "@/src/lib/auth/session";
 
 export const metadata = { title: "Admin overview · SIGNAL" };
@@ -55,6 +56,17 @@ const QUICK_LINKS: { href: string; label: string; description: string; icon: Ico
 ];
 
 export default async function AdminOverviewPage() {
+  // The layout gate renders a refusal for non-admins, but App Router renders
+  // layout and page in PARALLEL — a layout withholding {children} does not
+  // stop this component executing. Without this check a caretaker's visit
+  // still fired six admin API calls (all correctly 403, all swallowed by
+  // settle()). No data leaked; the work was simply done for nobody. Checking
+  // here is what makes the refusal structural rather than cosmetic.
+  const me = await requireStaff();
+  if (!me.is_admin) {
+    return null;
+  }
+
   const token = (await getSessionToken()) ?? "";
 
   const [providers, staff, children, audit, chain, usage] = await Promise.all([

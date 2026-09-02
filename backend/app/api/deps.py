@@ -20,6 +20,7 @@ row does not elevate.
 
 from __future__ import annotations
 
+import threading
 import uuid
 from collections.abc import Iterator
 
@@ -27,7 +28,8 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
@@ -91,15 +93,34 @@ def get_current_verified_staff(
         )
 
 
-def get_db(settings: Settings = Depends(get_settings)) -> Iterator[Session]:
-    """Request-scoped database session.
+# Engines are cached per URL and pooled. Previously one Engine was created
+# and disposed per request, which meant a fresh TCP + auth handshake on every
+# call and no pooling at all (audit F8).
+_ENGINES: dict[str, Engine] = {}
+_ENGINE_LOCK = threading.Lock()
 
-    Commits on success, rolls back on error. Skeleton-grade engine handling
-    (per-request dispose); a pooled engine + RLS session scoping
-    (`SET ROLE signal_app` + `app.institution_id`) lands with FEAT-12.
+
+def _engine_for(url: str) -> Engine:
+    engine = _ENGINES.get(url)
+    if engine is not None:
+        return engine
+    with _ENGINE_LOCK:
+        engine = _ENGINES.get(url)
+        if engine is None:
+            engine = create_engine(url, pool_pre_ping=True, pool_size=5, max_overflow=10)
+            _ENGINES[url] = engine
+    return engine
+
+
+def get_db(settings: Settings = Depends(get_settings)) -> Iterator[Session]:
+    """PRIVILEGED request-scoped session — no RLS scoping.
+
+    Reserved for the two places that legitimately cannot be tenant-scoped:
+    `/auth/token` (finds a staff row by email before any institution is
+    known) and the admin console's documented cross-institution reads.
+    Everything caretaker-facing must use `get_tenant_db` instead.
     """
-    engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
-    session = Session(bind=engine, expire_on_commit=False)
+    session = Session(bind=_engine_for(settings.DATABASE_URL), expire_on_commit=False)
     try:
         yield session
         session.commit()
@@ -108,7 +129,39 @@ def get_db(settings: Settings = Depends(get_settings)) -> Iterator[Session]:
         raise
     finally:
         session.close()
-        engine.dispose()
+
+
+def get_tenant_db(
+    current_staff: "CurrentStaff" = Depends(get_current_verified_staff),
+    settings: Settings = Depends(get_settings),
+) -> Iterator[Session]:
+    """Tenant-scoped session — the DB enforces isolation, not the handler.
+
+    Connects as the unprivileged `signal_app` role (no superuser, no
+    BYPASSRLS) and sets `app.institution_id` from the SIGNED token, so the
+    RLS policies from migration 0001 actually bind. A handler that forgets
+    its `WHERE institution_id = ...` now returns nothing instead of another
+    institution's children (audit F1).
+
+    `set_config(..., true)` makes the setting TRANSACTION-local. That is not
+    a detail: with a pooled connection a session-level setting would survive
+    into whichever request borrowed the connection next, which is precisely
+    the cross-tenant leak this function exists to prevent.
+    """
+    url = settings.TENANT_DATABASE_URL or settings.DATABASE_URL
+    session = Session(bind=_engine_for(url), expire_on_commit=False)
+    try:
+        session.execute(
+            text("SELECT set_config('app.institution_id', :iid, true)"),
+            {"iid": str(current_staff.institution_id)},
+        )
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 
 def get_current_admin_staff(

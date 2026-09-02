@@ -26,6 +26,32 @@ function LoginFormInner() {
         body: JSON.stringify({ email, password }),
       });
       if (!response.ok) {
+        // A 403 here is the CSRF origin check, not a bad password — telling
+        // the operator to re-check working credentials sent them hunting in
+        // the wrong place entirely (seen when serving through a dev tunnel).
+        if (response.status === 403) {
+          const body = (await response.json().catch(() => ({}))) as {
+            origin?: string;
+            expected?: string;
+          };
+          setError(
+            `Blocked before your credentials were checked: the browser is on ${
+              body.origin ?? "an unknown origin"
+            } but the server considers itself ${
+              body.expected ?? "a different origin"
+            }. Add the first to APP_ALLOWED_ORIGINS and restart.`,
+          );
+          return;
+        }
+        if (response.status === 429) {
+          const wait = Number(response.headers.get("Retry-After") ?? 300);
+          setError(
+            `Too many sign-in attempts for this account. Your credentials are fine — wait about ${Math.ceil(
+              wait / 60,
+            )} minute(s) and try again.`,
+          );
+          return;
+        }
         setError("Sign-in failed. Check your credentials and try again.");
         return;
       }

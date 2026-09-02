@@ -15,7 +15,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.api.deps import CurrentStaff, get_current_verified_staff, get_db
+from app.api.deps import CurrentStaff, get_current_verified_staff, get_tenant_db
 from app.core.envelope import envelope
 from app.models.usage_log import UsageLog
 from app.schemas.admin import MyUsage, UsageByProvider, UsageTotals
@@ -35,7 +35,7 @@ def my_usage(
     start: datetime.datetime | None = Query(default=None),
     end: datetime.datetime | None = Query(default=None),
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     """Caller's own usage only — the scope is the JWT's staff identity, so
     no other staff member's rows can ever appear here."""

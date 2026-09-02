@@ -3,10 +3,13 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+import { PageHeader } from "@/src/components/layout/PageHeader";
 import { VoiceRecorder } from "@/src/components/features/voice-recorder/VoiceRecorder";
 import { ReasoningPanel } from "@/src/components/features/reasoning/ReasoningPanel";
+import { Alert } from "@/src/components/ui/Alert";
 import { Badge } from "@/src/components/ui/Badge";
 import { Button } from "@/src/components/ui/Button";
+import { Icon } from "@/src/components/ui/Icon";
 import type { Observation, Session } from "@/src/lib/api/schemas";
 
 interface SessionChatProps {
@@ -31,6 +34,7 @@ export function SessionChat({ session, childName, initialTurns }: SessionChatPro
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const active = status === "in_progress";
+  const voiceMode = session.mode === "voice";
 
   async function submitTurn(rawInput: string) {
     setError(null);
@@ -121,120 +125,167 @@ export function SessionChat({ session, childName, initialTurns }: SessionChatPro
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl p-6 sm:p-8">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="mr-auto">
-          <p className="text-xs font-semibold tracking-[0.14em] text-ink-soft uppercase">
-            Observation session · {session.mode === "voice" ? "Voice mode" : "Text mode"}
-          </p>
-          <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-ink">
-            {childName ?? "Session"}
-          </h1>
-        </div>
-        <Badge tone={active ? "neutral" : "success"}>
-          {active ? "In progress" : "Completed"}
-        </Badge>
+    <main className="mx-auto w-full max-w-3xl p-5 sm:p-8">
+      <Link
+        href={`/dashboard/children/${session.child_id}`}
+        className="inline-flex items-center gap-1 text-sm font-medium text-pine hover:underline"
+      >
+        ← {childName ? `Back to ${childName}` : "Back to the child profile"}
+      </Link>
+
+      <div className="mt-3">
+        <PageHeader
+          eyebrow={`Observation session · ${voiceMode ? "Voice mode" : "Text mode"}`}
+          title={childName ?? "Session"}
+          lede={
+            voiceMode
+              ? "Recorded speech becomes a transcript you review before it is saved. The audio itself is never stored."
+              : "Typed observations are stored exactly as written — the same format voice mode produces."
+          }
+          actions={
+            <Badge tone={active ? "neutral" : "success"}>
+              {active ? "In progress" : "Completed"}
+            </Badge>
+          }
+        />
       </div>
 
-      <section aria-label="Recorded turns" className="mt-6">
-        {turns.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-line bg-surface p-6">
-            <p className="text-sm text-ink-soft">
-              No turns recorded yet. Record or type the first observation
-              below.
+      {error && (
+        <div className="mt-4">
+          <Alert tone="danger">{error}</Alert>
+        </div>
+      )}
+
+      {/* Part 1 — the record of what happened. Deliberately separated from
+          the screening conversation below: the two used to sit as adjacent
+          textareas with near-identical placeholders, so it was not visible
+          which one stored an observation and which one asked for a grade. */}
+      <section
+        aria-label="Observation log"
+        className="mt-6 rounded-xl border border-line bg-surface"
+      >
+        <header className="flex flex-wrap items-center gap-2 border-b border-line p-5">
+          <div className="mr-auto">
+            <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
+              Observation log
+            </h2>
+            <p className="mt-1 text-xs text-ink-soft">
+              What the child said or did, recorded verbatim. Nothing here is
+              graded — it is the record.
             </p>
           </div>
-        ) : (
-          <ol className="space-y-4">
-            {turns.map((turn) => (
-              <li key={turn.id} className="flex gap-3">
-                <span
-                  aria-hidden="true"
-                  className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line bg-surface font-display text-sm font-semibold text-pine"
-                >
-                  {turn.turn_number}
-                </span>
-                <div className="flex-1 rounded-xl border border-line bg-surface p-4">
-                  <p className="text-xs font-semibold tracking-wide text-ink-soft uppercase">
-                    Turn {turn.turn_number}
-                  </p>
-                  <p className="mt-1 text-sm leading-relaxed whitespace-pre-wrap text-ink">
-                    {turn.raw_input}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        )}
-      </section>
+          <Badge tone="neutral">
+            {turns.length} {turns.length === 1 ? "turn" : "turns"}
+          </Badge>
+        </header>
 
-      {active && (
-        <section aria-label="Add a turn" className="mt-8">
-          <h2 className="font-display text-lg font-semibold text-ink">
-            Add a turn
-          </h2>
-          {session.mode === "voice" && !sttDown && (
-            <div className="mt-3">
-              <VoiceRecorder disabled={pending || transcribing} onRecorded={handleRecorded} />
-              {transcribing && (
-                <p className="mt-2 text-xs text-ink-soft" role="status" aria-live="polite">
-                  Transcribing…
-                </p>
+        <div className="p-5">
+          {turns.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-line px-5 py-8 text-center">
+              <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-moss text-pine">
+                <Icon name="children" className="h-5 w-5" />
+              </span>
+              <p className="mt-3 text-sm font-semibold text-ink">
+                No turns recorded yet
+              </p>
+              <p className="mt-1 text-xs text-ink-soft">
+                {voiceMode
+                  ? "Record the first observation below, or type it."
+                  : "Type the first observation below."}
+              </p>
+            </div>
+          ) : (
+            <ol className="space-y-3">
+              {turns.map((turn) => (
+                <li key={turn.id} className="flex gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-moss font-display text-xs font-bold text-pine-deep"
+                  >
+                    {turn.turn_number}
+                  </span>
+                  <div className="min-w-0 flex-1 rounded-xl border border-line bg-moss/25 px-4 py-3">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap text-ink">
+                      {turn.raw_input}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
+
+          {active && (
+            <div className="mt-5 border-t border-line pt-5">
+              {voiceMode && !sttDown && (
+                <div className="mb-4">
+                  <VoiceRecorder
+                    disabled={pending || transcribing}
+                    onRecorded={handleRecorded}
+                  />
+                  {transcribing && (
+                    <p
+                      className="mt-2 text-xs font-medium text-pine"
+                      role="status"
+                      aria-live="polite"
+                    >
+                      Transcribing…
+                    </p>
+                  )}
+                </div>
               )}
+              <label
+                htmlFor="turn-input"
+                className="block text-sm font-medium text-ink"
+              >
+                {voiceMode && !sttDown
+                  ? "Review the transcript, correct it if needed, or type here"
+                  : "Record an observation"}
+              </label>
+              <textarea
+                id="turn-input"
+                ref={textareaRef}
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                rows={3}
+                maxLength={10_000}
+                className="mt-1.5 w-full rounded-xl border border-line bg-surface p-3 text-sm text-ink placeholder:text-ink-soft/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine"
+                placeholder="What did the child say or do?"
+                disabled={!active}
+              />
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Button
+                  onClick={() => void submitTurn(draft)}
+                  disabled={pending || transcribing || draft.trim().length === 0}
+                  aria-label="Save this turn"
+                >
+                  {pending ? "Saving…" : "Save turn"}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => void handleComplete()}
+                  disabled={pending || transcribing}
+                  aria-label="Complete this observation session"
+                >
+                  Complete session
+                </Button>
+              </div>
             </div>
           )}
-          <label htmlFor="turn-input" className="mt-4 block text-sm font-medium text-ink-soft">
-            {session.mode === "voice" && !sttDown
-              ? "Review the transcript, correct it if needed, or type here"
-              : "Type the observation"}
-          </label>
-          <textarea
-            id="turn-input"
-            ref={textareaRef}
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            rows={4}
-            maxLength={10_000}
-            className="mt-1 w-full rounded-xl border border-line bg-surface p-3 text-sm text-ink placeholder:text-ink-soft/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine"
-            placeholder="What did the child say or do?"
-            disabled={!active}
-          />
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <Button
-              onClick={() => void submitTurn(draft)}
-              disabled={pending || transcribing || draft.trim().length === 0}
-              aria-label="Save this turn"
-            >
-              {pending ? "Saving…" : "Save turn"}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => void handleComplete()}
-              disabled={pending || transcribing}
-              aria-label="Complete this observation session"
-            >
-              Complete session
-            </Button>
-          </div>
-        </section>
-      )}
+        </div>
+      </section>
 
-      {error && (
-        <p className="mt-4 rounded-lg bg-red-soft p-3 text-sm font-medium text-red" role="alert">
-          {error}
-        </p>
-      )}
+      {/* Part 2 — FEAT-06: the adaptive screening loop, capped at max_turns
+          server-side, concluding with a graded, cited result. */}
+      <div className="mt-4">
+        <ReasoningPanel sessionId={session.id} active={active} />
+      </div>
 
-      {/* FEAT-06: the adaptive screening loop — follow-up questions, capped
-          at max_turns server-side, graded conclusion with cited basis. */}
-      <ReasoningPanel sessionId={session.id} active={active} />
-
-      <div className="mt-8">
+      <div className="mt-6">
         <Link
           href="/dashboard"
           className="text-sm font-medium text-pine hover:underline"
         >
-          ← Back to dashboard
+          ← All children
         </Link>
       </div>
     </main>

@@ -77,6 +77,34 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             content={"detail": "Internal server error"},
         )
 
+    @app.middleware("http")
+    async def security_headers(request: Request, call_next):
+        """Defence-in-depth on the API itself.
+
+        The browser never loads these responses as documents — it reaches the
+        backend only through the Next proxies — so the frontend's headers do
+        not cover this surface. A direct hit on the API (curl, a mobile
+        client, a misrouted link) previously got no protective headers at all,
+        and every response carried PHI with no cache directive.
+        """
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        # This surface serves JSON only; it never needs to load anything.
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'none'; frame-ancestors 'none'; base-uri 'none'"
+        )
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains"
+        )
+        # Every API response may carry child health data. Nothing here is
+        # cacheable, by anyone, ever.
+        response.headers["Cache-Control"] = "private, no-store"
+        # Remove the server banner — free reconnaissance (OWASP A02).
+        response.headers["Server"] = "SIGNAL"
+        return response
+
     @app.get("/health")
     def health():
         return envelope({"status": "ok", "environment": settings.ENVIRONMENT})

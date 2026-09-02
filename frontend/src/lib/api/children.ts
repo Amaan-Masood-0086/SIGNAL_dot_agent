@@ -14,9 +14,11 @@ export async function listChildren(
   token: string,
   page = 1,
   pageSize = 50,
+  /** active (default) | archived | all — the backend allowlists these. */
+  status: "active" | "archived" | "all" = "active",
 ): Promise<ChildPage> {
   const raw = await backendFetch<unknown>(
-    `/api/v1/children?page=${page}&page_size=${pageSize}`,
+    `/api/v1/children?page=${page}&page_size=${pageSize}&status=${status}`,
     token,
   );
   return childPageEnvelopeSchema.parse(raw).data;

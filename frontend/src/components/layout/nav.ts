@@ -13,6 +13,16 @@ export interface NavGroup {
   label: string;
   /** Groups marked admin-only are never rendered for a caretaker. */
   adminOnly?: boolean;
+  /**
+   * Groups marked caretaker-only are hidden from the system admin.
+   *
+   * The admin role is SYSTEM-level (NextaSol/dev), not a member of any
+   * institution that delivers care. A child registered by an admin would be
+   * filed under the admin's own institution rather than a real one — clean
+   * data that is quietly wrong. Admins oversee care through "All children";
+   * they do not deliver it.
+   */
+  caretakerOnly?: boolean;
   items: NavItem[];
 }
 
@@ -24,6 +34,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     id: "care",
     label: "Care",
+    caretakerOnly: true,
     items: [
       { href: "/dashboard", label: "Children", icon: "children", exact: true },
       { href: "/dashboard/children/new", label: "Register a child", icon: "add-child" },
@@ -45,7 +56,9 @@ export const NAV_GROUPS: NavGroup[] = [
 ];
 
 export function navGroupsFor(isAdmin: boolean): NavGroup[] {
-  return NAV_GROUPS.filter((group) => !group.adminOnly || isAdmin);
+  return NAV_GROUPS.filter((group) =>
+    isAdmin ? !group.caretakerOnly : !group.adminOnly,
+  );
 }
 
 export function isActive(pathname: string, item: NavItem): boolean {

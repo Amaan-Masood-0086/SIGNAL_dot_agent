@@ -13,11 +13,14 @@ FEAT-03 acceptance criterion.
 
 from __future__ import annotations
 
+import base64
 from typing import Protocol
 
 import httpx
 
 from app.core.config import Settings
+
+KNOWLEZ_TRANSCRIBE_URL = "https://api-stt.knowlez.com/v1/stt/transcribe"
 
 
 class SttProvider(Protocol):
@@ -66,6 +69,44 @@ class AzureSpeechProvider:
         return str(response.json().get("DisplayText", ""))
 
 
+class KnowlezSttProvider:
+    """Info Inlet "Knowlez" Speech-to-Text REST adapter
+    (api-stt.knowlez.com, OpenAPI-documented 2026-09-01). One key is the
+    whole credential — no region. JSON body with base64 audio; the format
+    list (mp3/m4a/mp4/wav/webm/ogg/flac) covers the browser's webm/opus
+    capture directly, so unlike Azure this needs no re-encoding."""
+
+    def __init__(self, *, key: str, language: str):
+        self._key = key
+        self.language = language
+
+    @property
+    def key(self) -> str:
+        """In-process access only (provider construction / test calls).
+        Never serialized into any API response — the response schemas have
+        no field for it (ADR-09/10)."""
+        return self._key
+
+    def transcribe(self, audio: bytes) -> str:
+        # The API wants an ISO-639-1 two-letter hint; STT_LANGUAGE is
+        # Azure's BCP-47 locale ("ur-PK"). An unrecognised hint is just
+        # auto-detected per the vendor's docs, so this is a best-effort
+        # narrowing, not a strict requirement.
+        language = self.language.split("-", 1)[0].lower()
+        response = httpx.post(
+            KNOWLEZ_TRANSCRIBE_URL,
+            headers={"x-api-key": self._key, "Accept": "application/json"},
+            json={
+                "audio_base64": base64.b64encode(audio).decode("ascii"),
+                "filename": "recording.webm",
+                "language": language,
+            },
+            timeout=30.0,
+        )
+        response.raise_for_status()
+        return str(response.json().get("text", ""))
+
+
 def provider_from_settings(settings: Settings) -> SttProvider | None:
     """Resolve the configured provider; None = STT disabled (voice UI then
     degrades gracefully and the text fallback carries the product)."""
@@ -76,5 +117,11 @@ def provider_from_settings(settings: Settings) -> SttProvider | None:
             key=settings.AZURE_SPEECH_KEY,
             region=settings.AZURE_SPEECH_REGION,
             language=settings.STT_LANGUAGE,
+        )
+    if settings.STT_PROVIDER == "knowlez":
+        if not settings.KNOWLEZ_STT_API_KEY:
+            return None
+        return KnowlezSttProvider(
+            key=settings.KNOWLEZ_STT_API_KEY, language=settings.STT_LANGUAGE
         )
     return None
