@@ -64,8 +64,24 @@ export function UsagePanel() {
         <StatTile
           label="Estimated cost"
           value={money(usage.total.estimated_cost)}
-          hint="Sum of per-call estimates, not a provider invoice"
-          tone={(usage.total.estimated_cost ?? 0) > 0 ? "amber" : "neutral"}
+          // An operator compares this against a real invoice, so it has to
+          // say when it is incomplete. "—" means no call carried a price at
+          // all; the unpriced count means some did and some did not, which
+          // otherwise looks like a finished number.
+          hint={
+            usage.total.unpriced_calls > 0
+              ? `Excludes ${usage.total.unpriced_calls} call${
+                  usage.total.unpriced_calls === 1 ? "" : "s"
+                } with no recorded price`
+              : "Sum of per-call estimates, not a provider invoice"
+          }
+          tone={
+            usage.total.unpriced_calls > 0
+              ? "amber"
+              : (usage.total.estimated_cost ?? 0) > 0
+                ? "amber"
+                : "neutral"
+          }
         />
         <StatTile label="Institutions billing" value={institutionRows.length} />
         <StatTile
@@ -142,7 +158,19 @@ export function UsagePanel() {
                   </span>
                 </dd>
                 <p className="mt-1.5 text-[11px] text-ink-soft">
-                  {row.calls === 0 ? "Nothing spent — no calls recorded" : provider.note}
+                  {/* This is where the null matters most. An STT provider
+                      test hits a free endpoint and honestly costs 0; an LLM
+                      test connection is a real billed call whose price
+                      cannot be computed. Both used to render "$0.0000",
+                      which made the language-model invoice look like the
+                      speech one. */}
+                  {row.calls === 0
+                    ? "Nothing spent — no calls recorded"
+                    : row.unpriced_calls === row.calls
+                      ? `${row.calls} ${row.calls === 1 ? "call" : "calls"} made, none with a recorded price — this column is not a bill`
+                      : row.unpriced_calls > 0
+                        ? `${provider.note} · ${row.unpriced_calls} of ${row.calls} unpriced, so the figure is a floor`
+                        : provider.note}
                 </p>
               </div>
             );

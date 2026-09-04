@@ -118,15 +118,26 @@ export const chainEnvelopeSchema = z.object({
   data: chainStatusSchema,
 });
 
+// `estimated_cost` is null for "not recorded", NOT zero — an LLM test
+// connection is a real billed call whose price cannot be computed, while an
+// STT provider test genuinely costs nothing and records 0. `unpriced_calls`
+// covers the mixed case: SUM skips nulls, so a partial total would otherwise
+// read as a complete bill.
+const usageTotalsSchema = z.object({
+  calls: z.number(),
+  estimated_cost: z.number().nullable(),
+  unpriced_calls: z.number(),
+});
+
 export const usageEnvelopeSchema = z.object({
   success: z.boolean(),
   data: z.object({
-    total: z.object({ calls: z.number(), estimated_cost: z.number().nullable() }),
+    total: usageTotalsSchema,
     // STT and LLM are separate vendors with separate invoices; a merged
     // figure reconciles against neither.
     by_provider: z.object({
-      stt: z.object({ calls: z.number(), estimated_cost: z.number().nullable() }),
-      llm: z.object({ calls: z.number(), estimated_cost: z.number().nullable() }),
+      stt: usageTotalsSchema,
+      llm: usageTotalsSchema,
     }),
     by_staff: z.array(
       z.object({

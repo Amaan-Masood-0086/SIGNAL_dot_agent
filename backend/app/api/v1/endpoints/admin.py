@@ -43,6 +43,7 @@ from app.schemas.admin import (
     UsageByStaff,
     UsageByProvider,
     UsageTotals,
+    cost_or_none,
 )
 from app.services.audit import AuditService
 from app.services.usage import UsageService
@@ -350,12 +351,17 @@ def all_usage(
     if end is not None:
         filters.append(UsageLog.timestamp <= end)
 
-    calls, cost = db.execute(
+    # `COUNT(estimated_cost)` skips NULLs, so it counts the calls that
+    # actually carry a price. The gap against `COUNT(id)` is what stops a
+    # partial sum from reading as a complete bill — see `cost_or_none`.
+    calls, priced, cost = db.execute(
         select(
-            func.count(UsageLog.id), func.sum(UsageLog.estimated_cost)
+            func.count(UsageLog.id),
+            func.count(UsageLog.estimated_cost),
+            func.sum(UsageLog.estimated_cost),
         ).where(*filters)
     ).one()
-    total = UsageTotals(calls=calls or 0, estimated_cost=float(cost) if cost else 0.0)
+    total = UsageTotals.from_counts(calls, priced, cost)
 
     staff_stmt = (
         select(
@@ -376,7 +382,7 @@ def all_usage(
             email=row.email,
             institution_id=row.institution_id,
             calls=row.calls,
-            estimated_cost=float(row.cost) if row.cost else 0.0,
+            estimated_cost=cost_or_none(row.calls, row.cost),
         )
         for row in db.execute(staff_stmt).all()
     ]
@@ -398,7 +404,7 @@ def all_usage(
             institution_id=row.institution_id,
             name=row.name,
             calls=row.calls,
-            estimated_cost=float(row.cost) if row.cost else 0.0,
+            estimated_cost=cost_or_none(row.calls, row.cost),
         )
         for row in db.execute(inst_stmt).all()
     ]
@@ -407,14 +413,19 @@ def all_usage(
     # separately, so one merged number is not reconcilable against either.
     by_provider = {}
     for name in ("stt", "llm"):
-        p_calls, p_cost = db.execute(
-            select(func.count(UsageLog.id), func.sum(UsageLog.estimated_cost)).where(
-                *filters, UsageLog.provider == name
-            )
+        p_calls, p_priced, p_cost = db.execute(
+            select(
+                func.count(UsageLog.id),
+                func.count(UsageLog.estimated_cost),
+                func.sum(UsageLog.estimated_cost),
+            ).where(*filters, UsageLog.provider == name)
         ).one()
-        by_provider[name] = UsageTotals(
-            calls=p_calls or 0, estimated_cost=float(p_cost) if p_cost else 0.0
-        )
+        # This split is where NULL matters most: an STT provider test records
+        # Decimal("0") because that endpoint is genuinely free, while an LLM
+        # test connection records NULL because it is a real billed call whose
+        # price we cannot compute. Reporting both as $0.00 made the LLM
+        # invoice look like the STT one.
+        by_provider[name] = UsageTotals.from_counts(p_calls, p_priced, p_cost)
 
     result = AllUsage(
         total=total,

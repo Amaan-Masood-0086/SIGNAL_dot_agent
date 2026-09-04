@@ -131,6 +131,71 @@ def get_db(settings: Settings = Depends(get_settings)) -> Iterator[Session]:
         session.close()
 
 
+# Tenant URLs whose connected role has been checked and cannot bypass RLS.
+# Verified once per engine rather than once per request: the answer cannot
+# change without a DB-side ALTER ROLE, and a `pg_roles` lookup on every
+# caretaker request would buy nothing.
+_TENANT_ROLE_VERIFIED: set[str] = set()
+
+
+def _verified_tenant_engine(settings: Settings) -> Engine:
+    """The tenant engine — or nothing at all. Fail closed, no escape hatch.
+
+    Audit finding F1 was never a missing control. RLS was enabled, FORCEd
+    and covered by passing tests; it was simply not in force at runtime,
+    because the connection carried BYPASSRLS. A system in that state looks
+    completely healthy from the outside, and the thing it silently stops
+    enforcing is cross-institution isolation of children's health data.
+
+    Two misconfigurations recreate exactly that state, so both are refused
+    here instead of being absorbed:
+
+      * `TENANT_DATABASE_URL` unset. The old code fell back to
+        `DATABASE_URL`, which is the PRIVILEGED path by definition — so
+        forgetting one setting reverted the entire fix, and nothing said so.
+      * `TENANT_DATABASE_URL` set, but pointed at a role that is a superuser
+        or holds BYPASSRLS. The URL being present proves nothing; only the
+        role's own attributes do.
+
+    Refusing costs a 500 on caretaker traffic, which is loud and immediate.
+    That is the intended trade: a deployment with broken tenant isolation
+    must stop, not serve. There is deliberately no ENVIRONMENT exemption —
+    an exemption is precisely how the first version came to be inert.
+    """
+    url = settings.TENANT_DATABASE_URL
+    if not url:
+        raise RuntimeError(
+            "TENANT_DATABASE_URL is not configured. Caretaker-facing requests "
+            "must connect as the unprivileged `signal_app` role so row-level "
+            "security applies; falling back to DATABASE_URL would restore the "
+            "audit-F1 state in which RLS is enabled but never enforced. "
+            "See backend/.env.example."
+        )
+
+    engine = _engine_for(url)
+    if url in _TENANT_ROLE_VERIFIED:
+        return engine
+
+    with engine.connect() as conn:
+        row = conn.execute(
+            text(
+                "SELECT rolsuper, rolbypassrls FROM pg_roles "
+                "WHERE rolname = current_user"
+            )
+        ).one()
+    if row.rolsuper or row.rolbypassrls:
+        raise RuntimeError(
+            "TENANT_DATABASE_URL connects as a role that can bypass row-level "
+            "security (rolsuper=%r, rolbypassrls=%r). RLS would be inert and "
+            "tenant isolation would rest entirely on handler-side WHERE "
+            "clauses. Point it at the unprivileged `signal_app` role created "
+            "by migration 0001." % (row.rolsuper, row.rolbypassrls)
+        )
+
+    _TENANT_ROLE_VERIFIED.add(url)
+    return engine
+
+
 def get_tenant_db(
     current_staff: "CurrentStaff" = Depends(get_current_verified_staff),
     settings: Settings = Depends(get_settings),
@@ -148,8 +213,7 @@ def get_tenant_db(
     into whichever request borrowed the connection next, which is precisely
     the cross-tenant leak this function exists to prevent.
     """
-    url = settings.TENANT_DATABASE_URL or settings.DATABASE_URL
-    session = Session(bind=_engine_for(url), expire_on_commit=False)
+    session = Session(bind=_verified_tenant_engine(settings), expire_on_commit=False)
     try:
         session.execute(
             text("SELECT set_config('app.institution_id', :iid, true)"),

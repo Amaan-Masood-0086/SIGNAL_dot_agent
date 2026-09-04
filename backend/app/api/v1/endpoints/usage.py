@@ -24,10 +24,18 @@ router = APIRouter(prefix="/usage", tags=["usage"])
 
 
 def _totals(db: Session, *filters) -> UsageTotals:
-    calls, cost = db.execute(
-        select(func.count(UsageLog.id), func.sum(UsageLog.estimated_cost)).where(*filters)
+    # Three aggregates, one scan: total calls, calls that carry a price
+    # (COUNT of a column skips NULLs), and the sum. `UsageTotals.from_counts`
+    # needs all three to say "free" rather than "not recorded" — see the
+    # note on `cost_or_none`.
+    calls, priced, cost = db.execute(
+        select(
+            func.count(UsageLog.id),
+            func.count(UsageLog.estimated_cost),
+            func.sum(UsageLog.estimated_cost),
+        ).where(*filters)
     ).one()
-    return UsageTotals(calls=calls or 0, estimated_cost=float(cost) if cost else 0.0)
+    return UsageTotals.from_counts(calls, priced, cost)
 
 
 @router.get("/me")

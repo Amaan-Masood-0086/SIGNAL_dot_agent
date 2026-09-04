@@ -21,6 +21,7 @@ Security posture (the rules that make this layer trustworthy):
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass, field
 
 from app.services.knowledge import KnowledgeEntry
@@ -97,6 +98,36 @@ class ReasoningOutput:
     risk_modifiers: list[str] = field(default_factory=list)
 
 
+_log = logging.getLogger("signal.agents")
+
+
+def _output_shape(cleaned: str) -> str:
+    """Why the parse failed, WITHOUT quoting what the model actually wrote.
+
+    The diagnosis needs the two failure modes told apart, because they need
+    opposite fixes: an EMPTY reply means the token budget was spent before
+    any output (a model that reasons internally can eat the whole
+    allowance), while prose means the model ignored the JSON contract.
+
+    That distinction lives in the SHAPE of the output, never its content.
+    An agent reply carries caretaker-facing text and a child's clinical
+    detail, so a 120-character prefix of it is PHI in a log file — exactly
+    what CLAUDE.md rule 9 forbids, and a log is the wrong place for it
+    whatever the debugging value. A classification carries the whole
+    diagnosis and none of the data.
+    """
+    if not cleaned:
+        return "empty"
+    head = cleaned[0]
+    if head == "{":
+        return "json-object-truncated"  # opened correctly, so it was cut short
+    if head == "[":
+        return "json-array"  # array where the contract requires an object
+    if head == "`":
+        return "code-fence"
+    return "prose"
+
+
 def _parse_agent_json(text: str) -> dict:
     """Agents must answer with bare JSON; tolerate code fences only."""
     cleaned = text.strip()
@@ -107,14 +138,10 @@ def _parse_agent_json(text: str) -> dict:
     try:
         payload = json.loads(cleaned)
     except json.JSONDecodeError as exc:
-        # Length and prefix distinguish the two ways this fails: an EMPTY
-        # reply means the token budget was spent before any output (a model
-        # that reasons internally can eat the whole allowance), while prose
-        # means the model ignored the JSON contract. They need opposite fixes.
-        import logging
-
-        logging.getLogger("signal.agents").error(
-            "agent JSON parse failed: len=%d prefix=%r", len(cleaned), cleaned[:120]
+        _log.error(
+            "agent JSON parse failed: shape=%s len=%d",
+            _output_shape(cleaned),
+            len(cleaned),
         )
         raise AgentContractError(f"agent output is not JSON: {exc}") from exc
     if not isinstance(payload, dict):
