@@ -59,7 +59,7 @@
 |---|---|---|
 | `institutions` | id, name | Tenant boundary for RLS |
 | `staff` | id, institution_id, role, auth fields | role ∈ {caretaker, admin} |
-| `children` | id, institution_id, name, intake_date, **dob_confirmed (bool)**, dob (nullable), **estimated_age_range**, estimated_age_note | See ADR_02 |
+| `children` | id, institution_id, name, intake_date, **dob_confirmed (bool)**, dob (nullable), **estimated_age_range**, estimated_age_note, *archived_at (nullable)*, *archived_reason (nullable)* | See ADR_02. Archive columns added in migration 0006 — see §4a; archive is reversible and no DELETE grant exists on this table |
 | `sessions` | id, child_id, staff_id, status {in_progress, completed, abandoned}, mode {voice, text}, started_at, resumed_at | Supports save/resume (feature #8) |
 | `observations` | id, session_id, turn_number, raw_input, extracted_signals (jsonb) | Observation Agent output — extraction only |
 | `milestones` | id, domain {DLD, Hearing}, age_band_min_months, age_band_max_months, description, source | Knowledge base, RAG-retrieved, populated from Ayesha/Sami's data (Open Item #3) |
@@ -110,6 +110,95 @@
 - IDOR T1–T5 for every endpoint listed above
 - One test per business rule confirming it cannot be bypassed
 - Coverage ≥ 80%
+
+## 4a. Addendum — 2026-09-04 (surface added after the deep-code audit)
+
+Contracts introduced or changed since §4 was written. Kept as an addendum so
+the original spec stays readable as the Phase-1 baseline.
+
+### Two database paths (audit F1)
+
+The schema builds row-level security and the tests prove the policies work,
+but the running app connected as a superuser carrying `BYPASSRLS`, so every
+table-level guarantee was inert and tenant isolation rested entirely on each
+handler remembering its `WHERE institution_id`. There are now two paths:
+
+| Setting | Role | Used by |
+|---|---|---|
+| `DATABASE_URL` | privileged | migrations, `/auth/token` (finds a staff row by email before any institution is known), admin cross-institution reads |
+| `TENANT_DATABASE_URL` | `signal_app` — no superuser, no BYPASSRLS, no DELETE | every caretaker-facing endpoint |
+
+The tenant session sets `app.institution_id` **transaction-locally**. Not a
+detail: with a pooled connection a session-level setting would survive into
+whichever request borrowed that connection next — the exact cross-tenant
+leak this layer exists to prevent. Proven from the hostile direction in
+`tests/integration/test_tenant_session_rls.py`: queries run with **no**
+application filter and the database still refuses another institution's rows.
+
+### Read access is audited (audit F3)
+
+All fifteen original audited actions were writes, so "who opened this child's
+record" was unanswerable. Added: `child.read`, `flag.read`, `flag.list`,
+`admin.children_list`. Detail views log per record; list views log per query
+(a roster read is one act of access, and a row per child would bury the chain
+it exists to make readable).
+
+**Denied reads are deliberately NOT logged.** A 403 never confirms the record
+exists; writing an audit row keyed to an id the caller may not own would leak
+precisely what the uniform 403 hides.
+
+### Child archive (migration 0006)
+
+There was previously no way to take a child off the roster at all.
+
+| Endpoint | Contract |
+|---|---|
+| `POST /children/{id}/archive` | Body `{reason}` — mandatory, min length enforced. 409 if already archived |
+| `POST /children/{id}/restore` | 409 if not archived |
+| `GET /children?status=active\|archived\|all` | Allowlisted; default `active`. Archived rows sort newest-first |
+
+Archive, never delete: a mistaken registration and a child who has left both
+leave the roster, but only one carries a retention question, and children's
+health records carry long statutory retention. No `DELETE` grant exists on
+`children` for the app role — pinned by test.
+
+### Reasoning request gains a reply language
+
+`POST /sessions/{id}/reason` accepts `response_language: "auto" | "ur" | "en"`
+(default `auto`, which mirrors whatever the caretaker wrote).
+
+A **closed enum, never free text.** Caretaker input stays fenced as DATA and
+is never treated as instructions, so "reply in Urdu" typed into the box must
+not steer the model; a structured field is how the preference gets in without
+reopening that door. Only text a caretaker READS is affected — signals,
+grades and citation_refs stay English as the clinical record.
+
+### Reasoning trail is a snapshot, not a live lookup (audit F11)
+
+The knowledge base upserts on `citation_ref`, and the read path resolved
+descriptions live — so a six-month-old flag displayed today's wording rather
+than the wording its grade was made on. The trail now carries `basis` and
+`source` captured at write time, the read path prefers the snapshot, and
+`kb_drifted` tells the reader when the reference has since changed.
+
+### Provider timeout and output budget
+
+- `LLM_TIMEOUT_SECONDS` (default 90) is a setting. A hardcoded 60s was
+  observed killing turns outright.
+- `max_tokens` caps were tried and **reverted**. `deepseek-v4-flash` spends
+  its budget on internal reasoning, so a 400-token ceiling left nothing for
+  the reply and the model returned an empty string — the whole turn lost. A
+  cap is a guess about a specific model's reasoning overhead, and guessing
+  low destroys the turn rather than shortening it. `MAX_TOKENS_BY_TIER` stays
+  in place but empty, with the reason recorded at the definition.
+
+### Admin usage is split per provider
+
+STT and the LLM are different vendors with separate invoices, so one merged
+figure reconciled against neither. `GET /admin/usage` now returns
+`by_provider`. Provider test-connection calls are ledgered too — each LLM one
+is a real billed call the cost page was omitting; their cost is recorded NULL
+rather than invented.
 
 ## 5. 🤖 AI/Agent Architecture Section (per ai-agent-architecture skill — BINDING for Phase 5 BUILD)
 
