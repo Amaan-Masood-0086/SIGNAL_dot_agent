@@ -18,6 +18,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 // Accessible by default: type is explicit (never an accidental submit),
 // focus ring is always visible, and callers must supply a visible label or
 // aria-label (web-development.md MUST #11).
+// The default is "button", so a control that submits a <form> MUST pass
+// type="submit" — with no handler and no submit behaviour it would do nothing
+// at all, and do it silently.
 export function Button({
   variant = "primary",
   type = "button",

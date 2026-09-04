@@ -14,7 +14,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.api.deps import CurrentStaff, get_current_verified_staff, get_db
+from app.api.deps import CurrentStaff, get_current_verified_staff, get_tenant_db
 from app.core.envelope import envelope
 from app.models.flag import Flag
 from app.models.referral import Referral
@@ -54,7 +54,7 @@ def create_referral(
     flag_id: uuid.UUID,
     payload: ReferralCreate,
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     flag = _scoped_flag(db, current_staff, flag_id)
     try:
@@ -83,7 +83,7 @@ def create_referral(
 def get_referral(
     referral_id: uuid.UUID,
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     referral = _scoped_referral(db, current_staff, referral_id)
     return envelope(_read(db, referral).model_dump(mode="json"))
@@ -94,7 +94,7 @@ def update_referral(
     referral_id: uuid.UUID,
     payload: ReferralUpdate,
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     referral = _scoped_referral(db, current_staff, referral_id)
     if payload.status is not None:

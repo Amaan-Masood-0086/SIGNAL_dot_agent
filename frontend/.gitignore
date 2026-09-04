@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the TEMPLATE must ship: it is the only place a new developer
+# learns BACKEND_URL and APP_ALLOWED_ORIGINS exist. It holds no secrets.
+!.env.example
 
 # vercel
 .vercel

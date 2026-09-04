@@ -39,13 +39,14 @@ def settings(rsa_keypair):
 
 @pytest.fixture()
 def client(settings, db_session):
-    from app.api.deps import get_db
+    from app.api.deps import get_db, get_tenant_db
     from app.core.config import get_settings
     from app.main import create_app
 
     get_settings.cache_clear()
     app = create_app(settings)
     app.dependency_overrides[get_db] = lambda: db_session
+    app.dependency_overrides[get_tenant_db] = lambda: db_session
     with TestClient(app) as test_client:
         yield test_client
     get_settings.cache_clear()
@@ -369,6 +370,43 @@ def test_env_only_stt_path_unchanged_with_no_rows(settings, db_session):
     assert provider.key == ENV_SENTINEL
 
 
+def test_stt_db_credential_builds_knowlez_provider(client, settings, rsa_keypair, db_session):
+    """Owner-added second STT vendor (2026-09-01): a stored key + explicit
+    STT_PROVIDER=knowlez builds the Knowlez adapter, not Azure — and needs
+    no region, unlike Azure's stored-credential path above."""
+    inst, admin = _staff(db_session)
+    token = _mint(settings, rsa_keypair, institution_id=inst.id, staff_id=admin.id, role="admin")
+    settings.STT_PROVIDER = "knowlez"
+    client.put("/api/v1/admin/credentials/stt", headers=_auth(token), json={"value": SENTINEL})
+
+    from app.api.v1.endpoints.stt import get_stt_provider
+    from app.services.stt import KnowlezSttProvider
+
+    provider = get_stt_provider(settings, db_session)
+    assert isinstance(provider, KnowlezSttProvider)
+    assert provider.key == SENTINEL
+
+
+def test_stt_db_credential_still_builds_azure_when_provider_unset(
+    client, settings, rsa_keypair, db_session
+):
+    """Regression: adding the Knowlez branch must not change the existing
+    Azure stored-credential default (STT_PROVIDER left at "none", region
+    present — the original admin-intent-via-UI behavior)."""
+    inst, admin = _staff(db_session)
+    token = _mint(settings, rsa_keypair, institution_id=inst.id, staff_id=admin.id, role="admin")
+    settings.STT_PROVIDER = "none"
+    settings.AZURE_SPEECH_REGION = "westus"
+    client.put("/api/v1/admin/credentials/stt", headers=_auth(token), json={"value": SENTINEL})
+
+    from app.api.v1.endpoints.stt import get_stt_provider
+    from app.services.stt import AzureSpeechProvider
+
+    provider = get_stt_provider(settings, db_session)
+    assert isinstance(provider, AzureSpeechProvider)
+    assert provider.key == SENTINEL
+
+
 # ── Test connection honors precedence (ADR-09 endpoint keeps working) ───────
 
 
@@ -397,3 +435,35 @@ def test_test_connection_uses_active_db_credential(
     assert resp.json()["data"]["success"] is True
     assert seen_keys == [SENTINEL]             # DB credential, not env
     assert SENTINEL not in resp.text and ENV_SENTINEL not in resp.text
+
+
+def test_test_connection_llm_forwards_stored_model_override(
+    client, settings, rsa_keypair, db_session, monkeypatch
+):
+    """Regression: test-connection silently pinged settings.LLM_MODEL and
+    ignored the stored override, so a non-OpenAI model saved via the admin
+    console (e.g. a DeepSeek model on an OpenAI-compatible base URL) always
+    failed the connection test even with valid credentials."""
+    inst, admin = _staff(db_session)
+    token = _mint(settings, rsa_keypair, institution_id=inst.id, staff_id=admin.id, role="admin")
+    settings.LLM_MODEL = "gpt-4o-mini"  # the env default the bug fell back to
+    client.put(
+        "/api/v1/admin/credentials/llm",
+        headers=_auth(token),
+        json={"value": SENTINEL, "model": "deepseek-v4-flash"},
+    )
+
+    seen_models = []
+
+    def fake_post(url, **kwargs):
+        seen_models.append(kwargs["json"]["model"])
+        return __import__("httpx").Response(
+            200, request=__import__("httpx").Request("POST", url), content=b"{}"
+        )
+
+    monkeypatch.setattr("app.services.provider_checks.httpx.post", fake_post)
+
+    resp = client.post("/api/v1/admin/providers/llm/test", headers=_auth(token))
+    assert resp.status_code == 200
+    assert resp.json()["data"]["success"] is True
+    assert seen_models == ["deepseek-v4-flash"]  # stored override, not env LLM_MODEL

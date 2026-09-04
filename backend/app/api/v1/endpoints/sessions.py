@@ -22,7 +22,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import (
     CurrentStaff,
     get_current_verified_staff,
-    get_db,
+    get_tenant_db,
     require_active_staff,
 )
 from app.core.config import Settings, get_settings
@@ -76,7 +76,7 @@ def create_session(
     payload: SessionCreate,
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
     settings: Settings = Depends(get_settings),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     """Open a conversation for a child of the caller's institution."""
     # The JWT identity must resolve to a real staff row in the same tenant —
@@ -122,7 +122,7 @@ def create_session(
 def get_session(
     session_id: uuid.UUID,
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     session = _scoped_session(db, current_staff, session_id)
     return envelope(SessionRead.model_validate(session).model_dump(mode="json"))
@@ -132,7 +132,7 @@ def get_session(
 def complete_session(
     session_id: uuid.UUID,
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     session = _scoped_session(db, current_staff, session_id)
     if session.status != "in_progress":
@@ -154,7 +154,7 @@ def complete_session(
 def resume_session(
     session_id: uuid.UUID,
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     """FEAT-08 interrupted-shift handling: an in_progress session left idle
     is resumed by a new request. Turn history and reasoning state live in
@@ -186,7 +186,7 @@ def add_observation(
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
     _: None = Depends(rate_limited_observation),
     __: CurrentStaff = Depends(require_active_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     """Capture one caretaker turn. Voice transcripts and typed text arrive
     through this same endpoint — the stored observation is identical either
@@ -227,7 +227,7 @@ def list_observations(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     """Turn history for one session, paginated (contract #4; page_size ≤ 100)."""
     session = _scoped_session(db, current_staff, session_id)

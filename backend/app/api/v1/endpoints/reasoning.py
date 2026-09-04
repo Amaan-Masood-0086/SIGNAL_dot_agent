@@ -14,6 +14,8 @@ from __future__ import annotations
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
+from typing import Literal
+
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -21,7 +23,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import (
     CurrentStaff,
     get_current_verified_staff,
-    get_db,
+    get_tenant_db,
     require_active_staff,
 )
 from app.core.config import Settings, get_settings
@@ -56,6 +58,16 @@ FOLLOW_UP_MARKER = {"role": "risk_reasoning", "follow_up": True}
 
 class ReasoningRequest(BaseModel):
     raw_input: str = Field(min_length=1, max_length=10_000)
+    # Which language the caretaker READS. "auto" mirrors whatever they wrote,
+    # which is right until it isn't: plenty of caretakers type Roman English
+    # because the keyboard is easier while reading Urdu far more comfortably,
+    # and no amount of detection can see that.
+    #
+    # A closed enum on purpose. The caretaker's own text stays fenced as DATA
+    # and is never treated as instructions, so "reply in Urdu" typed into the
+    # box must not steer the model. A structured field is how a preference
+    # gets expressed without reopening that door.
+    response_language: Literal["auto", "ur", "en"] = "auto"
 
     @field_validator("raw_input")
     @classmethod
@@ -78,7 +90,7 @@ def rate_limited_reason(
 
 def get_reasoning_provider(
     settings: Settings = Depends(get_settings),
-    db: Session | None = Depends(get_db),
+    db: Session | None = Depends(get_tenant_db),
 ) -> LLMProvider | None:
     """ADR-10 precedence: an ACTIVE stored LLM credential beats the env var;
     with no stored row the env path runs unchanged (FEAT-05's bootstrap/CI
@@ -113,7 +125,7 @@ def reason(
     _: None = Depends(rate_limited_reason),
     __: CurrentStaff = Depends(require_active_staff),
     settings: Settings = Depends(get_settings),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
     provider: LLMProvider | None = Depends(get_reasoning_provider),
 ):
     session = db.get(ConversationSession, session_id)
@@ -173,14 +185,22 @@ def reason(
             caretaker_turns=caretaker_turns,
             turn_number=turn_number,
             staff_id=current_staff.staff_id,
+            response_language=payload.response_language,
             institution_id=current_staff.institution_id,
         )
     except LoopCapExceeded as exc:
         raise HTTPException(status_code=409, detail=str(exc))
     except PipelineError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
-    except (GroundingError, AgentContractError, LLMError):
-        # Never surface model/provider internals (MUST-NOT #1).
+    except (GroundingError, AgentContractError, LLMError) as exc:
+        # Never surface model/provider internals to the CLIENT (MUST-NOT #1),
+        # but the server log has to say what actually happened or a 502 is
+        # undiagnosable.
+        import logging
+
+        logging.getLogger("signal.reasoning").error(
+            "reasoning failed: %s: %s", type(exc).__name__, exc
+        )
         raise HTTPException(status_code=502, detail="Reasoning failed")
 
     # Persist the outcome artifacts.

@@ -15,7 +15,17 @@ const credentialsSchema = z.object({
 // storage — it is exchanged here and sealed into an HttpOnly cookie.
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) {
-    return NextResponse.json({ detail: "Forbidden" }, { status: 403 });
+    // Echo the rejected origin back. It is not a secret — the caller sent it
+    // — and without it a proxy/tunnel misconfiguration is indistinguishable
+    // from a wrong password, which is exactly the wrong thing to guess at.
+    return NextResponse.json(
+      {
+        detail: "Forbidden",
+        origin: request.headers.get("origin") ?? "(none sent)",
+        expected: request.nextUrl.origin,
+      },
+      { status: 403 },
+    );
   }
 
   let parsed: z.infer<typeof credentialsSchema>;
@@ -37,6 +47,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { detail: "Authentication service unavailable" },
       { status: 502 },
+    );
+  }
+
+  // A throttled sign-in is NOT a wrong password, and saying so sends the
+  // operator to check credentials that were never the problem. Pass 429
+  // through with its Retry-After so the form can say what actually happened.
+  if (backendResponse.status === 429) {
+    return NextResponse.json(
+      { detail: "Too many sign-in attempts for this account. Wait a few minutes." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": backendResponse.headers.get("Retry-After") ?? "300",
+        },
+      },
     );
   }
 

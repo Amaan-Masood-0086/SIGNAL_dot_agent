@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { SessionChat } from "@/src/components/features/session-chat/SessionChat";
+import { SessionConversation } from "@/src/components/features/session-chat/SessionConversation";
 import { getChild } from "@/src/lib/api/children";
 import { getSession, isAuthorizationError, listObservations } from "@/src/lib/api/sessions";
 import { getSessionToken } from "@/src/lib/auth/session";
@@ -42,6 +42,10 @@ export default async function SessionPage({
   const page = await listObservations(token, id, 1, 100);
 
   return (
-    <SessionChat session={session} childName={childName} initialTurns={page.items} />
+    <SessionConversation
+      session={session}
+      childName={childName}
+      initialTurns={page.items}
+    />
   );
 }

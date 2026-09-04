@@ -170,6 +170,10 @@ class RiskPipeline:
         staff_id: uuid.UUID,
         institution_id: uuid.UUID,
         reference_date: datetime.date | None = None,
+        # "auto" | "ur" | "en" — only affects text a caretaker READS.
+        # Signals, grades and citation_refs stay English: they are the
+        # clinical record, not the reply.
+        response_language: str = "auto",
     ) -> PipelineResult:
         if turn_number > MAX_TURNS:
             raise LoopCapExceeded(
@@ -244,6 +248,7 @@ class RiskPipeline:
                 age_context=age_context,
                 force_conclusion=force_conclusion,
                 case_memory=case_memory,
+                response_language=response_language,
             ),
         )
         if not reasoning.concluded:
@@ -289,10 +294,19 @@ class RiskPipeline:
 
         # Trail = the grade's own citations, then protective met-milestones
         # (deduped) — the clinician sees the rule AND the context.
+        # `basis` and `source` are SNAPSHOTS taken now, not references
+        # resolved later. A flag has to stay readable as the thing it was
+        # when the grade was made: the knowledge base is upserted on
+        # citation_ref, so a later wording change would otherwise silently
+        # rewrite the stated basis of every historical flag (audit F11).
         trail: list[dict] = []
         for ref in grade_result.citation_refs:
             trail.append(
-                {"citation_ref": ref, "basis": by_ref[ref].description}
+                {
+                    "citation_ref": ref,
+                    "basis": by_ref[ref].description,
+                    "source": by_ref[ref].source,
+                }
             )
         for entry in met_entries:
             if entry.citation_ref not in grade_result.citation_refs:
@@ -300,6 +314,7 @@ class RiskPipeline:
                     {
                         "citation_ref": entry.citation_ref,
                         "basis": f"protective: {entry.description}",
+                        "source": entry.source,
                     }
                 )
 

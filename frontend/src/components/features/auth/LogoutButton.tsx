@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { Button } from "@/src/components/ui/Button";
 
-export function LogoutButton() {
+export function LogoutButton({ className = "" }: { className?: string } = {}) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
@@ -21,7 +21,13 @@ export function LogoutButton() {
   }
 
   return (
-    <Button variant="ghost" onClick={onLogout} disabled={pending} aria-label="Sign out">
+    <Button
+      variant="secondary"
+      onClick={onLogout}
+      disabled={pending}
+      aria-label="Sign out"
+      className={className}
+    >
       {pending ? "Signing out…" : "Sign out"}
     </Button>
   );

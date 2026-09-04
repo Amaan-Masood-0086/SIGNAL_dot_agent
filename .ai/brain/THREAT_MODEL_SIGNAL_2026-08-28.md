@@ -48,6 +48,55 @@ The system-level admin now has a real console (`/dashboard/admin`, API `/api/v1/
 
 **Note:** the safeguarding-escalation access model is deliberately left conservative (nobody has full read access yet) because the downstream mandatory-reporting duty is undefined (PROJECT_BRIEF Open Item #6). Do not widen this access without that decision being made first.
 
+### 2026-09-04 addendum — controls the deep-code audit found MISSING and now present
+
+The audit's finding was not that these controls were designed badly. It was
+that three of them were designed, built, tested — and then not connected.
+
+**Tenant isolation was inert at runtime (F1).** Migration 0001 enables and
+FORCEs row-level security and `test_postgres_rls.py` proves the policies
+work. The application connected as a superuser carrying `BYPASSRLS`, which
+bypasses RLS even where FORCE is set — so every database-level guarantee was
+decorative and isolation depended entirely on each handler remembering its
+`WHERE institution_id`. One forgotten clause was one cross-tenant leak.
+
+Caretaker-facing endpoints now use an unprivileged role with a
+transaction-local `app.institution_id`. Verified from the attacker's side:
+`tests/integration/test_tenant_session_rls.py` runs queries with **no**
+application filter and asserts the database returns nothing.
+
+The same connection change restores two protections that were also inert:
+`audit_log` append-only (a GRANT only binds a non-superuser) and the absence
+of any `DELETE` grant on tenant data.
+
+**"Who read this record" was unanswerable (F3).** All fifteen audited actions
+were writes while seven endpoints returned child health data with no trace.
+Reads are now chained like any other entry. Denied reads are deliberately not
+logged — an audit row keyed to an id the caller may not own would leak what
+the uniform 403 exists to hide.
+
+**A documented basis could be silently rewritten (F11).** The knowledge base
+upserts on `citation_ref` and the flag read path resolved descriptions live,
+so editing a milestone changed the stated basis of every historical flag.
+For a product whose regulatory argument is "the basis is documented and
+reviewable", that was the one thing that could not be allowed. The trail is
+now a write-time snapshot, and drift is surfaced rather than hidden.
+
+**Newly acknowledged residual risks:**
+
+- Free-text caretaker observations reach a third-party LLM. Prompts carry no
+  name, id or institution — de-identified by construction — but a caretaker
+  who types a child's name sends it. No redaction pass exists.
+- Cost figures on the admin usage page are estimates priced with
+  gpt-4o-mini rates that were never updated for the provider actually in use.
+  Counts are exact; the money column is not, and the page says so.
+- `SL-RF-022` / `HEAR-RF-014` make "any caretaker concern" a HIGH red flag at
+  any age. In a tool people only open when worried this is nearly always
+  true, and the acceptance dataset contradicts it in at least three cases
+  (T3, T7, T8). What currently separates them is an undocumented, untested
+  LLM judgement about whether a concern is "confirmed". See
+  `.ai/audit/AUDIT_REPORT.md`.
+
 ## 3. Why Tamper-Evidence Is a Product Requirement, Not Just Hardening
 
 The source document's core "why institutions pay" argument is liability protection through documented response. The source doc's own v1→v2 correction states plainly: a documented concern with no recorded action is documented negligence, not protection. That argument only survives scrutiny if the record itself cannot be plausibly alleged to have been edited after the fact. The hash-chained audit log (§1, Tampering) is the direct technical answer to that legal exposure — this line item should be treated as business-critical, not as a nice-to-have security feature.

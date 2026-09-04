@@ -31,13 +31,14 @@ def settings(rsa_keypair):
 
 @pytest.fixture()
 def client(settings, db_session):
-    from app.api.deps import get_db
+    from app.api.deps import get_db, get_tenant_db
     from app.core.config import get_settings
     from app.main import create_app
 
     get_settings.cache_clear()
     app = create_app(settings)
     app.dependency_overrides[get_db] = lambda: db_session
+    app.dependency_overrides[get_tenant_db] = lambda: db_session
     with TestClient(app) as test_client:
         yield test_client
     get_settings.cache_clear()

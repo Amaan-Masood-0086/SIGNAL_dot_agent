@@ -20,7 +20,7 @@ from fastapi.testclient import TestClient
 @pytest.fixture()
 def make_client(rsa_keypair, db_session):
     """Client factory with per-test Settings overrides (provider env vars)."""
-    from app.api.deps import get_db
+    from app.api.deps import get_db, get_tenant_db
     from app.core.config import Settings, get_settings
     from app.main import create_app
 
@@ -40,6 +40,7 @@ def make_client(rsa_keypair, db_session):
         get_settings.cache_clear()
         app = create_app(settings)
         app.dependency_overrides[get_db] = lambda: db_session
+        app.dependency_overrides[get_tenant_db] = lambda: db_session
         test_client = TestClient(app)
         test_client.__enter__()
         clients.append(test_client)
@@ -291,6 +292,62 @@ def test_stt_test_connection_network_error_is_failure(
     data = resp.json()["data"]
     assert data["success"] is False
     assert STT_KEY not in resp.text
+
+
+def test_stt_test_connection_knowlez_uses_usage_endpoint_no_region(
+    make_client, db_session, rsa_keypair, monkeypatch
+):
+    """Owner-added second STT vendor (2026-09-01): Knowlez has no region
+    concept, and its connection test hits the free /v1/usage endpoint —
+    not a billed transcription call, unlike the LLM test-connection."""
+    client, settings = make_client(STT_PROVIDER="knowlez", KNOWLEZ_STT_API_KEY=STT_KEY)
+    token, _ = _admin(db_session, settings, rsa_keypair)
+
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append((url, kwargs))
+        return __import__("httpx").Response(
+            200, request=__import__("httpx").Request("GET", url), content=b"{}"
+        )
+
+    monkeypatch.setattr("app.services.provider_checks.httpx.get", fake_get)
+
+    resp = client.post(
+        "/api/v1/admin/providers/stt/test",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200, resp.text
+    data = resp.json()["data"]
+    assert data["success"] is True
+    assert len(calls) == 1
+    assert calls[0][0] == "https://api-stt.knowlez.com/v1/usage"
+    assert calls[0][1]["headers"]["x-api-key"] == STT_KEY
+    assert STT_KEY not in resp.text
+
+
+def test_status_cards_stt_knowlez_stored_credential_needs_no_region(
+    make_client, db_session, rsa_keypair
+):
+    """Regression: the stored-credential status branch used to hardcode
+    Azure and demand AZURE_SPEECH_REGION even for a non-Azure key."""
+    from app.services.credential_service import CredentialService
+
+    client, settings = make_client(STT_PROVIDER="knowlez")
+    token, admin = _admin(db_session, settings, rsa_keypair)
+    CredentialService(db_session, settings).store(
+        provider="stt", value=STT_KEY, staff_id=admin.id
+    )
+
+    resp = client.get(
+        "/api/v1/admin/providers",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200, resp.text
+    stt = next(row for row in resp.json()["data"]["providers"] if row["provider"] == "stt")
+    assert stt["configured"] is True
+    assert stt["backend"] == "knowlez"
+    assert "AZURE_SPEECH_REGION" not in stt["detail"]
 
 
 def test_llm_test_connection_success(make_client, db_session, rsa_keypair, monkeypatch):

@@ -14,6 +14,7 @@ itself is under the same tamper-evidence regime it administers.
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -40,11 +41,16 @@ from app.schemas.admin import (
     StaffRoleUpdate,
     UsageByInstitution,
     UsageByStaff,
+    UsageByProvider,
     UsageTotals,
+    cost_or_none,
 )
 from app.services.audit import AuditService
+from app.services.usage import UsageService
 from app.services.credential_service import CredentialConfigError, CredentialService
 from app.services.provider_checks import (
+    llm_configured,
+    stt_configured,
     provider_statuses,
     test_llm_connection,
     test_stt_connection,
@@ -209,6 +215,17 @@ def list_all_children(
         )
         for child, inst_name in rows
     ]
+    # This is the ONE read that crosses the tenant boundary, so it is the one
+    # that most needs a trail (audit F3). Recorded per query with the page
+    # actually returned — enough to reconstruct what an admin looked at
+    # without writing a row per child.
+    AuditService(db).append(
+        actor_id=str(admin.staff_id),
+        action="admin.children_list",
+        resource_type="child",
+        resource_id=f"page={page},size={page_size},returned={len(items)}",
+        institution_id=str(admin.institution_id),
+    )
     result = AdminChildPage(items=items, total=total, page=page, page_size=page_size)
     return envelope(result.model_dump(mode="json"))
 
@@ -270,14 +287,38 @@ def provider_test_connection(
         )
 
     try:
-        stored, _model = CredentialService(db, settings).resolve_with_model(provider)
+        stored, stored_model = CredentialService(db, settings).resolve_with_model(provider)
     except CredentialConfigError:
         stored = None
+        stored_model = None
 
     if provider == "stt":
+        attempted = bool(stored) or stt_configured(settings)
         success, detail = test_stt_connection(settings, key=stored)
     else:
-        success, detail = test_llm_connection(settings, key=stored)
+        attempted = bool(stored) or llm_configured(settings)
+        success, detail = test_llm_connection(settings, key=stored, model=stored_model)
+
+    # A test connection is a REAL provider call, and for the LLM it is a
+    # billed one. It was previously audit-logged but never written to the
+    # usage ledger, so the page whose entire job is cost visibility
+    # under-reported actual billed calls (five of them, in this build).
+    #
+    # Cost is left NULL for the LLM rather than invented: the response's
+    # token usage is not parsed on this path, and a made-up figure in a cost
+    # column is worse than an honest blank. The STT check hits a free
+    # endpoint (Azure issueToken / Knowlez /v1/usage), so zero is accurate.
+    #
+    # Nothing is recorded when the provider is unconfigured — no call left
+    # the process, so there is nothing to account for.
+    if attempted:
+        UsageService(db).record(
+            staff_id=admin.staff_id,
+            institution_id=admin.institution_id,
+            provider=provider,
+            call_type="test_connection",
+            estimated_cost=Decimal("0") if provider == "stt" else None,
+        )
 
     # Every admin action is audit-chained — including this one.
     AuditService(db).append(
@@ -310,12 +351,17 @@ def all_usage(
     if end is not None:
         filters.append(UsageLog.timestamp <= end)
 
-    calls, cost = db.execute(
+    # `COUNT(estimated_cost)` skips NULLs, so it counts the calls that
+    # actually carry a price. The gap against `COUNT(id)` is what stops a
+    # partial sum from reading as a complete bill — see `cost_or_none`.
+    calls, priced, cost = db.execute(
         select(
-            func.count(UsageLog.id), func.sum(UsageLog.estimated_cost)
+            func.count(UsageLog.id),
+            func.count(UsageLog.estimated_cost),
+            func.sum(UsageLog.estimated_cost),
         ).where(*filters)
     ).one()
-    total = UsageTotals(calls=calls or 0, estimated_cost=float(cost) if cost else 0.0)
+    total = UsageTotals.from_counts(calls, priced, cost)
 
     staff_stmt = (
         select(
@@ -336,7 +382,7 @@ def all_usage(
             email=row.email,
             institution_id=row.institution_id,
             calls=row.calls,
-            estimated_cost=float(row.cost) if row.cost else 0.0,
+            estimated_cost=cost_or_none(row.calls, row.cost),
         )
         for row in db.execute(staff_stmt).all()
     ]
@@ -358,10 +404,33 @@ def all_usage(
             institution_id=row.institution_id,
             name=row.name,
             calls=row.calls,
-            estimated_cost=float(row.cost) if row.cost else 0.0,
+            estimated_cost=cost_or_none(row.calls, row.cost),
         )
         for row in db.execute(inst_stmt).all()
     ]
 
-    result = AllUsage(total=total, by_staff=by_staff, by_institution=by_institution)
+    # Per-vendor split: DeepSeek (llm) and the speech provider bill
+    # separately, so one merged number is not reconcilable against either.
+    by_provider = {}
+    for name in ("stt", "llm"):
+        p_calls, p_priced, p_cost = db.execute(
+            select(
+                func.count(UsageLog.id),
+                func.count(UsageLog.estimated_cost),
+                func.sum(UsageLog.estimated_cost),
+            ).where(*filters, UsageLog.provider == name)
+        ).one()
+        # This split is where NULL matters most: an STT provider test records
+        # Decimal("0") because that endpoint is genuinely free, while an LLM
+        # test connection records NULL because it is a real billed call whose
+        # price we cannot compute. Reporting both as $0.00 made the LLM
+        # invoice look like the STT one.
+        by_provider[name] = UsageTotals.from_counts(p_calls, p_priced, p_cost)
+
+    result = AllUsage(
+        total=total,
+        by_provider=UsageByProvider(**by_provider),
+        by_staff=by_staff,
+        by_institution=by_institution,
+    )
     return envelope(result.model_dump(mode="json"))

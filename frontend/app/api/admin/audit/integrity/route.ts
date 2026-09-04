@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { SESSION_COOKIE } from "@/src/lib/auth/constants";
 import { backendFetch } from "@/src/lib/api/client";
+import { adminProxyError } from "@/src/lib/api/proxy-errors";
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE)?.value;
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest) {
   try {
     const data = await backendFetch<unknown>("/api/v1/audit_log/integrity", token);
     return NextResponse.json(data);
-  } catch {
-    return NextResponse.json({ detail: "Admin role required" }, { status: 403 });
+  } catch (error) {
+    return adminProxyError(error);
   }
 }

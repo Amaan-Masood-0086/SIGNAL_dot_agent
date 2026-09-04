@@ -8,6 +8,7 @@ leak through serialization (ADR-09 for provider keys, OWASP A02 in general).
 from __future__ import annotations
 
 import datetime
+import decimal
 import uuid
 from typing import Annotated, Literal
 
@@ -110,6 +111,14 @@ class CredentialStatusRead(BaseModel):
     """The ONLY credential shape that ever leaves the API — deliberately
     missing any field that could carry the raw or encrypted value."""
 
+    # `model_name` collides with Pydantic's reserved `model_` namespace and
+    # raised a UserWarning at import. `pytest.ini` sets `filterwarnings =
+    # error`, so it was one `import` away from failing collection outright
+    # and only stayed quiet because nothing imported this module early
+    # enough. The field name is part of the API contract; the namespace is
+    # not, so narrow the namespace.
+    model_config = ConfigDict(protected_namespaces=())
+
     provider: str
     is_active: bool
     masked_suffix: str | None = None
@@ -139,9 +148,58 @@ class AdminChildPage(BaseModel):
     page_size: int = Field(ge=1, le=100)
 
 
+def cost_or_none(calls: int | None, cost_sum: "decimal.Decimal | None") -> float | None:
+    """A cost figure that tells "free" apart from "never recorded".
+
+    `usage_log.estimated_cost` is nullable ON PURPOSE and the two states mean
+    different things: an STT provider test hits a FREE usage endpoint and
+    records `Decimal("0")`, while an LLM test connection is a real billed
+    call whose price cannot be computed and records NULL. Coercing NULL to
+    0.0 collapses that distinction and quietly under-reports the figure an
+    operator is reconciling against a vendor invoice.
+
+    `SUM` over no rows is NULL too, but that case genuinely IS zero — no
+    calls were made — so the call count settles which NULL this is.
+
+    Note the explicit `is None`: the previous `float(x) if x else 0.0` also
+    sent a real `Decimal("0")` down the fallback branch, so a genuinely free
+    provider was indistinguishable from an unrecorded one even before the
+    NULLs were considered.
+    """
+    if not calls:
+        return 0.0
+    if cost_sum is None:
+        return None
+    return float(cost_sum)
+
+
 class UsageTotals(BaseModel):
     calls: int
     estimated_cost: float | None
+    # How many of `calls` carry no cost at all. Without this, a set holding
+    # ten priced calls and three unpriced ones sums to the ten-call figure
+    # and READS as complete — the same under-reporting as coercing NULL to
+    # zero, just harder to notice. `SUM` skips NULLs silently; this says so.
+    unpriced_calls: int = 0
+
+    @classmethod
+    def from_counts(
+        cls,
+        calls: int | None,
+        priced_calls: int | None,
+        cost_sum: "decimal.Decimal | None",
+    ) -> "UsageTotals":
+        """Build from `COUNT(id)`, `COUNT(estimated_cost)` and `SUM(...)`.
+
+        `COUNT(<column>)` counts non-NULLs, so the gap between the two
+        counts is exactly the number of calls with no recorded price.
+        """
+        total_calls = calls or 0
+        return cls(
+            calls=total_calls,
+            estimated_cost=cost_or_none(total_calls, cost_sum),
+            unpriced_calls=total_calls - (priced_calls or 0),
+        )
 
 
 class UsageByProvider(BaseModel):
@@ -172,5 +230,11 @@ class UsageByInstitution(BaseModel):
 
 class AllUsage(BaseModel):
     total: UsageTotals
+    # STT and LLM are DIFFERENT VENDORS with different invoices. A single
+    # combined figure cannot be reconciled against either one, so the split
+    # travels with the total rather than being left to the reader to guess.
+    # (`UsageByProvider` already existed for the caretaker's own view; the
+    # admin console simply never surfaced it.)
+    by_provider: UsageByProvider
     by_staff: list[UsageByStaff]
     by_institution: list[UsageByInstitution]

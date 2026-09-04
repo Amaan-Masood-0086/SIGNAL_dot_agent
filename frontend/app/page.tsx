@@ -6,6 +6,13 @@ import Link from "next/link";
 import { Button } from "@/src/components/ui/Button";
 import { GrowthCurve } from "@/src/components/ui/GrowthCurve";
 
+// Dynamic on purpose: the CSP nonce is injected during server-side
+// rendering from the request header, so a statically prerendered page
+// gets no nonce and every script is refused under 'strict-dynamic'
+// (Next CSP guide, "How nonces work"). Nothing here benefits from
+// prerendering anyway.
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <main className="flex flex-1 items-center justify-center p-8">

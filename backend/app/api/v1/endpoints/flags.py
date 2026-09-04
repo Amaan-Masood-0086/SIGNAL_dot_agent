@@ -17,9 +17,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.api.deps import CurrentStaff, get_current_verified_staff, get_db
+from app.api.deps import CurrentStaff, get_current_verified_staff, get_tenant_db
 from app.core.envelope import envelope
 from app.models.child import Child
+from app.services.audit import AuditService
 from app.models.flag import Flag
 from app.models.milestone import Milestone
 from app.models.session import Session as ConversationSession
@@ -29,18 +30,34 @@ router = APIRouter(tags=["flags"])
 
 
 def _build_trail(flag: Flag, by_ref: dict) -> list[TrailEntryRead]:
+    """Resolve a flag's trail, preferring the SNAPSHOT over the live row.
+
+    The knowledge base is upserted on citation_ref, so resolving descriptions
+    live meant a six-month-old flag displayed today's wording rather than the
+    wording that actually produced its grade (audit F11). The snapshot taken
+    at flag creation is the record; the live row is only consulted for older
+    flags written before snapshots existed, and to report drift.
+    """
     entries = []
     for raw in flag.reasoning_trail or []:
         if not isinstance(raw, dict) or not raw.get("citation_ref"):
             continue
         ref = str(raw["citation_ref"])
         row = by_ref.get(ref)
+        snapshot = raw.get("basis")
+        live = row.description if row else None
         entries.append(
             TrailEntryRead(
                 citation_ref=ref,
-                basis=raw.get("basis"),
-                description=row.description if row else None,
-                source=row.source if row else None,
+                basis=snapshot,
+                # Snapshot first. Fall back to the live row only when this
+                # flag predates snapshotting, so old records still render.
+                description=snapshot or live,
+                source=raw.get("source") or (row.source if row else None),
+                # True when the knowledge base has been edited since: the
+                # basis shown is still the real one, and the reader is told
+                # the reference text has moved on.
+                kb_drifted=bool(snapshot and live and snapshot != live),
             )
         )
     return entries
@@ -70,12 +87,21 @@ def _milestones_by_ref(db: Session, flag: Flag) -> dict:
 def get_flag(
     flag_id: uuid.UUID,
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     flag = db.get(Flag, flag_id)
     if flag is None or flag.institution_id != current_staff.institution_id:
         # Uniform 403 (IDOR T1/T2): never distinguish missing from foreign.
         raise HTTPException(status_code=403, detail="Access denied")
+    # A flag IS the clinical finding — reading one is the access that most
+    # needs a trail (audit F3).
+    AuditService(db).append(
+        actor_id=str(current_staff.staff_id),
+        action="flag.read",
+        resource_type="flag",
+        resource_id=str(flag.id),
+        institution_id=str(current_staff.institution_id),
+    )
     return envelope(_flag_read(db, flag).model_dump(mode="json"))
 
 
@@ -85,7 +111,7 @@ def list_child_flags(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     child = db.get(Child, child_id)
     if child is None or child.institution_id != current_staff.institution_id:
@@ -102,6 +128,16 @@ def list_child_flags(
         .limit(page_size)
     ).scalars().all()
 
+    # Per-query, not per-row: opening a child's screening history is one act
+    # of access. Logging every row would bury the chain in noise and make the
+    # log unreadable for the audit it exists to serve.
+    AuditService(db).append(
+        actor_id=str(current_staff.staff_id),
+        action="flag.list",
+        resource_type="child",
+        resource_id=str(child.id),
+        institution_id=str(current_staff.institution_id),
+    )
     result = FlagPage(
         items=[_flag_read(db, row) for row in rows],
         total=total,
@@ -117,7 +153,7 @@ def list_session_flags(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     session = db.get(ConversationSession, session_id)
     if session is None or session.institution_id != current_staff.institution_id:

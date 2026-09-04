@@ -15,7 +15,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.api.deps import CurrentStaff, get_current_verified_staff, get_db
+from app.api.deps import CurrentStaff, get_current_verified_staff, get_tenant_db
 from app.core.envelope import envelope
 from app.models.usage_log import UsageLog
 from app.schemas.admin import MyUsage, UsageByProvider, UsageTotals
@@ -24,10 +24,18 @@ router = APIRouter(prefix="/usage", tags=["usage"])
 
 
 def _totals(db: Session, *filters) -> UsageTotals:
-    calls, cost = db.execute(
-        select(func.count(UsageLog.id), func.sum(UsageLog.estimated_cost)).where(*filters)
+    # Three aggregates, one scan: total calls, calls that carry a price
+    # (COUNT of a column skips NULLs), and the sum. `UsageTotals.from_counts`
+    # needs all three to say "free" rather than "not recorded" — see the
+    # note on `cost_or_none`.
+    calls, priced, cost = db.execute(
+        select(
+            func.count(UsageLog.id),
+            func.count(UsageLog.estimated_cost),
+            func.sum(UsageLog.estimated_cost),
+        ).where(*filters)
     ).one()
-    return UsageTotals(calls=calls or 0, estimated_cost=float(cost) if cost else 0.0)
+    return UsageTotals.from_counts(calls, priced, cost)
 
 
 @router.get("/me")
@@ -35,7 +43,7 @@ def my_usage(
     start: datetime.datetime | None = Query(default=None),
     end: datetime.datetime | None = Query(default=None),
     current_staff: CurrentStaff = Depends(get_current_verified_staff),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_tenant_db),
 ):
     """Caller's own usage only — the scope is the JWT's staff identity, so
     no other staff member's rows can ever appear here."""

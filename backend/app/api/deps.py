@@ -20,6 +20,7 @@ row does not elevate.
 
 from __future__ import annotations
 
+import threading
 import uuid
 from collections.abc import Iterator
 
@@ -27,7 +28,8 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
@@ -91,15 +93,34 @@ def get_current_verified_staff(
         )
 
 
-def get_db(settings: Settings = Depends(get_settings)) -> Iterator[Session]:
-    """Request-scoped database session.
+# Engines are cached per URL and pooled. Previously one Engine was created
+# and disposed per request, which meant a fresh TCP + auth handshake on every
+# call and no pooling at all (audit F8).
+_ENGINES: dict[str, Engine] = {}
+_ENGINE_LOCK = threading.Lock()
 
-    Commits on success, rolls back on error. Skeleton-grade engine handling
-    (per-request dispose); a pooled engine + RLS session scoping
-    (`SET ROLE signal_app` + `app.institution_id`) lands with FEAT-12.
+
+def _engine_for(url: str) -> Engine:
+    engine = _ENGINES.get(url)
+    if engine is not None:
+        return engine
+    with _ENGINE_LOCK:
+        engine = _ENGINES.get(url)
+        if engine is None:
+            engine = create_engine(url, pool_pre_ping=True, pool_size=5, max_overflow=10)
+            _ENGINES[url] = engine
+    return engine
+
+
+def get_db(settings: Settings = Depends(get_settings)) -> Iterator[Session]:
+    """PRIVILEGED request-scoped session — no RLS scoping.
+
+    Reserved for the two places that legitimately cannot be tenant-scoped:
+    `/auth/token` (finds a staff row by email before any institution is
+    known) and the admin console's documented cross-institution reads.
+    Everything caretaker-facing must use `get_tenant_db` instead.
     """
-    engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
-    session = Session(bind=engine, expire_on_commit=False)
+    session = Session(bind=_engine_for(settings.DATABASE_URL), expire_on_commit=False)
     try:
         yield session
         session.commit()
@@ -108,7 +129,103 @@ def get_db(settings: Settings = Depends(get_settings)) -> Iterator[Session]:
         raise
     finally:
         session.close()
-        engine.dispose()
+
+
+# Tenant URLs whose connected role has been checked and cannot bypass RLS.
+# Verified once per engine rather than once per request: the answer cannot
+# change without a DB-side ALTER ROLE, and a `pg_roles` lookup on every
+# caretaker request would buy nothing.
+_TENANT_ROLE_VERIFIED: set[str] = set()
+
+
+def _verified_tenant_engine(settings: Settings) -> Engine:
+    """The tenant engine — or nothing at all. Fail closed, no escape hatch.
+
+    Audit finding F1 was never a missing control. RLS was enabled, FORCEd
+    and covered by passing tests; it was simply not in force at runtime,
+    because the connection carried BYPASSRLS. A system in that state looks
+    completely healthy from the outside, and the thing it silently stops
+    enforcing is cross-institution isolation of children's health data.
+
+    Two misconfigurations recreate exactly that state, so both are refused
+    here instead of being absorbed:
+
+      * `TENANT_DATABASE_URL` unset. The old code fell back to
+        `DATABASE_URL`, which is the PRIVILEGED path by definition — so
+        forgetting one setting reverted the entire fix, and nothing said so.
+      * `TENANT_DATABASE_URL` set, but pointed at a role that is a superuser
+        or holds BYPASSRLS. The URL being present proves nothing; only the
+        role's own attributes do.
+
+    Refusing costs a 500 on caretaker traffic, which is loud and immediate.
+    That is the intended trade: a deployment with broken tenant isolation
+    must stop, not serve. There is deliberately no ENVIRONMENT exemption —
+    an exemption is precisely how the first version came to be inert.
+    """
+    url = settings.TENANT_DATABASE_URL
+    if not url:
+        raise RuntimeError(
+            "TENANT_DATABASE_URL is not configured. Caretaker-facing requests "
+            "must connect as the unprivileged `signal_app` role so row-level "
+            "security applies; falling back to DATABASE_URL would restore the "
+            "audit-F1 state in which RLS is enabled but never enforced. "
+            "See backend/.env.example."
+        )
+
+    engine = _engine_for(url)
+    if url in _TENANT_ROLE_VERIFIED:
+        return engine
+
+    with engine.connect() as conn:
+        row = conn.execute(
+            text(
+                "SELECT rolsuper, rolbypassrls FROM pg_roles "
+                "WHERE rolname = current_user"
+            )
+        ).one()
+    if row.rolsuper or row.rolbypassrls:
+        raise RuntimeError(
+            "TENANT_DATABASE_URL connects as a role that can bypass row-level "
+            "security (rolsuper=%r, rolbypassrls=%r). RLS would be inert and "
+            "tenant isolation would rest entirely on handler-side WHERE "
+            "clauses. Point it at the unprivileged `signal_app` role created "
+            "by migration 0001." % (row.rolsuper, row.rolbypassrls)
+        )
+
+    _TENANT_ROLE_VERIFIED.add(url)
+    return engine
+
+
+def get_tenant_db(
+    current_staff: "CurrentStaff" = Depends(get_current_verified_staff),
+    settings: Settings = Depends(get_settings),
+) -> Iterator[Session]:
+    """Tenant-scoped session — the DB enforces isolation, not the handler.
+
+    Connects as the unprivileged `signal_app` role (no superuser, no
+    BYPASSRLS) and sets `app.institution_id` from the SIGNED token, so the
+    RLS policies from migration 0001 actually bind. A handler that forgets
+    its `WHERE institution_id = ...` now returns nothing instead of another
+    institution's children (audit F1).
+
+    `set_config(..., true)` makes the setting TRANSACTION-local. That is not
+    a detail: with a pooled connection a session-level setting would survive
+    into whichever request borrowed the connection next, which is precisely
+    the cross-tenant leak this function exists to prevent.
+    """
+    session = Session(bind=_verified_tenant_engine(settings), expire_on_commit=False)
+    try:
+        session.execute(
+            text("SELECT set_config('app.institution_id', :iid, true)"),
+            {"iid": str(current_staff.institution_id)},
+        )
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 
 def get_current_admin_staff(
