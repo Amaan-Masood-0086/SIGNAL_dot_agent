@@ -93,8 +93,16 @@ docker compose up -d db
 cd backend
 python -m venv .venv && .venv/Scripts/activate      # Linux/macOS: source .venv/bin/activate
 pip install -r requirements.lock.txt
-cp .env.example .env                                 # then fill in the values below
-alembic upgrade head
+
+# Secrets. Either copy the template and fill it in by hand:
+cp .env.example .env
+# ...or generate a complete throwaway set for a local synthetic run
+# (RS256 keypair + Fernet key + both database URLs). It refuses to
+# overwrite an existing .env:
+python scripts/write_dev_env.py
+
+alembic upgrade head                                 # also creates the signal_app role
+python scripts/ingest_knowledge_base.py              # REQUIRED — see note below
 python scripts/seed_synthetic_tenant.py
 python scripts/seed_admin.py --email root@signal.example
 uvicorn app.main:app --port 8002
@@ -102,11 +110,36 @@ uvicorn app.main:app --port 8002
 # 3. Frontend
 cd ../frontend
 npm ci
-cp .env.example .env.local                           # set BACKEND_URL=http://localhost:8002
+cp .env.example .env.local                           # BACKEND_URL=http://localhost:8002
 npm run dev
 ```
 
 Open **http://localhost:3000**.
+
+`ingest_knowledge_base.py` is not optional. The milestones and red flags live in
+the database, not in code, and `alembic upgrade head` creates the table empty —
+so without this step every screening returns "not enough information" and the
+product does nothing. It reads
+`.ai/brain/knowledge-base-source/signal_knowledge_base_v2.csv`, is idempotent
+(upsert on `citation_ref`, ADR-08), and runs under the privileged role because
+`signal_app` has SELECT-only on that table.
+
+### Moving to another machine
+
+The repository carries everything except secrets and data: both are excluded on
+purpose. Run the steps above on the new machine, then be aware of two things.
+
+`CREDENTIAL_ENCRYPTION_KEY` is a **new** key unless you copy the old one across,
+and provider credentials are encrypted at rest with it (ADR-10). A new key does
+not corrupt anything, but previously stored provider keys become undecryptable —
+so re-enter the LLM and STT keys through the admin console. There is no export
+path for them by design: the surface is write-only, and only the last four
+characters are ever displayed again.
+
+The database itself does not travel with the repository. `docker compose`
+provisions an empty Postgres and the seed scripts rebuild the knowledge base, a
+synthetic tenant and an admin account, which is enough for a full working
+system. Real screening records, if any exist, need a `pg_dump`.
 
 ### Required environment values
 
