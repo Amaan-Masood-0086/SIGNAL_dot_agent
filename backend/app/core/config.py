@@ -79,8 +79,18 @@ class Settings(BaseSettings):
     LLM_FALLBACK_API_KEY: str | None = None
     LLM_FALLBACK_MODEL: str | None = None
     LLM_FALLBACK_BASE_URL: str | None = None
+    # How long to wait for one provider call. The reasoning tier sends the
+    # largest prompt (age context + retrieved knowledge base + transcript)
+    # and is the slow one; a fixed 60s was observed timing out against a real
+    # provider, which costs the caretaker their turn and reports only
+    # "Reasoning failed". Configurable so it can be tuned per provider
+    # instead of edited in code.
+    LLM_TIMEOUT_SECONDS: float = 90.0
+
     # Best-effort cost model for usage_log.estimated_cost ($ per 1M tokens);
-    # defaults bracket gpt-4o-mini, override per real contract.
+    # defaults bracket gpt-4o-mini, override per real contract. If the
+    # provider changed and these did not, the money column is priced for the
+    # previous vendor — the admin usage page says so explicitly.
     LLM_COST_PER_MILLION_INPUT: float = 0.15
     LLM_COST_PER_MILLION_OUTPUT: float = 0.60
 

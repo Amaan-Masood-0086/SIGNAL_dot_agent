@@ -129,6 +129,11 @@ export const sessionEnvelopeSchema = z.object({
 // FEAT-06: adaptive follow-up loop outcome for one reasoning turn.
 export const reasoningInputSchema = z.object({
   raw_input: z.string().trim().min(1).max(10_000),
+  // Must be listed here or Zod strips it: unknown keys are dropped by
+  // default, so a field the backend understands never leaves the proxy.
+  // A closed enum, never free text — the caretaker's own words stay fenced
+  // as data, so a language preference has to arrive as structure.
+  response_language: z.enum(["auto", "ur", "en"]).default("auto"),
 });
 export type ReasoningInput = z.infer<typeof reasoningInputSchema>;
 

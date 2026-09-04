@@ -172,5 +172,11 @@ class UsageByInstitution(BaseModel):
 
 class AllUsage(BaseModel):
     total: UsageTotals
+    # STT and LLM are DIFFERENT VENDORS with different invoices. A single
+    # combined figure cannot be reconciled against either one, so the split
+    # travels with the total rather than being left to the reader to guess.
+    # (`UsageByProvider` already existed for the caretaker's own view; the
+    # admin console simply never surfaced it.)
+    by_provider: UsageByProvider
     by_staff: list[UsageByStaff]
     by_institution: list[UsageByInstitution]

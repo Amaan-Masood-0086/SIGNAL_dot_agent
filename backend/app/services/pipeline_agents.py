@@ -107,6 +107,15 @@ def _parse_agent_json(text: str) -> dict:
     try:
         payload = json.loads(cleaned)
     except json.JSONDecodeError as exc:
+        # Length and prefix distinguish the two ways this fails: an EMPTY
+        # reply means the token budget was spent before any output (a model
+        # that reasons internally can eat the whole allowance), while prose
+        # means the model ignored the JSON contract. They need opposite fixes.
+        import logging
+
+        logging.getLogger("signal.agents").error(
+            "agent JSON parse failed: len=%d prefix=%r", len(cleaned), cleaned[:120]
+        )
         raise AgentContractError(f"agent output is not JSON: {exc}") from exc
     if not isinstance(payload, dict):
         raise AgentContractError("agent output must be a JSON object")
@@ -143,6 +152,33 @@ Rules:
 
 Answer with JSON ONLY, no prose:
 {"signals": ["..."], "safeguarding_pattern": false, "key_items_missing": false}"""
+
+
+# ── Reply language ──────────────────────────────────────────────────────────
+# Only ever applies to text a caretaker READS. Signals, grades and
+# citation_refs stay English: they are the clinical record, not the reply.
+_LANGUAGE_NAMES = {"ur": "Urdu", "en": "English"}
+
+
+def language_instruction(response_language: str) -> str:
+    """Turn the caller's allowlisted preference into a prompt line.
+
+    "auto" mirrors whatever the caretaker wrote, which is the right default.
+    An explicit choice overrides it, because detection cannot see the case
+    that matters most here: a caretaker who types Roman English for keyboard
+    convenience but reads Urdu far more comfortably.
+    """
+    named = _LANGUAGE_NAMES.get(response_language)
+    if named:
+        return (
+            "\n\nREPLY LANGUAGE (explicit, overrides detection): write every "
+            f"word the caretaker reads in {named}. Citation refs "
+            "(e.g. SL-M-019) stay verbatim — they are identifiers, not words."
+        )
+    return (
+        "\n\nREPLY LANGUAGE: mirror the caretaker's own language exactly "
+        "(Urdu, Roman Urdu, or English). Citation refs stay verbatim."
+    )
 
 
 class ObservationAgent:
@@ -187,6 +223,12 @@ GROUNDING (non-negotiable, ADR-03):
    INSUFFICIENT_INFORMATION — a correct, safe outcome).
 2. No clinical knowledge from memory. No diagnostic labels (never "DLD",
    "language disorder", "autism" — name observations, grade urgency).
+
+LANGUAGE:
+0. Any text a caretaker READS — above all `follow_up_question` — must be in
+   the SAME language they wrote in (Urdu, Roman Urdu, or English). A
+   follow-up they cannot read ends the conversation. Signals, grades and
+   citation_refs stay English: they are the clinical record, not the reply.
 
 JOINT DOMAIN CHECK (ADR-05):
 3. Speech_Language and Hearing are evaluated TOGETHER, every time. Delayed
@@ -241,6 +283,7 @@ class RiskReasoningAgent:
         age_context: AgeContext,
         force_conclusion: bool,
         case_memory: str | None = None,
+        response_language: str = "auto",
     ) -> ReasoningOutput:
         transcript = "\n".join(
             f"turn {index}: <caretaker_input>{turn}</caretaker_input>"
@@ -271,7 +314,7 @@ class RiskReasoningAgent:
         text = self._provider.complete(
             agent=AGENT_RISK_REASONING,
             tier=TIER_STRONG,
-            system=REASONING_SYSTEM,
+            system=REASONING_SYSTEM + language_instruction(response_language),
             user=user,
         )
         payload = _parse_agent_json(text)
@@ -332,6 +375,13 @@ Rules:
 3. Preserve the true confidence level: never round INSUFFICIENT_INFORMATION
    up to reassurance, never round a real concern down to sound gentler.
 4. Route to a clinician; SIGNAL screens, it never diagnoses.
+5. LANGUAGE: answer in the SAME language the caretaker used. If they wrote
+   Urdu, answer in Urdu; Roman Urdu, answer in Roman Urdu; English, English.
+   Mirroring the caretaker is not a preference — a caretaker in a Pakistani
+   institution who writes Urdu and is answered in English cannot act on the
+   result, which makes the whole screening worthless to the person holding
+   it. Citation refs (SL-M-019, HEAR-RF-003) stay verbatim in every
+   language: they are record identifiers, not words.
 Answer in prose only."""
 
 # Diagnostic labels that must never ship (ADR-07). OME/glue-ear is NOT here —
@@ -392,6 +442,7 @@ class ExplanationAgent:
         domain: str | None,
         trail: list[dict],
         age_uncertain: bool,
+        response_language: str = "auto",
     ) -> str:
         refs = [str(entry.get("citation_ref")) for entry in trail]
         basis_lines = "\n".join(
@@ -406,7 +457,7 @@ class ExplanationAgent:
         text = self._provider.complete(
             agent=AGENT_EXPLANATION,
             tier=TIER_MID,
-            system=EXPLANATION_SYSTEM,
+            system=EXPLANATION_SYSTEM + language_instruction(response_language),
             user=user,
         ).strip()
 

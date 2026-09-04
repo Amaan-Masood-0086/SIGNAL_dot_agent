@@ -42,6 +42,25 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
+/* Indeterminate progress sweep.
+   Deliberately NOT a percentage bar: a screening turn's duration is unknown
+   (prompt size and provider latency both vary), so a bar that fills to 100%
+   and then waits is a lie that makes the wait feel longer. This says
+   "working" honestly; the elapsed seconds beside it carry the real
+   information. Honoured by the reduced-motion block below. */
+@keyframes signal-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+.signal-sweep {
+  animation: signal-sweep 1.4s ease-in-out infinite;
+}
+
 /* Honor reduced motion across the app's few transitions. */
 @media (prefers-reduced-motion: reduce) {
   *,

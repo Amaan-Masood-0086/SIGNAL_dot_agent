@@ -75,6 +75,81 @@ export function UsagePanel() {
         />
       </div>
 
+      {/* The two providers are separate companies with separate invoices, so
+          the combined total above is not reconcilable against either bill on
+          its own. This is the split that is. */}
+      <section className="rounded-xl border border-line bg-surface p-5">
+        <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
+          By provider
+        </h2>
+        <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+          Speech-to-text and the language model are billed by different vendors.
+          Reconcile each column against that vendor&rsquo;s own invoice — the
+          combined total above matches neither.
+        </p>
+        {/* The counts come straight from the ledger and are exact. The costs
+            are model output, and the model only matches reality if the rates
+            were set for the vendor actually in use — saying so is the
+            difference between an estimate and a wrong number. */}
+        <p className="mt-2 rounded-lg bg-amber-soft px-3 py-2 text-[11px] leading-relaxed text-amber">
+          <span className="font-semibold">Counts are exact; costs are estimates.</span>{" "}
+          Cost is computed from per-million token rates and an audio-duration
+          guess, using whatever rates are configured in the environment. If the
+          provider was changed without updating
+          {" "}<code className="font-mono">LLM_COST_PER_MILLION_INPUT</code>/
+          <code className="font-mono">OUTPUT</code>, the money column is priced
+          for the previous vendor. Treat the vendor&rsquo;s invoice as the
+          source of truth, and this page as the early-warning signal it was
+          built to be.
+        </p>
+        <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {(
+            [
+              {
+                key: "llm" as const,
+                label: "Language model",
+                note: "Reasoning and explanation calls",
+              },
+              {
+                key: "stt" as const,
+                label: "Speech-to-text",
+                note: "One call per transcribed turn",
+              },
+            ]
+          ).map((provider) => {
+            const row = usage.by_provider[provider.key];
+            return (
+              <div
+                key={provider.key}
+                className="rounded-lg border border-line px-4 py-3"
+              >
+                <dt className="text-[11px] font-bold tracking-[0.12em] text-ink-soft uppercase">
+                  {provider.label}
+                </dt>
+                <dd className="mt-1.5 flex flex-wrap items-baseline gap-x-3">
+                  <span className="font-display text-2xl leading-none font-bold tracking-tight text-ink">
+                    {row.calls}
+                  </span>
+                  <span className="text-xs text-ink-soft">
+                    {row.calls === 1 ? "call" : "calls"}
+                  </span>
+                  <span
+                    className={`ml-auto font-display text-lg leading-none font-bold ${
+                      (row.estimated_cost ?? 0) > 0 ? "text-amber" : "text-ink-soft"
+                    }`}
+                  >
+                    {money(row.estimated_cost)}
+                  </span>
+                </dd>
+                <p className="mt-1.5 text-[11px] text-ink-soft">
+                  {row.calls === 0 ? "Nothing spent — no calls recorded" : provider.note}
+                </p>
+              </div>
+            );
+          })}
+        </dl>
+      </section>
+
       <Alert tone="info">
         These numbers are the reporting half of the cost-abuse control: rate limits
         cap how fast paid calls can be made, and this breakdown makes an unusual

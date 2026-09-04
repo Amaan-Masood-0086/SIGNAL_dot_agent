@@ -5,6 +5,13 @@
 services:
   db:
     image: postgres:16-alpine
+    # Observed exiting 255 on its own twice in one session — a host sleep or
+    # Docker Desktop restart is enough. Every SIGNAL surface then fails at
+    # once, and the failure reads as "password authentication failed" rather
+    # than "the database is gone", which sends you looking in the wrong
+    # place. Restart it automatically; a deliberate `docker compose stop`
+    # still stays stopped.
+    restart: unless-stopped
     environment:
       POSTGRES_USER: signal
       POSTGRES_PASSWORD: signal_dev_only

@@ -122,6 +122,12 @@ export const usageEnvelopeSchema = z.object({
   success: z.boolean(),
   data: z.object({
     total: z.object({ calls: z.number(), estimated_cost: z.number().nullable() }),
+    // STT and LLM are separate vendors with separate invoices; a merged
+    // figure reconciles against neither.
+    by_provider: z.object({
+      stt: z.object({ calls: z.number(), estimated_cost: z.number().nullable() }),
+      llm: z.object({ calls: z.number(), estimated_cost: z.number().nullable() }),
+    }),
     by_staff: z.array(
       z.object({
         staff_id: z.string(),

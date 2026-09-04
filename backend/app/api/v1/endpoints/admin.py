@@ -14,6 +14,7 @@ itself is under the same tamper-evidence regime it administers.
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -40,11 +41,15 @@ from app.schemas.admin import (
     StaffRoleUpdate,
     UsageByInstitution,
     UsageByStaff,
+    UsageByProvider,
     UsageTotals,
 )
 from app.services.audit import AuditService
+from app.services.usage import UsageService
 from app.services.credential_service import CredentialConfigError, CredentialService
 from app.services.provider_checks import (
+    llm_configured,
+    stt_configured,
     provider_statuses,
     test_llm_connection,
     test_stt_connection,
@@ -287,9 +292,32 @@ def provider_test_connection(
         stored_model = None
 
     if provider == "stt":
+        attempted = bool(stored) or stt_configured(settings)
         success, detail = test_stt_connection(settings, key=stored)
     else:
+        attempted = bool(stored) or llm_configured(settings)
         success, detail = test_llm_connection(settings, key=stored, model=stored_model)
+
+    # A test connection is a REAL provider call, and for the LLM it is a
+    # billed one. It was previously audit-logged but never written to the
+    # usage ledger, so the page whose entire job is cost visibility
+    # under-reported actual billed calls (five of them, in this build).
+    #
+    # Cost is left NULL for the LLM rather than invented: the response's
+    # token usage is not parsed on this path, and a made-up figure in a cost
+    # column is worse than an honest blank. The STT check hits a free
+    # endpoint (Azure issueToken / Knowlez /v1/usage), so zero is accurate.
+    #
+    # Nothing is recorded when the provider is unconfigured — no call left
+    # the process, so there is nothing to account for.
+    if attempted:
+        UsageService(db).record(
+            staff_id=admin.staff_id,
+            institution_id=admin.institution_id,
+            provider=provider,
+            call_type="test_connection",
+            estimated_cost=Decimal("0") if provider == "stt" else None,
+        )
 
     # Every admin action is audit-chained — including this one.
     AuditService(db).append(
@@ -375,5 +403,23 @@ def all_usage(
         for row in db.execute(inst_stmt).all()
     ]
 
-    result = AllUsage(total=total, by_staff=by_staff, by_institution=by_institution)
+    # Per-vendor split: DeepSeek (llm) and the speech provider bill
+    # separately, so one merged number is not reconcilable against either.
+    by_provider = {}
+    for name in ("stt", "llm"):
+        p_calls, p_cost = db.execute(
+            select(func.count(UsageLog.id), func.sum(UsageLog.estimated_cost)).where(
+                *filters, UsageLog.provider == name
+            )
+        ).one()
+        by_provider[name] = UsageTotals(
+            calls=p_calls or 0, estimated_cost=float(p_cost) if p_cost else 0.0
+        )
+
+    result = AllUsage(
+        total=total,
+        by_provider=UsageByProvider(**by_provider),
+        by_staff=by_staff,
+        by_institution=by_institution,
+    )
     return envelope(result.model_dump(mode="json"))

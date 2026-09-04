@@ -32,7 +32,31 @@ AGENT_RISK_REASONING = "risk_reasoning"
 AGENT_EXPLANATION = "explanation"
 
 DEFAULT_LLM_BASE_URL = "https://api.openai.com/v1"
-LLM_TIMEOUT_SECONDS = 60.0
+
+# Output budget per tier — DISABLED, and the reason is worth keeping.
+#
+# Capping output looked like the obvious latency fix: generation time scales
+# with tokens produced, and three uncapped sequential calls is how a
+# concluding turn reached 89 seconds.
+#
+# It broke the pipeline outright. `deepseek-v4-flash` spends its token budget
+# on internal reasoning before emitting anything, so a 400-token ceiling left
+# nothing for the actual reply and the model returned an EMPTY string —
+# `AgentContractError: agent output is not JSON` on the very first turn.
+#
+# A cap is therefore a guess about how many tokens a given model reasons
+# with, and guessing wrong does not slow the turn down, it destroys it. A
+# failed turn costs the caretaker their input and one of five attempts; a
+# slow turn costs them waiting. Uncapped is the safe default.
+#
+# To reintroduce this: set the values per model after measuring that model's
+# reasoning overhead, and treat an empty completion as the signal that the
+# budget is too low. `MAX_TOKENS_BY_TIER = {}` keeps every call uncapped.
+MAX_TOKENS_BY_TIER: dict[str, int] = {}
+DEFAULT_MAX_TOKENS: int | None = None
+# Fallback for the env-free construction paths; Settings.LLM_TIMEOUT_SECONDS
+# is the value that actually applies in the running app.
+LLM_TIMEOUT_SECONDS = 90.0
 
 
 class LLMError(RuntimeError):
@@ -62,10 +86,12 @@ class OpenAICompatibleLLM:
         base_url: str,
         cost_per_million_input: float = 0.15,
         cost_per_million_output: float = 0.60,
+        timeout_seconds: float = LLM_TIMEOUT_SECONDS,
     ):
         self._api_key = api_key
         self._model = model
         self._base_url = base_url.rstrip("/")
+        self._timeout = timeout_seconds
         self._input_rate = Decimal(str(cost_per_million_input))
         self._output_rate = Decimal(str(cost_per_million_output))
         self.last_call_cost: Decimal | None = None
@@ -94,8 +120,15 @@ class OpenAICompatibleLLM:
                         {"role": "user", "content": user},
                     ],
                     "temperature": 0.0,  # screening output must be reproducible
+                    # Only sent when a budget is configured for this tier;
+                    # see MAX_TOKENS_BY_TIER for why it is empty by default.
+                    **(
+                        {"max_tokens": MAX_TOKENS_BY_TIER[tier]}
+                        if tier in MAX_TOKENS_BY_TIER
+                        else {}
+                    ),
                 },
-                timeout=LLM_TIMEOUT_SECONDS,
+                timeout=self._timeout,
             )
         except httpx.HTTPError as exc:
             raise LLMError("LLM provider unreachable") from exc
@@ -139,6 +172,7 @@ def build_llm_provider(
         base_url=settings.LLM_BASE_URL or DEFAULT_LLM_BASE_URL,
         cost_per_million_input=settings.LLM_COST_PER_MILLION_INPUT,
         cost_per_million_output=settings.LLM_COST_PER_MILLION_OUTPUT,
+        timeout_seconds=settings.LLM_TIMEOUT_SECONDS,
     )
     if not settings.LLM_FALLBACK_API_KEY:
         return primary
@@ -150,6 +184,7 @@ def build_llm_provider(
         base_url=settings.LLM_FALLBACK_BASE_URL or DEFAULT_LLM_BASE_URL,
         cost_per_million_input=settings.LLM_COST_PER_MILLION_INPUT,
         cost_per_million_output=settings.LLM_COST_PER_MILLION_OUTPUT,
+        timeout_seconds=settings.LLM_TIMEOUT_SECONDS,
     )
     return ResilientLLM(primary, fallback=fallback)
 

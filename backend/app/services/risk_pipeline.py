@@ -170,6 +170,10 @@ class RiskPipeline:
         staff_id: uuid.UUID,
         institution_id: uuid.UUID,
         reference_date: datetime.date | None = None,
+        # "auto" | "ur" | "en" — only affects text a caretaker READS.
+        # Signals, grades and citation_refs stay English: they are the
+        # clinical record, not the reply.
+        response_language: str = "auto",
     ) -> PipelineResult:
         if turn_number > MAX_TURNS:
             raise LoopCapExceeded(
@@ -244,6 +248,7 @@ class RiskPipeline:
                 age_context=age_context,
                 force_conclusion=force_conclusion,
                 case_memory=case_memory,
+                response_language=response_language,
             ),
         )
         if not reasoning.concluded:
