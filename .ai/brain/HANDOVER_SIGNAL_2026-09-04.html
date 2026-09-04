@@ -1,0 +1,771 @@
+<title>SIGNAL Engineering Handover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Noto+Sans:wght@400;500;600;700&display=swap">
+
+<style>
+  /* SIGNAL's own tokens (frontend/app/globals.css) — this document belongs
+     to the project it describes, so it uses the project's palette. */
+  :root {
+    --paper: #f5f7f6;
+    --surface: #ffffff;
+    --sunken: #eef2f0;
+    --ink: #152825;
+    --ink-soft: #52655f;
+    --ink-faint: #7d8f89;
+    --pine: #175e54;
+    --pine-deep: #0c423b;
+    --moss: #e4efea;
+    --line: #dbe5e0;
+    --line-strong: #c3d3cc;
+    --amber: #965700;
+    --amber-soft: #fcf1df;
+    --red: #b3261e;
+    --red-soft: #fcebe9;
+    --shadow: 0 1px 2px rgba(21, 40, 37, .05), 0 8px 24px -12px rgba(21, 40, 37, .12);
+
+    --display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    --body: "Noto Sans", ui-sans-serif, system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0d1614;
+      --surface: #142220;
+      --sunken: #0f1b19;
+      --ink: #e8f0ed;
+      --ink-soft: #a3b5af;
+      --ink-faint: #7a8c86;
+      --pine: #5fbfaa;
+      --pine-deep: #8ad6c3;
+      --moss: #1a302b;
+      --line: #243a35;
+      --line-strong: #33504a;
+      --amber: #e2a250;
+      --amber-soft: #2c2115;
+      --red: #f08a80;
+      --red-soft: #2e1917;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px -12px rgba(0, 0, 0, .6);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #0d1614;
+    --surface: #142220;
+    --sunken: #0f1b19;
+    --ink: #e8f0ed;
+    --ink-soft: #a3b5af;
+    --ink-faint: #7a8c86;
+    --pine: #5fbfaa;
+    --pine-deep: #8ad6c3;
+    --moss: #1a302b;
+    --line: #243a35;
+    --line-strong: #33504a;
+    --amber: #e2a250;
+    --amber-soft: #2c2115;
+    --red: #f08a80;
+    --red-soft: #2e1917;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px -12px rgba(0, 0, 0, .6);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+
+  /* ── Masthead ─────────────────────────────────────────────── */
+  .masthead { display: flex; flex-direction: column; gap: 14px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--pine);
+    font-weight: 600;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(30px, 5.2vw, 42px);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -.022em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 16.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin: 0;
+    max-width: 62ch;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-faint);
+  }
+  .meta b { color: var(--ink-soft); font-weight: 600; }
+
+  /* ── Sections ─────────────────────────────────────────────── */
+  section { display: flex; flex-direction: column; gap: 18px; }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -.014em;
+    margin: 0;
+    padding-bottom: 9px;
+    border-bottom: 2px solid var(--pine);
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -.008em;
+  }
+
+  p { margin: 0; max-width: 68ch; }
+  .lede { color: var(--ink-soft); }
+
+  a { color: var(--pine); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--pine);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: .875em;
+    background: var(--moss);
+    color: var(--pine-deep);
+    padding: .1em .38em;
+    border-radius: 3px;
+  }
+
+  /* ── Findings: severity stripe, not another card ──────────── */
+  .finding {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 15px 18px 16px;
+    border-left: 3px solid var(--line-strong);
+    background: var(--surface);
+    border-radius: 0 6px 6px 0;
+  }
+  .finding.blocked  { border-left-color: var(--red); }
+  .finding.decision { border-left-color: var(--amber); }
+  .finding.done     { border-left-color: var(--pine); }
+
+  .finding-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+    background: var(--sunken);
+    color: var(--ink-soft);
+  }
+  .pill.blocked  { background: var(--red-soft);   color: var(--red); }
+  .pill.decision { background: var(--amber-soft); color: var(--amber); }
+  .pill.done     { background: var(--moss);       color: var(--pine); }
+
+  .stack { display: flex; flex-direction: column; gap: 16px; }
+  .stack-tight { display: flex; flex-direction: column; gap: 10px; }
+
+  /* ── Tables ───────────────────────────────────────────────── */
+  .scroll { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    padding: 0 14px 7px 0;
+    border-bottom: 1px solid var(--line-strong);
+    white-space: nowrap;
+  }
+  td {
+    padding: 9px 14px 9px 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.num { text-align: right; padding-right: 20px; white-space: nowrap; }
+  .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); white-space: nowrap; }
+  .verdict-high { color: var(--red); font-weight: 600; }
+  .verdict-ok   { color: var(--pine); font-weight: 600; }
+
+  /* ── Callout for the trap ─────────────────────────────────── */
+  .trap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--red-soft);
+    border: 1px solid var(--red);
+    border-radius: 6px;
+    padding: 15px 18px;
+  }
+  .trap h3 { color: var(--red); }
+
+  .note {
+    background: var(--moss);
+    border-radius: 6px;
+    padding: 14px 17px;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .note strong { color: var(--ink); }
+
+  ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 7px; max-width: 68ch; }
+  li::marker { color: var(--pine); }
+
+  dl.kv { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 7px 18px; font-size: 14px; }
+  dl.kv dt { font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .07em; padding-top: 3px; }
+  dl.kv dd { margin: 0; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+    font-size: 13px;
+    color: var(--ink-faint);
+    max-width: 68ch;
+  }
+
+  @media (max-width: 560px) {
+    dl.kv { grid-template-columns: 1fr; gap: 3px 0; }
+    dl.kv dd { padding-bottom: 8px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Engineering handover</div>
+    <h1>SIGNAL — state of the build</h1>
+    <p class="standfirst">
+      Developmental screening for children in institutional care. This is the honest
+      version: what works, what is measured but unsolved, what is waiting on a person
+      rather than on code, and the two things that will waste your afternoon if nobody
+      warns you first.
+    </p>
+    <div class="meta">
+      <span><b>Branch</b> feat/role-aware-dashboard-ui</span>
+      <span><b>Tests</b> 429 backend · 17 frontend</span>
+      <span><b>Model</b> deepseek-v4-flash</span>
+      <span><b>Date</b> 4 Sep 2026</span>
+    </div>
+  </header>
+
+  <!-- ── READ FIRST ─────────────────────────────────────────── -->
+  <section>
+    <h2>Read this before you start</h2>
+    <p class="lede">Three things are true right now that the code will not tell you.</p>
+
+    <div class="stack">
+      <div class="finding blocked">
+        <div class="finding-head">
+          <h3>CI cannot start, and it is not the workflow file</h3>
+          <span class="pill blocked">Owner action</span>
+        </div>
+        <p>
+          Every GitHub Actions run returns <code>startup_failure</code> in 0s with no jobs,
+          no logs and an empty workflow name. This was bisected, not guessed: a six-line
+          workflow with nothing in it to get wrong failed identically, and GitHub's own
+          dynamic Copilot workflow — which nobody here authored — fails the same way. The
+          Actions policy is clean (<code>enabled</code>, <code>allowed_actions=all</code>).
+          The repository is private, so the likely cause is exhausted Actions minutes or a
+          $0 spending limit. Confirming needs the billing scope; raising a limit is the
+          owner's call. Until then the Definition-of-Done gates are local-only.
+        </p>
+      </div>
+
+      <div class="finding decision">
+        <div class="finding-head">
+          <h3>A screening turn takes about 91 seconds</h3>
+          <span class="pill decision">Measured, unsolved</span>
+        </div>
+        <p>
+          Not a hang and not a bug in the pipeline — see the latency section below for what
+          was ruled out and, more importantly, for the one optimisation that must not be
+          retried.
+        </p>
+      </div>
+
+      <div class="finding decision">
+        <div class="finding-head">
+          <h3>The knowledge base contradicts its own test cases</h3>
+          <span class="pill decision">Clinical sign-off</span>
+        </div>
+        <p>
+          Two red-flag rules grade three of the dataset's own gold-standard conversations
+          wrong, and the test suite cannot currently see it. The engineering fix is clear;
+          the content fix is a clinician's decision, not a developer's.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LATENCY ────────────────────────────────────────────── -->
+  <section>
+    <h2>The response delay</h2>
+    <p class="lede">
+      Roughly 45s per LLM call. A normal turn makes two calls — observation, then risk
+      reasoning — so the caretaker waits about 91 seconds. The final turn of a session adds
+      a third call for the explanation.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Pipeline stage</th>
+            <th class="num">Calls logged</th>
+            <th class="num">Prompt size</th>
+            <th>Runs on</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Observation</td>
+            <td class="num">15</td>
+            <td class="num">~364 tok</td>
+            <td>every turn</td>
+          </tr>
+          <tr>
+            <td>Risk reasoning</td>
+            <td class="num">15</td>
+            <td class="num">~1,328 tok</td>
+            <td>every turn</td>
+          </tr>
+          <tr>
+            <td>Explanation</td>
+            <td class="num">3</td>
+            <td class="num">~487 tok</td>
+            <td>final turn only</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      <strong>Ruled out by measurement, not by argument.</strong> The prompts are small and
+      the outputs are short JSON, so neither prompt size nor generation length accounts for
+      45 seconds. What remains is the model's own internal reasoning or queueing on the
+      provider's side. A single timed <code>curl</code> straight at the provider separates
+      those two, and that is the next step — it has not been run yet.
+    </p>
+
+    <div class="trap">
+      <h3>Do not re-attempt: per-tier <code>max_tokens</code> caps</h3>
+      <p>
+        This was tried and it broke the pipeline outright.
+        <code>deepseek-v4-flash</code> spends its token budget on internal reasoning, so a
+        400-token ceiling left nothing for the reply and the model returned an empty
+        string — <code>AgentContractError</code> on the very first turn. It is reverted.
+        <code>MAX_TOKENS_BY_TIER</code> deliberately remains in the code but empty, with
+        the reason recorded at its definition and a test asserting the field is
+        <em>omitted</em> rather than sent as null. A cap is a guess about one model's
+        reasoning overhead, and guessing low destroys the turn instead of shortening it.
+      </p>
+    </div>
+
+    <div class="stack-tight">
+      <h3>The lever that has not been pulled</h3>
+      <p>
+        <code>TIER_CHEAP</code>, <code>TIER_MID</code> and <code>TIER_STRONG</code> exist
+        and ride along every call, but <strong>nothing maps a tier to a model</strong> —
+        one model currently serves all three. Observation is a structured-extraction task
+        and does not need the same model as risk reasoning. Wiring the tiers is the
+        realistic path to a faster turn, and it is blocked only on someone choosing the
+        model names.
+      </p>
+      <p>
+        Also relevant: <code>LLM_TIMEOUT_SECONDS</code> is now a setting at 90s. A
+        hardcoded 60s was previously killing turns outright.
+      </p>
+    </div>
+
+    <div class="note">
+      <strong>One recommendation was made and then withdrawn.</strong> Moving the
+      explanation call off the critical path looked attractive until the usage ledger was
+      checked: only 3 of 33 calls were explanations. It would speed up the last turn of a
+      session while leaving every follow-up turn at 91 seconds — real complexity and a new
+      failure mode for a narrow win.
+    </div>
+  </section>
+
+  <!-- ── KNOWLEDGE BASE ─────────────────────────────────────── -->
+  <section>
+    <h2>Knowledge base audit</h2>
+    <p class="lede">
+      94 rows — 50 milestones, 42 red flags, 2 risk modifiers; 61 Speech &amp; Language,
+      33 Hearing. Provenance is recorded per row: 31 <em>Ayesha original</em>,
+      18 <em>Ayesha original — CORRECTED</em>, 45 <em>Added in validation</em>.
+    </p>
+
+    <div class="stack">
+      <div class="finding decision">
+        <div class="finding-head">
+          <h3>&ldquo;Any caretaker concern&rdquo; grades everything HIGH</h3>
+          <span class="pill decision">Clinical sign-off</span>
+        </div>
+        <p>
+          <span class="ref">SL-RF-022</span> and <span class="ref">HEAR-RF-014</span> are
+          both severity <code>HIGH</code>, both span ages 0–72 months, and both have an
+          empty follow-up question. Sourced to JCIH 2019 — which was written for a parent
+          walking into a clinic, where &ldquo;I'm worried&rdquo; already means evidence has
+          accumulated. SIGNAL opens <em>because</em> someone is worried, so the same
+          sentence cannot carry the same weight.
+        </p>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Case</th>
+                <th>Caretaker's opening line</th>
+                <th>Expected</th>
+                <th>Rule gives</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="ref">T3 · 18mo</td>
+                <td>&ldquo;He only says about 5 words, is that bad?&rdquo;</td>
+                <td>LOW</td>
+                <td class="verdict-high">HIGH</td>
+              </tr>
+              <tr>
+                <td class="ref">T7 · 30mo</td>
+                <td>&ldquo;Sometimes I feel she's behind the other kids&rdquo;</td>
+                <td>LOW</td>
+                <td class="verdict-high">HIGH</td>
+              </tr>
+              <tr>
+                <td class="ref">T8 · 5yr</td>
+                <td>&ldquo;Something feels off with her&rdquo;</td>
+                <td>MODERATE</td>
+                <td class="verdict-high">HIGH</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          The provenance settles which side should give way: all three conversations are
+          <em>Ayesha original — CORRECTED</em>, the domain lead's own gold standard, while
+          both rules were <em>Added in validation</em>. Content added during validation is
+          contradicting the domain lead's own cases.
+        </p>
+      </div>
+
+      <div class="finding decision">
+        <div class="finding-head">
+          <h3>Connected symptoms are counted as independent evidence</h3>
+          <span class="pill decision">R14 · tracked</span>
+        </div>
+        <p>
+          <span class="ref">HEAR-RF-007</span> (ear-pulling with stalled speech),
+          <span class="ref">HEAR-RF-010</span> (sits close to the TV) and
+          <span class="ref">HEAR-RF-016</span> (recurrent ear infections) are all
+          <code>MODERATE</code> and all in the Hearing domain. ADR-06 rule 1b reads
+          <em>&ge;2 MODERATE red flags within the same domain &rarr; HIGH</em>, so any two
+          of them escalate. Clinically these are very likely one picture — fluid in the
+          middle ear — not three findings. This is already logged as <strong>R14</strong>
+          with an <code>xfail</code> test pinning the divergence, and is explicitly blocked
+          on clinical sign-off; no speculative fix is permitted.
+        </p>
+      </div>
+
+      <div class="finding decision">
+        <div class="finding-head">
+          <h3>28 of 42 red flags have no follow-up question</h3>
+          <span class="pill decision">Content</span>
+        </div>
+        <p>
+          These are exactly the moments where the agent should ask a clarifying question and
+          instead has nothing to work from. Note that this is the same fix as the finding
+          above it: <span class="ref">SL-RF-022</span> and
+          <span class="ref">HEAR-RF-014</span> cannot become follow-up gates until their
+          questions are written.
+        </p>
+      </div>
+
+      <div class="finding decision">
+        <div class="finding-head">
+          <h3>Two other gaps, both content</h3>
+          <span class="pill decision">Content</span>
+        </div>
+        <ul>
+          <li>
+            Both risk modifiers are Hearing. <strong>Speech &amp; Language has none</strong> —
+            prematurity, NICU stay and family history of language disorder are all absent.
+          </li>
+          <li>
+            Only 13 of 94 rows name a year or edition in their source; 16 say bare
+            &ldquo;ASHA&rdquo;. CDC shifted its milestone ages in 2022, and there is no way
+            to tell which rows predate that.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="stack-tight">
+      <h3>Two claims that were checked and did not hold</h3>
+      <p>
+        An external review raised seven issues. Five are confirmed above. Two are not
+        accurate, and a handover should say so rather than pass them along:
+      </p>
+      <ul>
+        <li>
+          <strong>&ldquo;No record of who added each row.&rdquo;</strong> The CSV has a
+          <code>provenance</code> column and it is fully populated. What is genuinely
+          missing is a <em>date</em> and a <em>named reviewer</em>, not the origin.
+        </li>
+        <li>
+          <strong>&ldquo;No &lsquo;this looks fine&rsquo; outcome is a design
+          oversight.&rdquo;</strong> It is a deliberate ADR-06 decision, documented in
+          <code>grade()</code>: the floor for the weakest confirmed evidence is
+          <code>LOW_MONITOR</code>. There are also <strong>four</strong> states, not three —
+          <code>INSUFFICIENT_INFORMATION</code> exists. Changing this needs a new ADR;
+          existing ADRs are never overridden in place.
+        </li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <strong>New finding, not in the external review.</strong> The dataset's
+      <code>expected_grade</code> column is asserted only for the safeguarding cases and
+      for T6 (the R14 <code>xfail</code>). It is <em>not</em> checked for the rest — which
+      is precisely why the T3/T7/T8 contradiction has gone unnoticed. A detector test that
+      runs every case through <code>grade()</code> and compares against
+      <code>expected_grade</code> would turn this class of problem into a build failure
+      instead of something a person has to spot. That work is pure engineering and needs no
+      clinical input; the content decisions above still do.
+    </div>
+  </section>
+
+  <!-- ── RECENTLY FIXED ─────────────────────────────────────── -->
+  <section>
+    <h2>Landed recently</h2>
+    <p class="lede">
+      Three PR review findings, all of the same shape as the original security audit: a
+      control correct in intent and quietly wrong in code.
+    </p>
+
+    <div class="stack">
+      <div class="finding done">
+        <div class="finding-head">
+          <h3>PHI was being written to logs</h3>
+          <span class="pill done">Fixed</span>
+        </div>
+        <p>
+          Agent JSON parse failures logged a 120-character prefix of the model's output —
+          which carries caretaker text and a child's clinical detail. The diagnostic value
+          was never the content but the <em>shape</em> (empty means the token budget was
+          spent before any output; prose means the JSON contract was ignored — opposite
+          fixes). A classifier now reports the shape and the content never reaches a handler.
+        </p>
+      </div>
+
+      <div class="finding done">
+        <div class="finding-head">
+          <h3>Tenant isolation could revert silently</h3>
+          <span class="pill done">Fixed</span>
+        </div>
+        <p>
+          <code>get_tenant_db</code> fell back to <code>DATABASE_URL</code> when
+          <code>TENANT_DATABASE_URL</code> was unset — and that is the privileged path by
+          definition, so forgetting one setting reverted the entire row-level-security fix
+          with no external symptom. It now refuses both a missing URL and any role reporting
+          <code>rolsuper</code> or <code>rolbypassrls</code>, verified once per engine.
+          There is deliberately no environment exemption: an exemption is how the control
+          came to be inert the first time.
+        </p>
+      </div>
+
+      <div class="finding done">
+        <div class="finding-head">
+          <h3>Unknown cost was reported as zero</h3>
+          <span class="pill done">Fixed</span>
+        </div>
+        <p>
+          <code>estimated_cost</code> is nullable on purpose — an STT provider test hits a
+          genuinely free endpoint and records <code>0</code>, while an LLM test connection
+          is a real billed call whose price cannot be computed and records
+          <code>NULL</code>. Five call sites collapsed that distinction. Sums also skip
+          NULLs, so a partial total read as a finished bill; the console now reports
+          unpriced calls alongside the figure.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SETUP ──────────────────────────────────────────────── -->
+  <section>
+    <h2>Standing it up on a new machine</h2>
+    <p class="lede">
+      Only PostgreSQL is containerised — there are no Dockerfiles for the backend or
+      frontend, which run natively on Python 3.12 and Node 22. The full sequence was
+      rehearsed end to end against a scratch database, so the README is accurate as written.
+    </p>
+
+    <dl class="kv">
+      <dt>Critical step</dt>
+      <dd>
+        <code>python scripts/ingest_knowledge_base.py</code> is not optional. Milestones
+        live in the database, and <code>alembic upgrade head</code> creates the table
+        empty — skip the ingest and every screening returns &ldquo;not enough
+        information&rdquo;.
+      </dd>
+      <dt>Two DB paths</dt>
+      <dd>
+        <code>DATABASE_URL</code> is the privileged <code>signal</code> role (migrations,
+        login, admin cross-institution reads). <code>TENANT_DATABASE_URL</code> is the
+        unprivileged <code>signal_app</code> role so RLS binds. They are not
+        interchangeable and there is no fallback.
+      </dd>
+      <dt>Provider keys</dt>
+      <dd>
+        Not in <code>.env</code>. They are entered through the admin console and encrypted
+        at rest, write-only — only the last four characters are ever shown again. A new
+        <code>CREDENTIAL_ENCRYPTION_KEY</code> makes previously stored keys undecryptable,
+        so on a fresh machine simply re-enter them.
+      </dd>
+      <dt>Data</dt>
+      <dd>
+        The database does not travel with the repository. Seed scripts rebuild the
+        knowledge base, a synthetic tenant and an admin account — enough for a full working
+        system. Real screening records would need a <code>pg_dump</code>.
+      </dd>
+    </dl>
+  </section>
+
+  <!-- ── OPEN DECISIONS ─────────────────────────────────────── -->
+  <section>
+    <h2>Waiting on a decision, not on code</h2>
+    <p class="lede">
+      These are deliberately unstarted. Each needs someone with authority to choose, and
+      building first would mean guessing at a clinical or governance question.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Whose call</th>
+            <th>Blocks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>R14 flag clustering</td>
+            <td>Clinical lead</td>
+            <td>An <code>xfail</code> test; over-escalation in Hearing</td>
+          </tr>
+          <tr>
+            <td>&ldquo;Any concern&rdquo; rule severity</td>
+            <td>Clinical lead</td>
+            <td>Correct grading of T3, T7, T8</td>
+          </tr>
+          <tr>
+            <td>28 follow-up questions</td>
+            <td>Clinical lead</td>
+            <td>Agent's ability to clarify a red flag</td>
+          </tr>
+          <tr>
+            <td>Speech &amp; Language risk modifiers</td>
+            <td>Clinical lead</td>
+            <td>Prematurity / NICU / family history</td>
+          </tr>
+          <tr>
+            <td>Actions minutes or spending limit</td>
+            <td>Repository owner</td>
+            <td>All CI</td>
+          </tr>
+          <tr>
+            <td>Password verification (FEAT-12)</td>
+            <td>Product</td>
+            <td>Real credentials</td>
+          </tr>
+          <tr>
+            <td>Consent, retention and erasure</td>
+            <td>Governance</td>
+            <td>Any non-synthetic data</td>
+          </tr>
+          <tr>
+            <td>Model names for tier wiring</td>
+            <td>Operator</td>
+            <td>The realistic latency fix</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <strong>A note on the content items.</strong> Drafting 28 clinical follow-up questions
+      and a set of risk modifiers is well within what an AI can produce fluently — which is
+      exactly the risk. The repository already sets the precedent in R14:
+      <em>resolution awaits clinical sign-off; no speculative fix allowed.</em> Generating
+      that content without review would break the same rule twenty-eight times over, in a
+      tool that grades children's development.
+    </div>
+  </section>
+
+  <footer>
+    Environment is <code>synthetic_only</code>; no real child data has been processed.
+    Test counts at time of writing: 429 backend (427 passed, 1 skipped, 1 xfailed) and 17
+    frontend, with <code>bandit</code>, <code>pip-audit</code> and <code>npm audit</code>
+    all reporting zero. Full session history and rationale live in
+    <code>.ai/brain/PROGRESS.md</code>.
+  </footer>
+
+</div>
