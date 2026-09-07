@@ -164,10 +164,10 @@ shown again.
 ```bash
 # Backend — needs real Postgres. SQLite is never a fallback: row-level
 # security is an acceptance criterion and is Postgres-only.
-./scripts/run_backend_tests.ps1        # 417 passed · 1 skipped · 1 xfailed
+./scripts/run_backend_tests.ps1        # 496 passed · 1 skipped · 1 xfailed
 
 # Frontend
-cd frontend && npm test                # 17 passed
+cd frontend && npm test                # 25 passed
 ```
 
 One test is a permanent `xfail` and that is deliberate — see
@@ -207,7 +207,7 @@ backend/
     services/             knowledge base, risk pipeline, agents, audit, credentials
     models/ schemas/      SQLAlchemy models · Pydantic contracts
   alembic/versions/       migrations (RLS lives in 0001)
-  tests/                  419 tests, Postgres-backed
+  tests/                  498 tests, Postgres-backed
 frontend/
   app/                    App Router pages + same-origin API proxies
   src/components/         UI primitives and feature surfaces
