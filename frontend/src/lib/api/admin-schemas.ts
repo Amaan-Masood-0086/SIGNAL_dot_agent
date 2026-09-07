@@ -81,12 +81,52 @@ export const adminChildSchema = z.object({
   dob: z.string().nullable(),
   estimated_age_range: z.string().nullable(),
   intake_date: z.string(),
+  // Who is RESPONSIBLE for this child (migration 0007). Not access control:
+  // every institution member still sees every child.
+  assigned_staff_id: z.string().nullable().default(null),
+  archived_at: z.string().nullable().default(null),
+  archived_reason: z.string().nullable().default(null),
 });
 export type AdminChild = z.infer<typeof adminChildSchema>;
 
 export const childPageEnvelopeSchema = z.object({
   success: z.boolean(),
   data: z.object({ items: z.array(adminChildSchema), total: z.number() }),
+});
+
+// ── Onboarding: institution → staff → child ───────────────────────────────
+
+export const institutionSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  is_synthetic: z.boolean(),
+  created_at: z.string(),
+});
+export type Institution = z.infer<typeof institutionSchema>;
+
+export const institutionPageEnvelopeSchema = z.object({
+  success: z.boolean(),
+  data: z.object({ items: z.array(institutionSchema), total: z.number() }),
+});
+
+export const institutionEnvelopeSchema = z.object({
+  success: z.boolean(),
+  data: institutionSchema,
+});
+
+export const adminChildCreatedSchema = z.object({
+  id: z.string(),
+  institution_id: z.string(),
+  name: z.string(),
+  dob_confirmed: z.boolean(),
+  dob: z.string().nullable(),
+  estimated_age_range: z.string().nullable(),
+  intake_date: z.string(),
+});
+
+export const adminChildCreatedEnvelopeSchema = z.object({
+  success: z.boolean(),
+  data: adminChildCreatedSchema,
 });
 
 export const auditEntrySchema = z.object({

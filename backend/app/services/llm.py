@@ -16,6 +16,7 @@ limitation, not a silent gap.
 
 from __future__ import annotations
 
+import time
 from decimal import Decimal
 from typing import Protocol
 
@@ -58,9 +59,61 @@ DEFAULT_MAX_TOKENS: int | None = None
 # is the value that actually applies in the running app.
 LLM_TIMEOUT_SECONDS = 90.0
 
+# Transient-failure retry.
+#
+# Measured against Gemini's free tier (2026-09-06): roughly half of first
+# calls returned HTTP 503 "model overloaded", and an immediate retry
+# succeeded. Without this, one hiccup raised LLMError, the endpoint returned
+# 502 "Reasoning failed", and the caretaker lost their input AND one of only
+# five turns — for a condition that clears in about a second.
+#
+# This sits BENEATH `ResilientLLM`, which solves a different problem: that
+# fails over to a second endpoint (only when one is configured) and treats
+# the primary as broken. A provider saying "busy" is not a broken provider.
+#
+# Only genuinely transient statuses qualify. 401/403/404 mean the key or the
+# model name is wrong, and retrying those turns a clear configuration error
+# into a slow one.
+#
+# 429 is deliberately NOT here, which is worth explaining because it looks
+# like the obvious candidate. Measured against Gemini's free tier: a 429
+# carries `retryDelay: 55s`, and the quota it names is
+# `GenerateRequestsPerDayPerProjectPerModel` — a DAILY cap. A one-second
+# backoff cannot help with either, so retrying a 429 only delays telling the
+# operator the one thing they need to know: the budget is gone, not the key.
+TRANSIENT_STATUSES = frozenset({500, 502, 503, 504})
+RETRY_ATTEMPTS = 3
+RETRY_BACKOFF_SECONDS = 1.0
+
 
 class LLMError(RuntimeError):
     """Provider failure — mapped to a clean 502 upstream, never surfaced raw."""
+
+
+def _terminal_message(status_code: int) -> str:
+    """Name the cause in the SERVER log; the client still gets a generic 502.
+
+    "rejected the call (HTTP 429)" sent an operator to check a key that was
+    perfectly fine — the actual cause was an exhausted daily quota, and the
+    two need opposite responses. The status code stays in the message either
+    way so nothing is lost.
+    """
+    if status_code == 429:
+        return (
+            "LLM provider quota exhausted (HTTP 429) — the credential is "
+            "valid; the request budget for this model is spent"
+        )
+    if status_code in (401, 403):
+        return (
+            f"LLM provider rejected the credential (HTTP {status_code}) — "
+            f"check the stored API key"
+        )
+    if status_code == 404:
+        return (
+            "LLM provider does not recognise the model (HTTP 404) — check "
+            "LLM_MODEL or the stored model override"
+        )
+    return f"LLM provider rejected the call (HTTP {status_code})"
 
 
 class LLMProvider(Protocol):
@@ -109,29 +162,52 @@ class OpenAICompatibleLLM:
         return self._model
 
     def complete(self, *, agent: str, tier: str, system: str, user: str) -> str:
-        try:
-            response = httpx.post(
-                f"{self._base_url}/chat/completions",
-                headers={"Authorization": f"Bearer {self._api_key}"},
-                json={
-                    "model": self._model,
-                    "messages": [
-                        {"role": "system", "content": system},
-                        {"role": "user", "content": user},
-                    ],
-                    "temperature": 0.0,  # screening output must be reproducible
-                    # Only sent when a budget is configured for this tier;
-                    # see MAX_TOKENS_BY_TIER for why it is empty by default.
-                    **(
-                        {"max_tokens": MAX_TOKENS_BY_TIER[tier]}
-                        if tier in MAX_TOKENS_BY_TIER
-                        else {}
-                    ),
-                },
-                timeout=self._timeout,
-            )
-        except httpx.HTTPError as exc:
-            raise LLMError("LLM provider unreachable") from exc
+        body = {
+            "model": self._model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            "temperature": 0.0,  # screening output must be reproducible
+            # Only sent when a budget is configured for this tier;
+            # see MAX_TOKENS_BY_TIER for why it is empty by default.
+            **(
+                {"max_tokens": MAX_TOKENS_BY_TIER[tier]}
+                if tier in MAX_TOKENS_BY_TIER
+                else {}
+            ),
+        }
+
+        response = None
+        last_error: Exception | None = None
+        for attempt in range(RETRY_ATTEMPTS):
+            try:
+                response = httpx.post(
+                    f"{self._base_url}/chat/completions",
+                    headers={"Authorization": f"Bearer {self._api_key}"},
+                    json=body,
+                    timeout=self._timeout,
+                )
+            except httpx.HTTPError as exc:
+                # A dropped connection is the same transient class as a 503.
+                last_error, response = exc, None
+            else:
+                if response.status_code == 200:
+                    break
+                if response.status_code not in TRANSIENT_STATUSES:
+                    # Terminal: a wrong key, a model that does not exist, a
+                    # malformed request, or an exhausted quota. Retrying only
+                    # delays the answer the first response already gave.
+                    raise LLMError(_terminal_message(response.status_code))
+                last_error = None
+
+            if attempt < RETRY_ATTEMPTS - 1:
+                # Back off — immediate retries hammer a provider that is
+                # already saying it is overloaded.
+                time.sleep(RETRY_BACKOFF_SECONDS * (2**attempt))
+
+        if response is None:
+            raise LLMError("LLM provider unreachable") from last_error
         if response.status_code != 200:
             raise LLMError(
                 f"LLM provider rejected the call (HTTP {response.status_code})"

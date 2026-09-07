@@ -105,7 +105,9 @@ alembic upgrade head                                 # also creates the signal_a
 python scripts/ingest_knowledge_base.py              # REQUIRED — see note below
 python scripts/seed_synthetic_tenant.py
 python scripts/seed_admin.py --email root@signal.example
-uvicorn app.main:app --port 8002
+# --no-server-header stops uvicorn stamping its own `server: uvicorn`
+# alongside the app's `Server: SIGNAL` (OWASP A02 banner removal).
+uvicorn app.main:app --port 8002 --no-server-header
 
 # 3. Frontend
 cd ../frontend

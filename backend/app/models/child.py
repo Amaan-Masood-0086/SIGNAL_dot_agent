@@ -43,6 +43,22 @@ class Child(IdMixin, TimestampMixin, Base):
     )
     archived_reason: Mapped[str | None] = mapped_column(String(200), nullable=True)
 
+    # Which staff member is responsible for this child (migration 0007).
+    #
+    # RESPONSIBILITY, not ACCESS. Nothing reads this to decide what a
+    # caretaker may see — every institution member still sees every child.
+    # Narrowing that is REMEDIATION_BACKLOG R8 and carries a real question
+    # this column does not answer: a child whose assigned caretaker is off
+    # shift must not become invisible to whoever is covering.
+    #
+    # Nullable because unassigned is a legitimate state, not a defect.
+    assigned_staff_id: Mapped[uuid.UUID | None] = mapped_column(
+        UuidType,
+        ForeignKey("staff.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+
     @property
     def is_archived(self) -> bool:
         return self.archived_at is not None

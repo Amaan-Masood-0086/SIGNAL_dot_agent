@@ -79,7 +79,13 @@ _CONCEPTS = (
     },
     {
         "name": "vague_five_year_old",
-        "phrases": ("something feels off"),
+        # The trailing comma is load-bearing. Without it this is a plain
+        # string, `for phrase in phrases` walks its CHARACTERS, and the
+        # concept matches any input containing "s" or a space — which meant
+        # a five-year-old whose caretaker reported nothing developmental was
+        # graded MODERATE on invented evidence. Pinned by
+        # tests/test_synthetic_reasoner_matching.py.
+        "phrases": ("something feels off",),
         "follow_up": "Does she talk as much as other children her age? Does she hear and understand you?",
         "confirmed": (("SL-RF-020", 60, 72),),
         "missed": (("SL-M-031", 60, 72),),

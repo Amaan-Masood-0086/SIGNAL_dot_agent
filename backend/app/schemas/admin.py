@@ -14,6 +14,8 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
+from app.schemas.child import ChildCreate
+
 StaffRole = Literal["caretaker", "admin"]
 
 
@@ -139,6 +141,11 @@ class AdminChildRead(BaseModel):
     dob: datetime.date | None = None
     estimated_age_range: str | None = None
     intake_date: datetime.date
+    # Responsibility + roster state, so the console can show and change both
+    # without a second round-trip per row.
+    assigned_staff_id: uuid.UUID | None = None
+    archived_at: datetime.datetime | None = None
+    archived_reason: str | None = None
 
 
 class AdminChildPage(BaseModel):
@@ -146,6 +153,67 @@ class AdminChildPage(BaseModel):
     total: int
     page: int = Field(ge=1)
     page_size: int = Field(ge=1, le=100)
+
+
+# ── Onboarding: institution → staff → child ────────────────────────────────
+#
+# Every one of these takes the institution EXPLICITLY. The system-level admin
+# belongs to the NextaSol tenant, not to any institution that delivers care,
+# so deriving scope from their token — the way the caretaker routes correctly
+# do — would file real children under the system tenant. `nav.ts` calls that
+# "clean data that is quietly wrong", and a required field is what stops it.
+
+
+class InstitutionCreate(BaseModel):
+    name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=2, max_length=200)]
+
+
+class InstitutionRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    name: str
+    is_synthetic: bool
+    created_at: datetime.datetime
+
+
+class InstitutionPage(BaseModel):
+    items: list[InstitutionRead]
+    total: int
+
+
+class StaffCreate(BaseModel):
+    """Create a staff account.
+
+    No password field, and that is deliberate rather than an omission: login
+    does not verify passwords yet (FEAT-12), so accepting one here would
+    store a credential nothing checks and imply a guarantee the system does
+    not make. The row gets an unusable placeholder hash until real
+    verification lands.
+    """
+
+    email: Annotated[str, StringConstraints(strip_whitespace=True, min_length=3, max_length=320)]
+    role: StaffRole
+    institution_id: uuid.UUID
+
+
+class ChildAssignment(BaseModel):
+    """Who is responsible for a child. `None` clears the assignment —
+    unassigned is a legitimate state (a carer leaves, a child is between
+    carers), not a defect to be prevented."""
+
+    staff_id: uuid.UUID | None = None
+
+
+class AdminChildCreate(ChildCreate):
+    """The caretaker intake contract plus an explicit institution.
+
+    Subclassing `ChildCreate` is the point: the ADR-02 dual-age validator is
+    inherited whole, so the admin path cannot drift into a weaker version of
+    the rule that confirmed-DOB and estimated-range are mutually exclusive.
+    """
+
+    institution_id: uuid.UUID
 
 
 def cost_or_none(calls: int | None, cost_sum: "decimal.Decimal | None") -> float | None:

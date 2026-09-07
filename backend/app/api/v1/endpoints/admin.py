@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+import secrets
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -25,17 +26,24 @@ from app.api.deps import CurrentStaff, get_current_admin_staff, get_db
 from app.core.config import Settings, get_settings
 from app.core.envelope import envelope
 from app.core.rate_limit import FixedWindowRateLimiter
+from app.core.synthetic_gate import assert_synthetic_write
 from app.models.child import Child
 from app.models.institution import Institution
 from app.models.staff import STAFF_ROLES, Staff
 from app.models.usage_log import UsageLog
 from app.schemas.admin import (
     AllUsage,
+    AdminChildCreate,
     AdminChildPage,
     AdminChildRead,
+    ChildAssignment,
+    InstitutionCreate,
+    InstitutionPage,
+    InstitutionRead,
     ProviderStatus,
     ProviderTestResult,
     StaffActiveUpdate,
+    StaffCreate,
     StaffPage,
     StaffRead,
     StaffRoleUpdate,
@@ -45,6 +53,7 @@ from app.schemas.admin import (
     UsageTotals,
     cost_or_none,
 )
+from app.schemas.child import ChildArchive, ChildRead
 from app.services.audit import AuditService
 from app.services.usage import UsageService
 from app.services.credential_service import CredentialConfigError, CredentialService
@@ -179,6 +188,428 @@ def set_staff_active(
     return envelope(StaffRead.model_validate(staff).model_dump(mode="json"))
 
 
+# ── Onboarding: institution → staff → child ────────────────────────────
+#
+# Without these a fresh system is unusable: there was no way to create a
+# staff row through the product at all, so an admin could promote and
+# deactivate people who already existed but never add one — and with no
+# caretaker, no session can be opened and the screening pipeline cannot run.
+#
+# Each takes the institution EXPLICITLY. See the note on `InstitutionCreate`:
+# deriving it from the admin's own token is precisely the "quietly wrong"
+# filing that the caretaker-only nav guard exists to prevent.
+
+
+def _institution_or_404(db: Session, institution_id: uuid.UUID) -> Institution:
+    institution = db.get(Institution, institution_id)
+    if institution is None:
+        raise HTTPException(status_code=404, detail="Institution not found")
+    return institution
+
+
+@router.get("/institutions")
+def list_institutions(
+    admin: CurrentStaff = Depends(get_current_admin_staff),
+    db: Session = Depends(get_db),
+):
+    """CROSS-INSTITUTION BYPASS (justified): the picker behind every
+    onboarding form. An explicit institution_id is unusable in a UI without
+    a way to enumerate the choices."""
+    rows = db.execute(select(Institution).order_by(Institution.name.asc())).scalars().all()
+    result = InstitutionPage(
+        items=[InstitutionRead.model_validate(row) for row in rows],
+        total=len(rows),
+    )
+    return envelope(result.model_dump(mode="json"))
+
+
+@router.post("/institutions", status_code=201)
+def create_institution(
+    payload: InstitutionCreate,
+    admin: CurrentStaff = Depends(get_current_admin_staff),
+    settings: Settings = Depends(get_settings),
+    db: Session = Depends(get_db),
+):
+    """Register a care institution.
+
+    `is_synthetic` is forced to match the environment rather than accepted
+    from the body. In `synthetic_only` a non-synthetic institution would be
+    a dead end — every child write into it would be refused by the synthetic
+    gate — so the tenant is created in the only state that can actually be
+    used, and the client cannot ask for otherwise.
+    """
+    is_synthetic = settings.ENVIRONMENT == "synthetic_only"
+    institution = Institution(name=payload.name, is_synthetic=is_synthetic)
+    db.add(institution)
+    db.flush()
+
+    AuditService(db).append(
+        actor_id=str(admin.staff_id),
+        action="institution.create",
+        resource_type="institution",
+        resource_id=str(institution.id),
+        institution_id=str(institution.id),
+    )
+    return envelope(InstitutionRead.model_validate(institution).model_dump(mode="json"))
+
+
+@router.post("/staff", status_code=201)
+def create_staff(
+    payload: StaffCreate,
+    admin: CurrentStaff = Depends(get_current_admin_staff),
+    settings: Settings = Depends(get_settings),
+    db: Session = Depends(get_db),
+):
+    """Create a staff account in a named institution.
+
+    This is the only way to onboard a caretaker through the product; before
+    it existed the sole paths were two seed scripts run by someone with
+    database access.
+
+    The stored hash is an unusable placeholder, exactly as `seed_admin.py`
+    does it. Login does not verify passwords yet (FEAT-12), so storing a
+    real one would imply a guarantee the system does not make — and storing
+    a guessable one would be worse than storing none.
+    """
+    institution = _institution_or_404(db, payload.institution_id)
+    assert_synthetic_write(bool(institution.is_synthetic), environment=settings.ENVIRONMENT)
+
+    email = payload.email.strip().lower()
+    existing = db.execute(select(Staff).where(Staff.email == email)).scalar_one_or_none()
+    if existing is not None:
+        # `staff.email` is unique at the DB level; say so cleanly instead of
+        # letting an IntegrityError surface as a 500.
+        raise HTTPException(
+            status_code=409, detail="A staff account with that email already exists"
+        )
+
+    staff = Staff(
+        institution_id=institution.id,
+        email=email,
+        hashed_password=f"!created-{secrets.token_urlsafe(24)}",
+        role=payload.role,
+        is_active=True,
+        is_synthetic=bool(institution.is_synthetic),
+    )
+    db.add(staff)
+    db.flush()
+
+    AuditService(db).append(
+        actor_id=str(admin.staff_id),
+        action="staff.create",
+        resource_type="staff",
+        resource_id=str(staff.id),
+        institution_id=str(institution.id),
+    )
+    return envelope(StaffRead.model_validate(staff).model_dump(mode="json"))
+
+
+@router.post("/children", status_code=201)
+def create_child_for_institution(
+    payload: AdminChildCreate,
+    admin: CurrentStaff = Depends(get_current_admin_staff),
+    settings: Settings = Depends(get_settings),
+    db: Session = Depends(get_db),
+):
+    """Register a child under an EXPLICITLY named institution.
+
+    The caretaker route (`POST /children`) derives scope from the token and
+    is deliberately untouched. This one cannot: a system-level admin has no
+    care institution of their own, so the field is required and the admin
+    states it every time.
+
+    The ADR-02 dual-age contract is inherited from `ChildCreate`, not
+    reimplemented — an admin-entered record is the same clinical record.
+    """
+    institution = _institution_or_404(db, payload.institution_id)
+    is_synthetic = bool(institution.is_synthetic)
+    assert_synthetic_write(is_synthetic, environment=settings.ENVIRONMENT)
+
+    child = Child(
+        institution_id=institution.id,
+        name=payload.name.strip(),
+        intake_date=payload.intake_date or datetime.date.today(),
+        dob_confirmed=payload.dob_confirmed,
+        dob=payload.dob if payload.dob_confirmed else None,
+        estimated_age_range=(
+            None if payload.dob_confirmed else payload.estimated_age_range
+        ),
+        estimated_age_note=(
+            None if payload.dob_confirmed else payload.estimated_age_note
+        ),
+        is_synthetic=is_synthetic,
+    )
+    db.add(child)
+    db.flush()
+
+    AuditService(db).append(
+        actor_id=str(admin.staff_id),
+        action="child.create",
+        resource_type="child",
+        resource_id=str(child.id),
+        # The institution the child was FILED UNDER, not the admin's own —
+        # that is the field an auditor would check.
+        institution_id=str(institution.id),
+    )
+    return envelope(ChildRead.model_validate(child).model_dump(mode="json"))
+
+
+# ── Removal: delete what is empty, archive what is not ─────────────────
+#
+# Nothing in SIGNAL was hard-deletable, and that was deliberate: staff
+# deactivate, children archive, `signal_app` holds no DELETE grant, and
+# REMEDIATION_BACKLOG R7 ("retention + defensible deletion") is open pending a
+# policy decision. A flag is a clinical finding and the audit chain names the
+# staff member behind it — destroying either removes the evidence the product
+# exists to produce.
+#
+# That reasoning only binds records that HAVE such content. A mistyped
+# registration with no sessions and no flags raises no retention question at
+# all, and refusing to remove it just leaves junk on the roster forever.
+#
+# So deletion is permitted exactly there and refused everywhere else, with the
+# safe alternative named in the refusal. The rule is a property of the ROW,
+# not a permission of the caller: there is no force flag and no admin
+# override, because privilege does not change what a record contains.
+
+
+def _child_history_counts(db: Session, child_id: uuid.UUID) -> dict[str, int]:
+    from app.models.flag import Flag
+    from app.models.observation import Observation
+    from app.models.session import Session as ConversationSession
+
+    session_ids = select(ConversationSession.id).where(
+        ConversationSession.child_id == child_id
+    )
+    return {
+        "sessions": db.execute(
+            select(func.count(ConversationSession.id)).where(
+                ConversationSession.child_id == child_id
+            )
+        ).scalar_one(),
+        "flags": db.execute(
+            select(func.count(Flag.id)).where(Flag.child_id == child_id)
+        ).scalar_one(),
+        "observations": db.execute(
+            select(func.count(Observation.id)).where(
+                Observation.session_id.in_(session_ids)
+            )
+        ).scalar_one(),
+    }
+
+
+@router.delete("/children/{child_id}")
+def delete_child(
+    child_id: uuid.UUID,
+    admin: CurrentStaff = Depends(get_current_admin_staff),
+    db: Session = Depends(get_db),
+):
+    """Permanently remove a child that has no clinical record.
+
+    Refuses the moment any screening history exists and points at archive,
+    which keeps the record and takes the child off the roster.
+    """
+    child = db.get(Child, child_id)
+    if child is None:
+        raise HTTPException(status_code=404, detail="Child not found")
+
+    counts = _child_history_counts(db, child.id)
+    if any(counts.values()):
+        detail = (
+            "This child has a screening record ("
+            + ", ".join(f"{n} {name}" for name, n in counts.items() if n)
+            + "). Deleting it would destroy clinical evidence — archive the "
+            "child instead, which removes them from the roster and keeps the "
+            "record."
+        )
+        raise HTTPException(status_code=409, detail=detail)
+
+    name_len = len(child.name)  # nothing identifying goes to the audit row
+    db.delete(child)
+    db.flush()
+
+    AuditService(db).append(
+        actor_id=str(admin.staff_id),
+        action="child.delete",
+        resource_type="child",
+        resource_id=str(child_id),
+        institution_id=str(child.institution_id),
+    )
+    return envelope({"deleted": True, "id": str(child_id), "name_length": name_len})
+
+
+@router.post("/children/{child_id}/archive")
+def admin_archive_child(
+    child_id: uuid.UUID,
+    payload: ChildArchive,
+    admin: CurrentStaff = Depends(get_current_admin_staff),
+    db: Session = Depends(get_db),
+):
+    """The safe removal, reachable from the admin console.
+
+    Archive already existed, but only on the caretaker's child profile — a
+    page the admin console cannot open, which left the delete refusal above
+    pointing at a control the admin had no way to reach.
+    """
+    child = db.get(Child, child_id)
+    if child is None:
+        raise HTTPException(status_code=404, detail="Child not found")
+    if child.archived_at is not None:
+        raise HTTPException(status_code=409, detail="Child is already archived")
+
+    child.archived_at = datetime.datetime.now(datetime.timezone.utc)
+    child.archived_reason = payload.reason.strip()
+    db.flush()
+
+    AuditService(db).append(
+        actor_id=str(admin.staff_id),
+        action="child.archive",
+        resource_type="child",
+        resource_id=str(child.id),
+        institution_id=str(child.institution_id),
+    )
+    return envelope(ChildRead.model_validate(child).model_dump(mode="json"))
+
+
+@router.post("/children/{child_id}/restore")
+def admin_restore_child(
+    child_id: uuid.UUID,
+    admin: CurrentStaff = Depends(get_current_admin_staff),
+    db: Session = Depends(get_db),
+):
+    """Archiving is reversible on purpose — a wrong archive must not need a
+    DBA to undo."""
+    child = db.get(Child, child_id)
+    if child is None:
+        raise HTTPException(status_code=404, detail="Child not found")
+    if child.archived_at is None:
+        raise HTTPException(status_code=409, detail="Child is not archived")
+
+    child.archived_at = None
+    child.archived_reason = None
+    db.flush()
+
+    AuditService(db).append(
+        actor_id=str(admin.staff_id),
+        action="child.restore",
+        resource_type="child",
+        resource_id=str(child.id),
+        institution_id=str(child.institution_id),
+    )
+    return envelope(ChildRead.model_validate(child).model_dump(mode="json"))
+
+
+@router.delete("/staff/{staff_id}")
+def delete_staff(
+    staff_id: uuid.UUID,
+    admin: CurrentStaff = Depends(get_current_admin_staff),
+    db: Session = Depends(get_db),
+):
+    """Permanently remove a staff account that never did anything.
+
+    Refuses once the account has run sessions or spent provider budget: the
+    audit chain names this person as the actor behind graded findings, and a
+    row that no longer exists cannot answer "who did this" — which is the
+    non-repudiation the chain exists to provide. Deactivation keeps the
+    identity and removes the access.
+    """
+    staff = _get_staff_or_404(db, staff_id)
+    if staff.id == admin.staff_id:
+        # Same anti-lockout rail as role change and deactivation.
+        raise HTTPException(
+            status_code=409,
+            detail="You cannot delete your own account; ask another admin",
+        )
+
+    from app.models.session import Session as ConversationSession
+
+    sessions = db.execute(
+        select(func.count(ConversationSession.id)).where(
+            ConversationSession.staff_id == staff.id
+        )
+    ).scalar_one()
+    usage = db.execute(
+        select(func.count(UsageLog.id)).where(UsageLog.staff_id == staff.id)
+    ).scalar_one()
+    if sessions or usage:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"This account has activity on the record ({sessions} session(s), "
+                f"{usage} provider call(s)) and the audit trail names it as the "
+                f"actor. Deactivate it instead — that removes access and keeps "
+                f"the attribution."
+            ),
+        )
+
+    institution_id = staff.institution_id
+    db.delete(staff)
+    db.flush()
+
+    AuditService(db).append(
+        actor_id=str(admin.staff_id),
+        action="staff.delete",
+        resource_type="staff",
+        resource_id=str(staff_id),
+        institution_id=str(institution_id),
+    )
+    return envelope({"deleted": True, "id": str(staff_id)})
+
+
+# ── Assignment: who is responsible for this child ───────────────────────
+
+
+@router.patch("/children/{child_id}/assignment")
+def assign_child(
+    child_id: uuid.UUID,
+    payload: ChildAssignment,
+    admin: CurrentStaff = Depends(get_current_admin_staff),
+    db: Session = Depends(get_db),
+):
+    """Record which staff member is responsible for a child (migration 0007).
+
+    RESPONSIBILITY, not ACCESS. Nothing reads this column to decide what a
+    caretaker may see — every institution member still sees every child, and
+    a test pins that. Narrowing visibility is REMEDIATION_BACKLOG R8 and a
+    separate product decision: a child whose assigned caretaker is off shift
+    must not disappear for the colleague covering the ward.
+    """
+    child = db.get(Child, child_id)
+    if child is None:
+        raise HTTPException(status_code=404, detail="Child not found")
+
+    if payload.staff_id is None:
+        child.assigned_staff_id = None
+    else:
+        staff = db.get(Staff, payload.staff_id)
+        if staff is None:
+            raise HTTPException(status_code=404, detail="Staff member not found")
+        if staff.institution_id != child.institution_id:
+            # A carer who works elsewhere cannot be responsible for this
+            # child, and recording it would imply a relationship the tenant
+            # boundary forbids.
+            raise HTTPException(
+                status_code=409,
+                detail="That staff member works at a different institution",
+            )
+        if not staff.is_active:
+            raise HTTPException(
+                status_code=409,
+                detail="That account is deactivated and cannot be assigned",
+            )
+        child.assigned_staff_id = staff.id
+    db.flush()
+
+    AuditService(db).append(
+        actor_id=str(admin.staff_id),
+        action="child.assign",
+        resource_type="child",
+        resource_id=str(child.id),
+        institution_id=str(child.institution_id),
+    )
+    return envelope(ChildRead.model_validate(child).model_dump(mode="json"))
+
+
 # ── Children oversight (owner-requested 2026-09-01) ─────────────────────
 
 
@@ -212,6 +643,9 @@ def list_all_children(
             dob=child.dob,
             estimated_age_range=child.estimated_age_range,
             intake_date=child.intake_date,
+            assigned_staff_id=child.assigned_staff_id,
+            archived_at=child.archived_at,
+            archived_reason=child.archived_reason,
         )
         for child, inst_name in rows
     ]

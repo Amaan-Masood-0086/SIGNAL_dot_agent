@@ -64,6 +64,9 @@ class ChildRead(BaseModel):
     # the banner; the roster filters archived rows out entirely.
     archived_at: datetime.datetime | None = None
     archived_reason: str | None = None
+    # Who is responsible for this child (migration 0007). Responsibility,
+    # not access — every institution member still sees every child.
+    assigned_staff_id: uuid.UUID | None = None
 
 
 class ChildArchive(BaseModel):

@@ -5,11 +5,14 @@
 // Responses are Zod-parsed here too: a proxy is not a trust boundary.
 
 import {
+  adminChildCreatedEnvelopeSchema,
   auditPageEnvelopeSchema,
   chainEnvelopeSchema,
   childPageEnvelopeSchema,
   credentialListEnvelopeSchema,
   credentialStatusSchema,
+  institutionEnvelopeSchema,
+  institutionPageEnvelopeSchema,
   providerListEnvelopeSchema,
   providerTestResultSchema,
   staffEnvelopeSchema,
@@ -21,6 +24,7 @@ import {
   type AuditEntry,
   type ChainStatus,
   type CredentialStatus,
+  type Institution,
   type ProviderStatus,
   type ProviderTestResult,
 } from "@/src/lib/api/admin-schemas";
@@ -132,6 +136,89 @@ export function updateStaffActive(staffId: string, isActive: boolean): Promise<A
     `/api/admin/staff/${staffId}/active`,
     jsonInit("PATCH", { is_active: isActive }),
     (raw) => staffEnvelopeSchema.parse(raw).data,
+  );
+}
+
+// ── Onboarding ─────────────────────────────────────────────────────────
+
+export function fetchInstitutions(): Promise<{ items: Institution[]; total: number }> {
+  return request("/api/admin/institutions", {}, (raw) =>
+    institutionPageEnvelopeSchema.parse(raw).data,
+  );
+}
+
+export function createInstitution(name: string): Promise<Institution> {
+  return request("/api/admin/institutions", jsonInit("POST", { name }), (raw) =>
+    institutionEnvelopeSchema.parse(raw).data,
+  );
+}
+
+export function createStaff(input: {
+  email: string;
+  role: "caretaker" | "admin";
+  institution_id: string;
+}): Promise<AdminStaff> {
+  return request("/api/admin/staff", jsonInit("POST", input), (raw) =>
+    staffEnvelopeSchema.parse(raw).data,
+  );
+}
+
+export interface AdminChildInput {
+  name: string;
+  institution_id: string;
+  dob_confirmed: boolean;
+  dob?: string | null;
+  estimated_age_range?: string | null;
+  estimated_age_note?: string | null;
+}
+
+export function createChildForInstitution(input: AdminChildInput) {
+  return request("/api/admin/children", jsonInit("POST", input), (raw) =>
+    adminChildCreatedEnvelopeSchema.parse(raw).data,
+  );
+}
+
+// ── Removal and assignment ─────────────────────────────────────────────
+//
+// Delete succeeds only for records with no history; the 409 that comes back
+// otherwise carries the reason and the safe alternative, and `request()`
+// surfaces it verbatim.
+
+export function deleteChild(childId: string): Promise<{ deleted: boolean }> {
+  return request(`/api/admin/children/${childId}`, { method: "DELETE" }, (raw) => {
+    const body = raw as { data?: { deleted?: boolean } };
+    return { deleted: body.data?.deleted === true };
+  });
+}
+
+export function deleteStaff(staffId: string): Promise<{ deleted: boolean }> {
+  return request(`/api/admin/staff/${staffId}`, { method: "DELETE" }, (raw) => {
+    const body = raw as { data?: { deleted?: boolean } };
+    return { deleted: body.data?.deleted === true };
+  });
+}
+
+export function archiveChild(childId: string, reason: string): Promise<void> {
+  return request(
+    `/api/admin/children/${childId}/archive`,
+    jsonInit("POST", { reason }),
+    () => undefined,
+  );
+}
+
+export function restoreChild(childId: string): Promise<void> {
+  return request(
+    `/api/admin/children/${childId}/restore`,
+    { method: "POST" },
+    () => undefined,
+  );
+}
+
+export function assignChild(childId: string, staffId: string | null): Promise<void> {
+  return request(
+    `/api/admin/children/${childId}`,
+    jsonInit("PATCH", { staff_id: staffId }),
+    () => undefined,
   );
 }
 

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { SESSION_COOKIE } from "@/src/lib/auth/constants";
+import { contentSecurityPolicy } from "@/src/lib/auth/csp";
 
 /**
  * Route protection + Content-Security-Policy. Next 16's `proxy` convention
@@ -10,33 +11,14 @@ import { SESSION_COOKIE } from "@/src/lib/auth/constants";
  * — this layer enforces session presence, the no-cache rule for
  * authenticated HTML, and the per-request CSP nonce.
  *
+ * The policy itself lives in `src/lib/auth/csp.ts` so it can be unit tested;
+ * the dev-only 'unsafe-eval' branch is security-relevant enough to need an
+ * assertion holding it to development.
+ *
  * The matcher covers every page so CSP ships everywhere, but the auth
  * redirect is scoped to /dashboard inside the handler: widening the matcher
  * without that guard would redirect /login to /login forever.
  */
-function contentSecurityPolicy(nonce: string): string {
-  return [
-    "default-src 'self'",
-    // 'strict-dynamic' + nonce means no inline script needs 'unsafe-inline';
-    // Next attaches the nonce to its own hydration scripts.
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-    // Styles keep 'unsafe-inline' on purpose: a nonce does not cover inline
-    // style *attributes* (CSP3 governs those separately), and injected CSS is
-    // a far smaller threat than injected script. Honest trade, not an oversight.
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob:",
-    "font-src 'self' data:",
-    // The browser never calls the backend directly — everything goes through
-    // this app's own /api proxies, so same-origin is the whole allowlist.
-    "connect-src 'self'",
-    // blob: is required for MediaRecorder playback in the voice capture flow.
-    "media-src 'self' blob:",
-    "object-src 'none'",
-    "base-uri 'self'",
-    "form-action 'self'",
-    "frame-ancestors 'none'",
-  ].join("; ");
-}
 
 export function proxy(request: NextRequest) {
   const nonce = crypto.randomUUID().replace(/-/g, "");

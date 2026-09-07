@@ -11,14 +11,16 @@ import { Icon } from "@/src/components/ui/Icon";
 import { SkeletonRows } from "@/src/components/ui/Skeleton";
 import { StatTile } from "@/src/components/ui/StatTile";
 import { TableHead, TableRow, TableScroll } from "@/src/components/ui/DataTable";
-import { fetchStaff, updateStaffActive, updateStaffRole } from "@/src/lib/api/admin-client";
+import { AddStaffForm } from "@/src/components/features/admin/AddStaffForm";
+import { deleteStaff, fetchStaff, updateStaffActive, updateStaffRole } from "@/src/lib/api/admin-client";
 import { ADMIN_PAGE_SIZE, type AdminStaff } from "@/src/lib/api/admin-schemas";
 
 const COLUMNS = "grid-cols-[minmax(0,2fr)_7rem_6rem_minmax(0,13rem)]";
 
 type PendingAction =
   | { kind: "role"; staff: AdminStaff; nextRole: "admin" | "caretaker" }
-  | { kind: "active"; staff: AdminStaff; nextActive: boolean };
+  | { kind: "active"; staff: AdminStaff; nextActive: boolean }
+  | { kind: "delete"; staff: AdminStaff };
 
 /**
  * Staff directory + the only promotion path in the product.
@@ -77,6 +79,9 @@ export function StaffPanel({ currentStaffId }: { currentStaffId: string }) {
       if (pending.kind === "role") {
         await updateStaffRole(pending.staff.id, pending.nextRole);
         setNotice(`${pending.staff.email} is now a ${pending.nextRole}.`);
+      } else if (pending.kind === "delete") {
+        await deleteStaff(pending.staff.id);
+        setNotice(`${pending.staff.email} was permanently deleted.`);
       } else {
         await updateStaffActive(pending.staff.id, pending.nextActive);
         setNotice(
@@ -113,6 +118,11 @@ export function StaffPanel({ currentStaffId }: { currentStaffId: string }) {
 
       {notice && <Alert tone="success">{notice}</Alert>}
       {error && <Alert tone="danger">{error}</Alert>}
+
+      {/* The only way to onboard anyone through the product. Before this
+          existed the sole paths were two seed scripts run by someone with
+          database access. */}
+      <AddStaffForm onCreated={() => setReloadKey((key) => key + 1)} />
 
       <section className="rounded-xl border border-line bg-surface">
         <header className="flex flex-wrap items-center gap-3 border-b border-line px-5 py-4">
@@ -227,6 +237,19 @@ export function StaffPanel({ currentStaffId }: { currentStaffId: string }) {
                               >
                                 {staff.is_active ? "Deactivate" : "Reactivate"}
                               </Button>
+                              {/* Deletion succeeds only for an account that
+                                  never did anything. The backend refuses once
+                                  the audit chain names it as an actor, and
+                                  says so — this button surfaces that answer
+                                  rather than pretending to predict it. */}
+                              <Button
+                                variant="ghost"
+                                onClick={() => setPending({ kind: "delete", staff })}
+                                aria-label={`Delete ${staff.email}`}
+                                className="text-red hover:bg-red-soft hover:text-red"
+                              >
+                                Delete
+                              </Button>
                             </>
                           )}
                         </div>
@@ -259,7 +282,9 @@ export function StaffPanel({ currentStaffId }: { currentStaffId: string }) {
       <ConfirmDialog
         open={pending !== null}
         title={
-          pending?.kind === "role"
+          pending?.kind === "delete"
+            ? "Delete this account permanently?"
+            : pending?.kind === "role"
             ? pending.nextRole === "admin"
               ? "Grant system-level admin?"
               : "Remove admin access?"
@@ -268,7 +293,19 @@ export function StaffPanel({ currentStaffId }: { currentStaffId: string }) {
               : "Deactivate this account?"
         }
         description={
-          pending?.kind === "role" ? (
+          pending?.kind === "delete" ? (
+            <>
+              <span className="font-semibold text-ink">{pending.staff.email}</span>{" "}
+              will be removed from the database entirely. This cannot be undone.
+              <span className="mt-3 block">
+                It only works for an account that never did anything. If this
+                person has run screening sessions the audit trail names them as
+                the actor behind those findings, and the request will be refused
+                with a note to deactivate instead — which removes their access
+                and keeps the attribution.
+              </span>
+            </>
+          ) : pending?.kind === "role" ? (
             pending.nextRole === "admin" ? (
               <>
                 <span className="font-semibold text-ink">{pending.staff.email}</span> will be able
@@ -297,7 +334,9 @@ export function StaffPanel({ currentStaffId }: { currentStaffId: string }) {
           )
         }
         confirmLabel={
-          pending?.kind === "role"
+          pending?.kind === "delete"
+            ? "Delete permanently"
+            : pending?.kind === "role"
             ? pending.nextRole === "admin"
               ? "Grant admin"
               : "Remove admin"
