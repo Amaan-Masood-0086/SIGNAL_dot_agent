@@ -19,7 +19,7 @@ cd backend
 #   then verify: .\.venv\Scripts\python.exe scripts\smoke_feat05_llm.py
 
 # Start (backend on 8002; frontend reads BACKEND_URL=http://localhost:8002)
-uvicorn app.main:app --port 8002
+uvicorn app.main:app --port 8002 --no-server-header
 cd ..\frontend; npm run build; npm start
 ```
 

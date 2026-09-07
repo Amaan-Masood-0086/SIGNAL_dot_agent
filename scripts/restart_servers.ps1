@@ -12,8 +12,12 @@ Start-Sleep -Seconds 2
 $backendDir = Join-Path $PSScriptRoot '..\backend'
 $frontendDir = Join-Path $PSScriptRoot '..\frontend'
 
+# --no-server-header: uvicorn stamps its own `server: uvicorn` AFTER the app
+# has returned, so the middleware's `Server: SIGNAL` does not replace it — the
+# response carried BOTH and the banner-removal (OWASP A02) was defeated. The
+# app cannot fix this from inside; only the server's own config can.
 Start-Process -FilePath (Join-Path $backendDir '.venv\Scripts\python.exe') `
-  -ArgumentList '-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', '8002' `
+  -ArgumentList '-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', '8002', '--no-server-header' `
   -WorkingDirectory $backendDir -WindowStyle Hidden
 Write-Output 'backend starting on 8002'
 

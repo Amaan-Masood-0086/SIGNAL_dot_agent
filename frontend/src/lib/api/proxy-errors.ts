@@ -15,10 +15,22 @@ const MESSAGES: Record<number, string> = {
   429: "Too many attempts. Try again in a few minutes.",
 };
 
-export function adminProxyError(error: unknown): NextResponse {
+/**
+ * `overrides` exists because a status code is not a meaning. 409 on a role
+ * change means "you cannot demote yourself"; 409 on staff creation means
+ * "that email is taken"; 404 when creating means "that institution does not
+ * exist", not "the record is gone". Sending one canned sentence for all of
+ * them is how three different failures once all read "check your
+ * credentials" — the exact bug this file was written to stop.
+ */
+export function adminProxyError(
+  error: unknown,
+  overrides: Record<number, string> = {},
+): NextResponse {
   const status = error instanceof ApiError ? error.status : 502;
+  const message = overrides[status] ?? MESSAGES[status];
   return NextResponse.json(
-    { detail: MESSAGES[status] ?? "The request could not be completed." },
-    { status: MESSAGES[status] ? status : 502 },
+    { detail: message ?? "The request could not be completed." },
+    { status: message ? status : 502 },
   );
 }

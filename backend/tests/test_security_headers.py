@@ -67,7 +67,22 @@ def test_error_responses_also_carry_headers(client):
 
 
 def test_server_banner_is_not_the_framework_default(client):
-    """OWASP A02: do not advertise the server stack."""
+    """OWASP A02: do not advertise the server stack.
+
+    SCOPE — read before trusting this test. It proves only that the
+    APPLICATION sets `Server: SIGNAL`. It cannot prove the deployed response
+    carries nothing else, because TestClient speaks ASGI directly and never
+    goes through uvicorn's HTTP layer.
+
+    That gap was real, not theoretical: uvicorn stamps its own
+    `server: uvicorn` after the app returns, so a live response carried BOTH
+    headers and this test stayed green throughout. The fix is uvicorn's
+    `--no-server-header` at every launch point (README, restart_servers.ps1,
+    DEMO_SCRIPT) — configuration the app cannot enforce from inside.
+
+    Verify the real thing against a running server, not here:
+        curl -sD - -o /dev/null http://127.0.0.1:8002/health | grep -i '^server:'
+    """
     assert resp_server(client) == "SIGNAL"
 
 
