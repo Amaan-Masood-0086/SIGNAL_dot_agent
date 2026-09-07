@@ -33,8 +33,11 @@ Built: FastAPI + PostgreSQL 16 with row-level security, Next.js 16, a 94-row cur
 
 ## 3. Presentation
 
-Slides live in [`PRESENTATION.md`](PRESENTATION.md) — export to PDF or PPTX before uploading
-(the portal does not accept a Slides link).
+Upload **`SIGNAL_Presentation.pptx`** (12 slides). The portal converts it to PDF for the judges
+and keeps the original. `SIGNAL_Presentation.pdf` is the same deck already exported, if you would
+rather upload that.
+
+`PRESENTATION.md` is the source outline the deck was built from — it is not the upload.
 
 ---
 
