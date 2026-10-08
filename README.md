@@ -68,6 +68,15 @@ Two properties matter more than the model:
 
 ---
 
+## Knowledge base v3 review release
+
+The live application still uses the 94-row v2 knowledge base. A separate
+[v3 research and clinical review release](knowledge_base/v3/README.md) adds 88
+source-linked entries across the seven planned developmental domains, with
+birth-to-under-18 age scope, 41 primary references, and a mapping of all legacy
+entries. It is **not clinically approved or enabled for live scoring**.
+See the release guide for editing, validation, limitations, and activation gates.
+
 ## Stack
 
 | Layer | Choice |
@@ -84,6 +93,16 @@ Two properties matter more than the model:
 ## Running it locally
 
 **Prerequisites:** Docker, Python 3.12, Node 22.
+
+**Fastest way (Windows).** With the backend venv and `npm ci` done once, one command starts everything
+(database, migrations, knowledge base, synthetic data, both servers) and checks it:
+
+```bash
+.\scriptsun_demo.ps1 -Reset
+```
+
+It uses database port 5432, or 5433 when another project already holds 5432. See
+[the demo runbook](docs/submission/DEMO_RUNBOOK.md). The manual steps follow.
 
 ```bash
 # 1. Database
@@ -263,6 +282,7 @@ Honest list. None of these are hidden in the code.
 
 ## Documentation
 
+- [`docs/`](docs/README.md) — product overview, technical architecture, plain-language guide, and the hackathon submission material
 - `.ai/brain/PROJECT_BRIEF*.md` — what is being built and why
 - `.ai/brain/TRD*.md` — API contracts and data model
 - `.ai/brain/THREAT_MODEL*.md` — STRIDE analysis and the RBAC matrix

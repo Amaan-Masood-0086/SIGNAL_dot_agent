@@ -3,8 +3,8 @@
 > Orientation document. Read this first if you are new to SIGNAL and want to understand
 > *what it does and why it exists* before touching the code.
 >
-> For setup, tests and repository layout see [`README.md`](README.md).
-> For the formal decision record see [`.ai/brain/`](.ai/brain/).
+> For setup, tests and repository layout see [`README.md`](../../README.md).
+> For the formal decision record see [`.ai/brain/`](../../.ai/brain).
 
 ---
 
@@ -258,7 +258,7 @@ real.
 | Response latency | ~45s per model call against the current provider; needs one measurement before optimising |
 
 The full ranked list, with effort estimates, is in
-[`.ai/audit/REMEDIATION_BACKLOG.md`](.ai/audit/REMEDIATION_BACKLOG.md).
+[`.ai/audit/REMEDIATION_BACKLOG.md`](../../.ai/audit/REMEDIATION_BACKLOG.md).
 
 ---
 
@@ -278,10 +278,10 @@ The full ranked list, with effort estimates, is in
 
 | Document | What it holds |
 |---|---|
-| [`README.md`](README.md) | Setup, running locally, tests, repository layout |
-| [`.ai/brain/PROJECT_BRIEF_SIGNAL_2026-08-28.md`](.ai/brain/PROJECT_BRIEF_SIGNAL_2026-08-28.md) | Formal scope, users, open items |
-| [`.ai/brain/TRD_SIGNAL_2026-08-28.md`](.ai/brain/TRD_SIGNAL_2026-08-28.md) | API contracts and data model |
-| [`.ai/brain/ADR_*.md`](.ai/brain/) | Every architectural decision, with its reasoning |
-| [`.ai/brain/THREAT_MODEL_SIGNAL_2026-08-28.md`](.ai/brain/THREAT_MODEL_SIGNAL_2026-08-28.md) | Security model and trust boundaries |
-| [`.ai/brain/PROGRESS.md`](.ai/brain/PROGRESS.md) | Current state, session log, exact stopping point |
-| [`.ai/audit/AUDIT_REPORT.md`](.ai/audit/AUDIT_REPORT.md) | Principal-engineer code audit and findings |
+| [`README.md`](../../README.md) | Setup, running locally, tests, repository layout |
+| [`.ai/brain/PROJECT_BRIEF_SIGNAL_2026-08-28.md`](../../.ai/brain/PROJECT_BRIEF_SIGNAL_2026-08-28.md) | Formal scope, users, open items |
+| [`.ai/brain/TRD_SIGNAL_2026-08-28.md`](../../.ai/brain/TRD_SIGNAL_2026-08-28.md) | API contracts and data model |
+| [`.ai/brain/ADR_*.md`](../../.ai/brain) | Every architectural decision, with its reasoning |
+| [`.ai/brain/THREAT_MODEL_SIGNAL_2026-08-28.md`](../../.ai/brain/THREAT_MODEL_SIGNAL_2026-08-28.md) | Security model and trust boundaries |
+| [`.ai/brain/PROGRESS.md`](../../.ai/brain/PROGRESS.md) | Current state, session log, exact stopping point |
+| [`.ai/audit/AUDIT_REPORT.md`](../../.ai/audit/AUDIT_REPORT.md) | Principal-engineer code audit and findings |

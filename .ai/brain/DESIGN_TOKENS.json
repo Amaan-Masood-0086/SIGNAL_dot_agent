@@ -1,0 +1,47 @@
+{
+  "project": "SIGNAL",
+  "preset": "Custom (clinical pine, Teal family)",
+  "note": "Documents the tokens that exist today in frontend/app/globals.css. Values are measured, not aspirational.",
+  "color": {
+    "paper": "#f4f7f7",
+    "surface": "#ffffff",
+    "ink": "#203431",
+    "ink-soft": "#596e68",
+    "pine": "#176b5b",
+    "pine-deep": "#104e43",
+    "moss": "#e8f3ee",
+    "line": "#dce6e2",
+    "control": "#667a74",
+    "amber": "#965700",
+    "amber-soft": "#fcf1df",
+    "red": "#b3261e",
+    "red-soft": "#fcebe9"
+  },
+  "contrast": {
+    "ink on surface": 13.15,
+    "ink-soft on surface": 5.45,
+    "ink-soft on paper": 5.06,
+    "pine on surface": 6.38,
+    "white on pine": 6.38,
+    "amber on amber-soft": 5.13,
+    "red on red-soft": 5.66,
+    "control on surface (input border, needs 3.0)": 4.56,
+    "control on paper (needs 3.0)": 4.24,
+    "line (decorative divider only, exempt)": 1.27
+  },
+  "type": {
+    "display": "Bricolage Grotesque (500/600/700)",
+    "body": "Noto Sans (400/500/600/700)",
+    "mono": null,
+    "scaleInUse": ["text-xs 12", "text-sm 14", "text-base 16", "text-lg 18", "text-xl 20", "text-2xl 24", "text-3xl 30"],
+    "minimumSize": 12,
+    "note": "Fonts are self-hosted through next/font, so the CSP needs no third-party font origin."
+  },
+  "space": "Tailwind default 4px scale (no arbitrary spacing values in components)",
+  "radius": { "sm": 6, "md": 8, "lg": 12, "xl": 16, "pill": 9999, "note": "rounded-lg and rounded-xl dominate; globals.css classes also use 11, 14 and 20 px, which are off-scale and are the cleanup candidates." },
+  "motion": { "reducedMotion": "honoured in globals.css (prefers-reduced-motion: reduce)" },
+  "breakpoints": { "tailwind": [640, 768, 1024, 1280, 1536], "globals.css": [767, 1023, 1199] },
+  "focus": "2px solid pine, offset 3px, on :focus-visible",
+  "darkMode": "Not shipped. The app is light-only by decision (an OS dark-mode leak once made input text white on white).",
+  "signature": "A growth-curve motif and a clinical pine/paper palette: it reads as a record to be reviewed, not a chatbot."
+}

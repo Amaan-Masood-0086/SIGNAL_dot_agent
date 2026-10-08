@@ -33,11 +33,11 @@ Built: FastAPI + PostgreSQL 16 with row-level security, Next.js 16, a 94-row cur
 
 ## 3. Presentation
 
-Upload **`SIGNAL_Presentation.pptx`** (12 slides). The portal converts it to PDF for the judges
-and keeps the original. `SIGNAL_Presentation.pdf` is the same deck already exported, if you would
+Upload **`docs/submission/SIGNAL_Presentation.pptx`** (12 slides). The portal converts it to PDF for the judges
+and keeps the original. `docs/submission/SIGNAL_Presentation.pdf` is the same deck already exported, if you would
 rather upload that.
 
-`PRESENTATION.md` is the source outline the deck was built from — it is not the upload.
+`docs/submission/PRESENTATION.md` is the source outline the deck was built from — it is not the upload.
 
 ---
 
