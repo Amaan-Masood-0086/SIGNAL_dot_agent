@@ -1,0 +1,2641 @@
+{
+  "schema_version": "3.0",
+  "release_id": "signal-kb-v3.0.0-review.1",
+  "created_on": "2026-09-09",
+  "release_status": "research_draft",
+  "runtime_enabled": false,
+  "age_scope": {
+    "min_months": 0,
+    "max_months_exclusive": 216
+  },
+  "clinical_scoring_policy": "not_validated_no_automatic_grade",
+  "rows": [
+    {
+      "citation_ref": "V3-SL-M-002-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 2,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 2,
+      "age_basis": "developmental_age",
+      "observation": "Uses a non-crying vocal sound.",
+      "follow_up_en": "What sounds occur while the baby is comfortable?",
+      "follow_up_ur_latn": "Bacha araam mein kaunsi awazein nikalta hai?",
+      "source_ids": [
+        "CDC-02"
+      ],
+      "evidence_group": "early_vocalisation",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-MOT-M-002-2",
+      "domain": "Motor",
+      "entry_kind": "milestone",
+      "age_min_months": 2,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 2,
+      "age_basis": "developmental_age",
+      "observation": "Lifts the head during awake tummy time.",
+      "follow_up_en": "What happens to the head during supervised tummy time?",
+      "follow_up_ur_latn": "Jaagtay hue pait ke bal sar kaise uthata hai?",
+      "source_ids": [
+        "CDC-02"
+      ],
+      "evidence_group": "head_control",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SOC-M-002-3",
+      "domain": "Social_Communication",
+      "entry_kind": "milestone",
+      "age_min_months": 2,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 2,
+      "age_basis": "developmental_age",
+      "observation": "Smiles in response to an adult's social approach.",
+      "follow_up_en": "How does the baby respond to a familiar smile?",
+      "follow_up_ur_latn": "Jaan pehchan walay ki muskurahat par kya karta hai?",
+      "source_ids": [
+        "CDC-02"
+      ],
+      "evidence_group": "social_response",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-M-002",
+        "SL-M-004",
+        "SL-RF-002"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-M-004-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 4,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 4,
+      "age_basis": "developmental_age",
+      "observation": "Responds vocally during an adult's talking turn.",
+      "follow_up_en": "Does the baby answer your voice with a sound?",
+      "follow_up_ur_latn": "Aap ki baat par bacha awaz nikalta hai?",
+      "source_ids": [
+        "CDC-04"
+      ],
+      "evidence_group": "vocal_turns",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-HEAR-M-004-2",
+      "domain": "Hearing",
+      "entry_kind": "milestone",
+      "age_min_months": 4,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 4,
+      "age_basis": "developmental_age",
+      "observation": "Orients the head toward a voice.",
+      "follow_up_en": "What response do you notice to an ordinary voice?",
+      "follow_up_ur_latn": "Aam awaz par bacha kis tarah mutawajjah hota hai?",
+      "source_ids": [
+        "CDC-04"
+      ],
+      "evidence_group": "sound_orientation",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-M-003",
+        "HEAR-M-004",
+        "HEAR-M-005",
+        "HEAR-M-006",
+        "HEAR-M-008",
+        "HEAR-M-010",
+        "HEAR-RF-002"
+      ]
+    },
+    {
+      "citation_ref": "V3-MOT-M-004-3",
+      "domain": "Motor",
+      "entry_kind": "milestone",
+      "age_min_months": 4,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 4,
+      "age_basis": "developmental_age",
+      "observation": "Maintains a steady head when held upright.",
+      "follow_up_en": "How steady is the head while you hold the baby?",
+      "follow_up_ur_latn": "God mein sar kitna seedha rehta hai?",
+      "source_ids": [
+        "CDC-04"
+      ],
+      "evidence_group": "head_control",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SL-M-006-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 6,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 6,
+      "age_basis": "developmental_age",
+      "observation": "Participates in alternating vocal play.",
+      "follow_up_en": "Can you describe your back-and-forth sound play?",
+      "follow_up_ur_latn": "Aap dono bari bari awazein kaise nikalte hain?",
+      "source_ids": [
+        "CDC-06"
+      ],
+      "evidence_group": "vocal_turns",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-MOT-M-006-2",
+      "domain": "Motor",
+      "entry_kind": "milestone",
+      "age_min_months": 6,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 6,
+      "age_basis": "developmental_age",
+      "observation": "Rolls from tummy onto the back.",
+      "follow_up_en": "Has the baby rolled from tummy to back independently?",
+      "follow_up_ur_latn": "Bacha khud pait se peeth par palatta hai?",
+      "source_ids": [
+        "CDC-06"
+      ],
+      "evidence_group": "rolling",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SOC-M-006-3",
+      "domain": "Social_Communication",
+      "entry_kind": "milestone",
+      "age_min_months": 6,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 6,
+      "age_basis": "developmental_age",
+      "observation": "Recognises familiar people.",
+      "follow_up_en": "What differs when a familiar person approaches?",
+      "follow_up_ur_latn": "Jaan pehchan wala aaye to rawayya kaise badalta hai?",
+      "source_ids": [
+        "CDC-06"
+      ],
+      "evidence_group": "social_response",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-RF-002"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-M-009-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 9,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 9,
+      "age_basis": "developmental_age",
+      "observation": "Produces repeated syllable-like strings.",
+      "follow_up_en": "What repeated sounds have you heard recently?",
+      "follow_up_ur_latn": "Haal mein kaunsi dohrayi hui awazein suni hain?",
+      "source_ids": [
+        "CDC-09"
+      ],
+      "evidence_group": "babbling",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-M-007",
+        "HEAR-RF-003",
+        "HEAR-RF-005",
+        "SL-M-005",
+        "SL-M-006",
+        "SL-RF-003"
+      ]
+    },
+    {
+      "citation_ref": "V3-MOT-M-009-2",
+      "domain": "Motor",
+      "entry_kind": "milestone",
+      "age_min_months": 9,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 9,
+      "age_basis": "developmental_age",
+      "observation": "Sits without another person supporting the body.",
+      "follow_up_en": "Can the baby sit without being held?",
+      "follow_up_ur_latn": "Bacha baghair saharay baith sakta hai?",
+      "source_ids": [
+        "CDC-09"
+      ],
+      "evidence_group": "sitting",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SOC-M-009-3",
+      "domain": "Social_Communication",
+      "entry_kind": "milestone",
+      "age_min_months": 9,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 9,
+      "age_basis": "developmental_age",
+      "observation": "Looks toward the caller when named.",
+      "follow_up_en": "What happens when a familiar person calls the name?",
+      "follow_up_ur_latn": "Jaan pehchan wala naam bulaye to kya hota hai?",
+      "source_ids": [
+        "CDC-09"
+      ],
+      "evidence_group": "name_response",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-M-009",
+        "HEAR-RF-004",
+        "HEAR-RF-013",
+        "SL-M-007",
+        "SL-RF-005"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-M-012-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 12,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 12,
+      "age_basis": "developmental_age",
+      "observation": "Uses a special name for a familiar caregiver.",
+      "follow_up_en": "What name does the child use for a familiar adult?",
+      "follow_up_ur_latn": "Bachcha apne kisi jaan-pehchaan ke baray ko kis naam se bulata hai?",
+      "source_ids": [
+        "CDC-12"
+      ],
+      "evidence_group": "meaningful_words",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-009"
+      ]
+    },
+    {
+      "citation_ref": "V3-MOT-M-012-2",
+      "domain": "Motor",
+      "entry_kind": "milestone",
+      "age_min_months": 12,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 12,
+      "age_basis": "developmental_age",
+      "observation": "Pulls up into standing.",
+      "follow_up_en": "Can the child pull up using stable furniture?",
+      "follow_up_ur_latn": "Mazboot saharay se khud khara ho sakta hai?",
+      "source_ids": [
+        "CDC-12"
+      ],
+      "evidence_group": "standing",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SOC-M-012-3",
+      "domain": "Social_Communication",
+      "entry_kind": "milestone",
+      "age_min_months": 12,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 12,
+      "age_basis": "developmental_age",
+      "observation": "Participates in a familiar interactive game.",
+      "follow_up_en": "Which simple games do you play together?",
+      "follow_up_ur_latn": "Aap dono kaunse saada khel kheltay hain?",
+      "source_ids": [
+        "CDC-12"
+      ],
+      "evidence_group": "reciprocal_play",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SL-M-015-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 15,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 15,
+      "age_basis": "developmental_age",
+      "observation": "Attempts one or two words beyond caregiver names.",
+      "follow_up_en": "Which words are used besides caregiver names?",
+      "follow_up_ur_latn": "Kya bachcha dekh-bhaal karne walay shakhs ke naam ke ilawa aur alfaaz bhi bolta hai?",
+      "source_ids": [
+        "CDC-15"
+      ],
+      "evidence_group": "meaningful_words",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-009",
+        "SL-M-011",
+        "SL-RF-006"
+      ]
+    },
+    {
+      "citation_ref": "V3-MOT-M-015-2",
+      "domain": "Motor",
+      "entry_kind": "milestone",
+      "age_min_months": 15,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 15,
+      "age_basis": "developmental_age",
+      "observation": "Takes a few independent steps.",
+      "follow_up_en": "Has the child taken steps without support?",
+      "follow_up_ur_latn": "Bacha baghair saharay kuch qadam chala hai?",
+      "source_ids": [
+        "CDC-15"
+      ],
+      "evidence_group": "walking",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SOC-M-015-3",
+      "domain": "Social_Communication",
+      "entry_kind": "milestone",
+      "age_min_months": 15,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 15,
+      "age_basis": "developmental_age",
+      "observation": "Shows a liked object to another person.",
+      "follow_up_en": "Does the child show you something they enjoy?",
+      "follow_up_ur_latn": "Pasand ki cheez aap ko dikhata hai?",
+      "source_ids": [
+        "CDC-15"
+      ],
+      "evidence_group": "shared_interest",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SL-M-018-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 18,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 18,
+      "age_basis": "developmental_age",
+      "observation": "Attempts at least three words beyond caregiver names.",
+      "follow_up_en": "Which words can a daily caregiver describe?",
+      "follow_up_ur_latn": "Roz dekh bhal karne wala kaunse alfaaz bata sakta hai?",
+      "source_ids": [
+        "CDC-18"
+      ],
+      "evidence_group": "meaningful_words",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-012",
+        "SL-M-015",
+        "SL-M-016",
+        "SL-M-022",
+        "SL-RF-006"
+      ]
+    },
+    {
+      "citation_ref": "V3-MOT-M-018-2",
+      "domain": "Motor",
+      "entry_kind": "milestone",
+      "age_min_months": 18,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 18,
+      "age_basis": "developmental_age",
+      "observation": "Walks independently.",
+      "follow_up_en": "How does the child move without holding support?",
+      "follow_up_ur_latn": "Bacha baghair sahara pakray kaise chalta hai?",
+      "source_ids": [
+        "CDC-18"
+      ],
+      "evidence_group": "walking",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SOC-M-018-3",
+      "domain": "Social_Communication",
+      "entry_kind": "milestone",
+      "age_min_months": 18,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 18,
+      "age_basis": "developmental_age",
+      "observation": "Points to share an interesting thing.",
+      "follow_up_en": "Does pointing share interest as well as request help?",
+      "follow_up_ur_latn": "Ishara sirf mangne ya dilchasp cheez dikhane ko bhi karta hai?",
+      "source_ids": [
+        "CDC-18"
+      ],
+      "evidence_group": "shared_interest",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-008",
+        "SL-M-014",
+        "SL-RF-004",
+        "SL-RF-007"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-M-024-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 24,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 24,
+      "age_basis": "developmental_age",
+      "observation": "Combines two spoken words meaningfully.",
+      "follow_up_en": "What two-word combinations have you heard?",
+      "follow_up_ur_latn": "Kaunse do alfaaz jor kar bolta hai?",
+      "source_ids": [
+        "CDC-24"
+      ],
+      "evidence_group": "word_combinations",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-017",
+        "SL-RF-009",
+        "SL-RF-013"
+      ]
+    },
+    {
+      "citation_ref": "V3-MOT-M-024-2",
+      "domain": "Motor",
+      "entry_kind": "milestone",
+      "age_min_months": 24,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 24,
+      "age_basis": "developmental_age",
+      "observation": "Runs during play.",
+      "follow_up_en": "How does the child move when trying to run?",
+      "follow_up_ur_latn": "Khel mein dorne ki koshish kaise karta hai?",
+      "source_ids": [
+        "CDC-24"
+      ],
+      "evidence_group": "running",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SOC-M-024-3",
+      "domain": "Social_Communication",
+      "entry_kind": "milestone",
+      "age_min_months": 24,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 24,
+      "age_basis": "developmental_age",
+      "observation": "Notices another person's distress.",
+      "follow_up_en": "What happens when another child is upset?",
+      "follow_up_ur_latn": "Doosra bacha pareshan ho to kya karta hai?",
+      "source_ids": [
+        "CDC-24"
+      ],
+      "evidence_group": "social_response",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SL-M-030-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 30,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 30,
+      "age_basis": "developmental_age",
+      "observation": "Uses approximately fifty words.",
+      "follow_up_en": "What words occur across the languages used daily?",
+      "follow_up_ur_latn": "Jo zabanen rozana istemal hoti hain, bachcha un mein kaun se alfaaz bolta hai?",
+      "source_ids": [
+        "CDC-30"
+      ],
+      "evidence_group": "meaningful_words",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-015",
+        "SL-M-016",
+        "SL-M-022"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-M-030-2",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 30,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 30,
+      "age_basis": "developmental_age",
+      "observation": "Combines words with an action word.",
+      "follow_up_en": "Can you give an example containing an action?",
+      "follow_up_ur_latn": "Bachche ki kahi hui koi misaal bata sakte hain jis mein kisi kaam ka zikr ho?",
+      "source_ids": [
+        "CDC-30"
+      ],
+      "evidence_group": "word_combinations",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-020",
+        "SL-M-026",
+        "SL-RF-016"
+      ]
+    },
+    {
+      "citation_ref": "V3-MOT-M-030-3",
+      "domain": "Motor",
+      "entry_kind": "milestone",
+      "age_min_months": 30,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 30,
+      "age_basis": "developmental_age",
+      "observation": "Jumps clear of the ground with both feet.",
+      "follow_up_en": "Have you seen both feet leave the ground together?",
+      "follow_up_ur_latn": "Dono paon aik saath zameen se uthtay hain?",
+      "source_ids": [
+        "CDC-30"
+      ],
+      "evidence_group": "jumping",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SL-M-036-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 36,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 36,
+      "age_basis": "developmental_age",
+      "observation": "Exchanges at least two conversational turns.",
+      "follow_up_en": "What does a short conversation together sound like?",
+      "follow_up_ur_latn": "Choti si do tarfa guftagu ki misaal dein?",
+      "source_ids": [
+        "CDC-36"
+      ],
+      "evidence_group": "conversation",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-M-014"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-M-036-2",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 36,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 36,
+      "age_basis": "developmental_age",
+      "observation": "Is understood by others much of the time.",
+      "follow_up_en": "Who understands the child's everyday speech?",
+      "follow_up_ur_latn": "Roz ki baat kin logon ko samajh aati hai?",
+      "source_ids": [
+        "CDC-36"
+      ],
+      "evidence_group": "intelligibility",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-019",
+        "SL-M-023",
+        "SL-M-027"
+      ]
+    },
+    {
+      "citation_ref": "V3-SOC-M-036-3",
+      "domain": "Social_Communication",
+      "entry_kind": "milestone",
+      "age_min_months": 36,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 36,
+      "age_basis": "developmental_age",
+      "observation": "Notices peers and joins their play.",
+      "follow_up_en": "How does the child approach other children's play?",
+      "follow_up_ur_latn": "Doosray bachon ke khel mein kaise shamil hota hai?",
+      "source_ids": [
+        "CDC-36"
+      ],
+      "evidence_group": "peer_participation",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SL-M-048-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 48,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 48,
+      "age_basis": "developmental_age",
+      "observation": "Uses sentences with four or more words.",
+      "follow_up_en": "Can you share a sentence the child used?",
+      "follow_up_ur_latn": "Bachay ka bola hua aik jumla bataein?",
+      "source_ids": [
+        "CDC-48"
+      ],
+      "evidence_group": "sentences",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-020",
+        "SL-M-026",
+        "SL-M-028",
+        "SL-RF-016"
+      ]
+    },
+    {
+      "citation_ref": "V3-MOT-M-048-2",
+      "domain": "Motor",
+      "entry_kind": "milestone",
+      "age_min_months": 48,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 48,
+      "age_basis": "developmental_age",
+      "observation": "Catches a large ball on most attempts.",
+      "follow_up_en": "How does catching a large soft ball go?",
+      "follow_up_ur_latn": "Bari naram gaind pakarne mein kya hota hai?",
+      "source_ids": [
+        "CDC-48"
+      ],
+      "evidence_group": "ball_skills",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SOC-M-048-3",
+      "domain": "Social_Communication",
+      "entry_kind": "milestone",
+      "age_min_months": 48,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 48,
+      "age_basis": "developmental_age",
+      "observation": "Uses pretend roles during play.",
+      "follow_up_en": "What pretend roles appear in play?",
+      "follow_up_ur_latn": "Khel mein kis ka kirdar banata hai?",
+      "source_ids": [
+        "CDC-48"
+      ],
+      "evidence_group": "pretend_play",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SL-M-060-1",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 60,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 60,
+      "age_basis": "developmental_age",
+      "observation": "Narrates at least two connected events.",
+      "follow_up_en": "Can the child tell an event and what happened next?",
+      "follow_up_ur_latn": "Aik waqia aur us ke baad kya hua bata sakta hai?",
+      "source_ids": [
+        "CDC-60"
+      ],
+      "evidence_group": "narrative",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-024",
+        "SL-M-029",
+        "SL-RF-019"
+      ]
+    },
+    {
+      "citation_ref": "V3-MOT-M-060-2",
+      "domain": "Motor",
+      "entry_kind": "milestone",
+      "age_min_months": 60,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 60,
+      "age_basis": "developmental_age",
+      "observation": "Hops on one foot.",
+      "follow_up_en": "Has the child hopped on one foot during play?",
+      "follow_up_ur_latn": "Khel mein aik paon par uchalta hai?",
+      "source_ids": [
+        "CDC-60"
+      ],
+      "evidence_group": "hopping",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-ATT-M-060-3",
+      "domain": "Attention",
+      "entry_kind": "milestone",
+      "age_min_months": 60,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 60,
+      "age_basis": "developmental_age",
+      "observation": "Engages briefly in a non-screen activity for roughly 5–10 minutes.",
+      "follow_up_en": "Which activity holds attention and under what conditions?",
+      "follow_up_ur_latn": "Kis kaam mein tawajjoh rehti hai aur kis mahaul mein?",
+      "source_ids": [
+        "CDC-60"
+      ],
+      "evidence_group": "engagement",
+      "cross_check_domains": [],
+      "action": "developmental_review",
+      "interpretation_notes": "Surveillance prompt, not a diagnostic cutoff. Not observed is not the same as absent; consider language, access, opportunity and age uncertainty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-HEAR-001",
+      "domain": "Hearing",
+      "entry_kind": "concern",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 12,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Everyday sound responses seem absent or inconsistent.",
+      "follow_up_en": "What ordinary sounds has the baby responded to?",
+      "follow_up_ur_latn": "Bachay ne kin aam awazon par jawab diya?",
+      "source_ids": [
+        "NIDCD-EARLY"
+      ],
+      "evidence_group": "sound_response",
+      "cross_check_domains": [
+        "Speech_Language"
+      ],
+      "action": "audiology_review",
+      "interpretation_notes": "Never provoke a startle using loud sounds. Observation is not a hearing test.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-M-001",
+        "HEAR-M-003",
+        "HEAR-M-004",
+        "HEAR-M-005",
+        "HEAR-M-006",
+        "HEAR-M-007",
+        "HEAR-M-008",
+        "HEAR-M-010",
+        "HEAR-RF-001",
+        "HEAR-RF-002",
+        "HEAR-RF-003",
+        "HEAR-RF-005",
+        "SL-M-002",
+        "SL-M-005",
+        "SL-M-006",
+        "SL-RF-001",
+        "SL-RF-003"
+      ]
+    },
+    {
+      "citation_ref": "V3-HEAR-002",
+      "domain": "Hearing",
+      "entry_kind": "professional_test",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 12,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Newborn hearing screen is missing, failed or undocumented.",
+      "follow_up_en": "What does the dated hearing-screen report say?",
+      "follow_up_ur_latn": "Tareekh wali sunai report mein kya likha hai?",
+      "source_ids": [
+        "NIDCD-NEWBORN"
+      ],
+      "evidence_group": "newborn_hearing",
+      "cross_check_domains": [],
+      "action": "audiology_review",
+      "interpretation_notes": "Screen by 1 month, diagnostic assessment by 3 months and intervention by 6 months are service targets; a missed target needs follow-up, not diagnosis.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-HEAR-003",
+      "domain": "Hearing",
+      "entry_kind": "concern",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "A caregiver or child reports a current hearing concern.",
+      "follow_up_en": "What change in hearing has been noticed?",
+      "follow_up_ur_latn": "Sunai mein kya tabdeeli mehsoos hui?",
+      "source_ids": [
+        "CDC-HEAR"
+      ],
+      "evidence_group": "hearing_concern",
+      "cross_check_domains": [
+        "Speech_Language"
+      ],
+      "action": "audiology_review",
+      "interpretation_notes": "Concern warrants assessment; it is not proof of impairment and does not automatically mean HIGH confidence.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-M-009",
+        "HEAR-M-015",
+        "HEAR-RF-004",
+        "HEAR-RF-008",
+        "HEAR-RF-013",
+        "HEAR-RF-014",
+        "SL-M-007",
+        "SL-RF-005",
+        "SL-RF-022"
+      ]
+    },
+    {
+      "citation_ref": "V3-HEAR-004",
+      "domain": "Hearing",
+      "entry_kind": "context",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "A previous hearing-screen pass does not resolve a new concern.",
+      "follow_up_en": "When was the last screen and when did the concern begin?",
+      "follow_up_ur_latn": "Aakhri test aur nayi pareshani kab shuru hui?",
+      "source_ids": [
+        "CDC-HEAR"
+      ],
+      "evidence_group": "hearing_history",
+      "cross_check_domains": [],
+      "action": "context_only",
+      "interpretation_notes": "Source supports assessment, not a SIGNAL confidence grade. Local pathway and clinical review required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-RISK-02"
+      ]
+    },
+    {
+      "citation_ref": "V3-HEAR-005",
+      "domain": "Hearing",
+      "entry_kind": "concern",
+      "age_min_months": 12,
+      "age_max_months_exclusive": 144,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Hearing or listening seems to vary over time.",
+      "follow_up_en": "What changes from one day to another?",
+      "follow_up_ur_latn": "Aik din se doosray din kya farq hota hai?",
+      "source_ids": [
+        "NICE-OME"
+      ],
+      "evidence_group": "fluctuating_hearing",
+      "cross_check_domains": [
+        "Speech_Language"
+      ],
+      "action": "audiology_review",
+      "interpretation_notes": "Do not label OME from observations; clinical hearing assessment is needed.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-RF-006"
+      ]
+    },
+    {
+      "citation_ref": "V3-HEAR-006",
+      "domain": "Hearing",
+      "entry_kind": "concern",
+      "age_min_months": 36,
+      "age_max_months_exclusive": 144,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Requests repetition or increased listening volume.",
+      "follow_up_en": "When are repetition or higher volume needed?",
+      "follow_up_ur_latn": "Dobara bolne ya awaz barhane ki zaroorat kab hoti hai?",
+      "source_ids": [
+        "NICE-OME"
+      ],
+      "evidence_group": "fluctuating_hearing",
+      "cross_check_domains": [
+        "Vision",
+        "Speech_Language"
+      ],
+      "action": "audiology_review",
+      "interpretation_notes": "Linked signs form one review group, not independent votes.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-RF-009",
+        "HEAR-RF-010"
+      ]
+    },
+    {
+      "citation_ref": "V3-HEAR-007",
+      "domain": "Hearing",
+      "entry_kind": "context",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 144,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Ear symptoms coexist with listening difficulty.",
+      "follow_up_en": "What ear symptoms and clinical assessments are documented?",
+      "follow_up_ur_latn": "Kaan ki alamat aur doctor ki jaanch kya hai?",
+      "source_ids": [
+        "NICE-OME"
+      ],
+      "evidence_group": "fluctuating_hearing",
+      "cross_check_domains": [],
+      "action": "audiology_review",
+      "interpretation_notes": "Three-month OME reassessment follows clinical assessment; do not delay initial evaluation for three months.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-RF-007",
+        "HEAR-RF-016"
+      ]
+    },
+    {
+      "citation_ref": "V3-HEAR-008",
+      "domain": "Hearing",
+      "entry_kind": "concern",
+      "age_min_months": 72,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Spoken classroom information is frequently missed.",
+      "follow_up_en": "What happens in quiet conversation versus the classroom?",
+      "follow_up_ur_latn": "Khamoshi aur class ki guftagu mein kya farq hai?",
+      "source_ids": [
+        "ASHA-SCHOOL-HEAR"
+      ],
+      "evidence_group": "classroom_listening",
+      "cross_check_domains": [
+        "Attention",
+        "Speech_Language"
+      ],
+      "action": "audiology_review",
+      "interpretation_notes": "Source supports assessment, not a SIGNAL confidence grade. Local pathway and clinical review required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-M-015",
+        "HEAR-RF-011",
+        "HEAR-RF-012"
+      ]
+    },
+    {
+      "citation_ref": "V3-HEAR-009",
+      "domain": "Hearing",
+      "entry_kind": "context",
+      "age_min_months": 120,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Loud recreational sound exposure accompanies hearing symptoms.",
+      "follow_up_en": "What listening exposure and symptoms are reported?",
+      "follow_up_ur_latn": "Tez awaz ka istemal aur kaunsi alamat hain?",
+      "source_ids": [
+        "NIDCD-NOISE"
+      ],
+      "evidence_group": "noise_exposure",
+      "cross_check_domains": [],
+      "action": "audiology_review",
+      "interpretation_notes": "No sound-exposure challenge or unsupervised headphone test.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-HEAR-010",
+      "domain": "Hearing",
+      "entry_kind": "urgent",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "A sudden or rapid reduction in hearing is reported.",
+      "follow_up_en": "When did hearing change? Do not delay seeking care.",
+      "follow_up_ur_latn": "Sunai kab achanak badli? Madad lene mein dair na karein.",
+      "source_ids": [
+        "NIDCD-SUDDEN"
+      ],
+      "evidence_group": "acute_hearing",
+      "cross_check_domains": [],
+      "action": "immediate_medical",
+      "interpretation_notes": "Source supports assessment, not a SIGNAL confidence grade. Local pathway and clinical review required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-HEAR-011",
+      "domain": "Hearing",
+      "entry_kind": "context",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Documented family or medical history may affect hearing follow-up.",
+      "follow_up_en": "Which risk factors are documented by a clinician?",
+      "follow_up_ur_latn": "Doctor ne kaunse risk factors likhay hain?",
+      "source_ids": [
+        "ASHA-HEAR"
+      ],
+      "evidence_group": "hearing_history",
+      "cross_check_domains": [],
+      "action": "context_only",
+      "interpretation_notes": "Unknown family history stays unknown. Do not turn consanguinity alone into an inferred hearing finding.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-RISK-01"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-001",
+      "domain": "Speech_Language",
+      "entry_kind": "concern",
+      "age_min_months": 24,
+      "age_max_months_exclusive": 48,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Limited vocabulary with absent word combinations needs contextual assessment.",
+      "follow_up_en": "What words and combinations occur across familiar languages?",
+      "follow_up_ur_latn": "Jaan pehchan ki zabanon mein kya alfaaz aur jor bolta hai?",
+      "source_ids": [
+        "ASHA-LLE"
+      ],
+      "evidence_group": "early_language",
+      "cross_check_domains": [
+        "Hearing",
+        "Social_Communication"
+      ],
+      "action": "speech_language_review",
+      "interpretation_notes": "ASHA describes a commonly used <50 words and no combinations at 24 months criterion; not a Pakistan-validated score.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-RF-008",
+        "SL-M-015",
+        "SL-M-016",
+        "SL-M-017",
+        "SL-M-022",
+        "SL-RF-006",
+        "SL-RF-009",
+        "SL-RF-010",
+        "SL-RF-013"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-002",
+      "domain": "Speech_Language",
+      "entry_kind": "context",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "English-only performance may misrepresent multilingual ability.",
+      "follow_up_en": "Which languages and communication modes does the child use?",
+      "follow_up_ur_latn": "Bacha kaunsi zaban aur isharay istemal karta hai?",
+      "source_ids": [
+        "ASHA-MULTI"
+      ],
+      "evidence_group": "language_access",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "context_only",
+      "interpretation_notes": "Do not classify dialect, code-switching, sign or AAC use as a disorder.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SL-003",
+      "domain": "Speech_Language",
+      "entry_kind": "concern",
+      "age_min_months": 72,
+      "age_max_months_exclusive": 120,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Understanding spoken instructions limits school participation.",
+      "follow_up_en": "Which instructions are difficult in the best-understood language?",
+      "follow_up_ur_latn": "Sab se samajh aane wali zaban mein kya mushkil hai?",
+      "source_ids": [
+        "ASHA-LANGUAGE"
+      ],
+      "evidence_group": "functional_language",
+      "cross_check_domains": [
+        "Hearing",
+        "Attention"
+      ],
+      "action": "speech_language_review",
+      "interpretation_notes": "Ages are product bands, not new normative cutoffs.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-033",
+        "SL-M-034",
+        "SL-M-035",
+        "SL-RF-020",
+        "SL-RF-023",
+        "SL-RF-024",
+        "SL-RF-025"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-004",
+      "domain": "Speech_Language",
+      "entry_kind": "concern",
+      "age_min_months": 120,
+      "age_max_months_exclusive": 180,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Explaining events or understanding classroom language remains difficult.",
+      "follow_up_en": "Which real tasks are affected and in which languages?",
+      "follow_up_ur_latn": "Kaunse asal kaam aur kaunsi zaban mein mushkil hai?",
+      "source_ids": [
+        "ASHA-LANGUAGE"
+      ],
+      "evidence_group": "functional_language",
+      "cross_check_domains": [
+        "Hearing",
+        "Attention"
+      ],
+      "action": "speech_language_review",
+      "interpretation_notes": "Check educational opportunity; do not grade against English vocabulary averages.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-028",
+        "SL-M-033",
+        "SL-M-034",
+        "SL-M-035",
+        "SL-RF-023",
+        "SL-RF-024",
+        "SL-RF-025"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-005",
+      "domain": "Speech_Language",
+      "entry_kind": "concern",
+      "age_min_months": 180,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Communication difficulties affect study, daily tasks or transition planning.",
+      "follow_up_en": "What communication support does the young person want?",
+      "follow_up_ur_latn": "Naujawan ko baat samajhne ya karne mein kya madad chahiye?",
+      "source_ids": [
+        "ASHA-LANGUAGE"
+      ],
+      "evidence_group": "functional_language",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "speech_language_review",
+      "interpretation_notes": "Include the young person's account; no adult diagnosis inferred.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-033",
+        "SL-M-034",
+        "SL-M-035",
+        "SL-RF-023",
+        "SL-RF-024",
+        "SL-RF-025"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-006",
+      "domain": "Speech_Language",
+      "entry_kind": "concern",
+      "age_min_months": 36,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Speech clarity persistently restricts being understood.",
+      "follow_up_en": "Who understands the child across familiar languages?",
+      "follow_up_ur_latn": "Mukhtalif zabanon mein kin logon ko baat samajh aati hai?",
+      "source_ids": [
+        "ASHA-SPEECH"
+      ],
+      "evidence_group": "intelligibility",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "speech_language_review",
+      "interpretation_notes": "No universal 50/75/100-percent intelligibility rule; pronunciation is language-specific.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-019",
+        "SL-M-023",
+        "SL-M-027",
+        "SL-M-032",
+        "SL-RF-012",
+        "SL-RF-015",
+        "SL-RF-017",
+        "SL-RF-018",
+        "SL-RF-020"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-007",
+      "domain": "Speech_Language",
+      "entry_kind": "urgent",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Previously used language skills have been lost.",
+      "follow_up_en": "Which skill was present and when was it lost?",
+      "follow_up_ur_latn": "Kaunsi salahiyat pehle thi aur kab khatam hui?",
+      "source_ids": [
+        "NICE-SOCIAL"
+      ],
+      "evidence_group": "regression",
+      "cross_check_domains": [
+        "Hearing",
+        "Motor",
+        "Social_Communication"
+      ],
+      "action": "prompt_medical",
+      "interpretation_notes": "Route for clinical assessment; referral specialty depends on age and presentation, not an app diagnosis.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-RF-015",
+        "SL-RF-008",
+        "SL-RF-011",
+        "SL-RF-021"
+      ]
+    },
+    {
+      "citation_ref": "V3-VIS-001",
+      "domain": "Vision",
+      "entry_kind": "concern",
+      "age_min_months": 4,
+      "age_max_months_exclusive": 12,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "An infant does not visually follow an object well.",
+      "follow_up_en": "What is seen during ordinary visual tracking?",
+      "follow_up_ur_latn": "Aam cheez ko aankhon se follow kaise karta hai?",
+      "source_ids": [
+        "AAPOS-VISION"
+      ],
+      "evidence_group": "visual_tracking",
+      "cross_check_domains": [
+        "Motor"
+      ],
+      "action": "eye_review",
+      "interpretation_notes": "Source supports assessment, not a SIGNAL confidence grade. Local pathway and clinical review required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-VIS-002",
+      "domain": "Vision",
+      "entry_kind": "professional_test",
+      "age_min_months": 36,
+      "age_max_months_exclusive": 60,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "A trained preschool acuity screen records a referral result.",
+      "follow_up_en": "What result did the trained screener document for each eye?",
+      "follow_up_ur_latn": "Maher ne har aankh ka kya nateeja likha?",
+      "source_ids": [
+        "AAPOS-VISION"
+      ],
+      "evidence_group": "visual_acuity",
+      "cross_check_domains": [],
+      "action": "eye_review",
+      "interpretation_notes": "AAPOS pass lines: 20/50 at 36–47 months, 20/40 at 48–59. Unreliable tests are not passes.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-VIS-003",
+      "domain": "Vision",
+      "entry_kind": "professional_test",
+      "age_min_months": 60,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "A trained school-age acuity screen records a referral result.",
+      "follow_up_en": "What is the documented result for each eye?",
+      "follow_up_ur_latn": "Har aankh ka likha hua nateeja kya hai?",
+      "source_ids": [
+        "AAPOS-VISION"
+      ],
+      "evidence_group": "visual_acuity",
+      "cross_check_domains": [],
+      "action": "eye_review",
+      "interpretation_notes": "AAPOS uses 20/32 from 5 years. Calibrated testing by trained staff only; screen-size guesses are invalid.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-VIS-004",
+      "domain": "Vision",
+      "entry_kind": "urgent",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "A white pupil or unusual white reflection is reported.",
+      "follow_up_en": "When was the reflection noticed? Seek urgent assessment.",
+      "follow_up_ur_latn": "Safed aks kab dekha? Foran tibbi jaanch karwaein.",
+      "source_ids": [
+        "NHS-WHITE"
+      ],
+      "evidence_group": "white_pupil",
+      "cross_check_domains": [],
+      "action": "urgent_medical",
+      "interpretation_notes": "Do not diagnose from a photo or reassure from a different normal photo.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-VIS-005",
+      "domain": "Vision",
+      "entry_kind": "concern",
+      "age_min_months": 12,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Difficulty seeing interferes with ordinary activities.",
+      "follow_up_en": "Which activities are harder to see clearly?",
+      "follow_up_ur_latn": "Kin kaamon mein saaf nazar aane mein mushkil hai?",
+      "source_ids": [
+        "NHS-VISION"
+      ],
+      "evidence_group": "functional_vision",
+      "cross_check_domains": [
+        "Hearing",
+        "Attention"
+      ],
+      "action": "eye_review",
+      "interpretation_notes": "Source supports assessment, not a SIGNAL confidence grade. Local pathway and clinical review required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-RF-009",
+        "HEAR-RF-010"
+      ]
+    },
+    {
+      "citation_ref": "V3-VIS-006",
+      "domain": "Vision",
+      "entry_kind": "urgent",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Vision suddenly disappears in one or both eyes.",
+      "follow_up_en": "When did this start? Seek emergency care now.",
+      "follow_up_ur_latn": "Yeh kab shuru hua? Abhi emergency madad lein.",
+      "source_ids": [
+        "NHS-VISION"
+      ],
+      "evidence_group": "acute_vision",
+      "cross_check_domains": [],
+      "action": "immediate_medical",
+      "interpretation_notes": "Source supports assessment, not a SIGNAL confidence grade. Local pathway and clinical review required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-MOT-001",
+      "domain": "Motor",
+      "entry_kind": "concern",
+      "age_min_months": 72,
+      "age_max_months_exclusive": 120,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Coordination repeatedly limits play or everyday tasks.",
+      "follow_up_en": "Which activities are affected despite opportunity to practise?",
+      "follow_up_ur_latn": "Mashq ka mauqa hone par bhi kaunse kaam mushkil hain?",
+      "source_ids": [
+        "NHS-COORD"
+      ],
+      "evidence_group": "functional_motor",
+      "cross_check_domains": [
+        "Vision"
+      ],
+      "action": "motor_review",
+      "interpretation_notes": "Source supports assessment, not a SIGNAL confidence grade. Local pathway and clinical review required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-MOT-002",
+      "domain": "Motor",
+      "entry_kind": "concern",
+      "age_min_months": 120,
+      "age_max_months_exclusive": 180,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Movement difficulties restrict school or self-care participation.",
+      "follow_up_en": "Which tasks require help and what has changed?",
+      "follow_up_ur_latn": "Kin kaamon mein madad chahiye aur kya badla hai?",
+      "source_ids": [
+        "NHS-COORD"
+      ],
+      "evidence_group": "functional_motor",
+      "cross_check_domains": [
+        "Vision"
+      ],
+      "action": "motor_review",
+      "interpretation_notes": "Source supports assessment, not a SIGNAL confidence grade. Local pathway and clinical review required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-MOT-003",
+      "domain": "Motor",
+      "entry_kind": "concern",
+      "age_min_months": 180,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Persistent coordination problems affect independent daily tasks.",
+      "follow_up_en": "What practical support is useful to the young person?",
+      "follow_up_ur_latn": "Naujawan ko roz ke kaamon mein kya madad chahiye?",
+      "source_ids": [
+        "NHS-COORD"
+      ],
+      "evidence_group": "functional_motor",
+      "cross_check_domains": [
+        "Vision"
+      ],
+      "action": "motor_review",
+      "interpretation_notes": "Clumsiness alone is not a diagnosis; check functional impact.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-MOT-004",
+      "domain": "Motor",
+      "entry_kind": "urgent",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 192,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Previously acquired movement skills have regressed.",
+      "follow_up_en": "Which movement skill has been lost?",
+      "follow_up_ur_latn": "Kaunsi harkat ki salahiyat khatam hui?",
+      "source_ids": [
+        "NICE-NEURO"
+      ],
+      "evidence_group": "regression",
+      "cross_check_domains": [
+        "Speech_Language"
+      ],
+      "action": "prompt_medical",
+      "interpretation_notes": "NICE under-16 pathway; older adolescents need a locally agreed pathway.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-RF-015",
+        "SL-RF-008",
+        "SL-RF-011",
+        "SL-RF-021"
+      ]
+    },
+    {
+      "citation_ref": "V3-MOT-005",
+      "domain": "Motor",
+      "entry_kind": "urgent",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 192,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "New limb or facial weakness starts suddenly or progresses rapidly.",
+      "follow_up_en": "When did weakness begin? Seek immediate assessment.",
+      "follow_up_ur_latn": "Kamzori kab shuru hui? Foran tibbi madad lein.",
+      "source_ids": [
+        "NICE-NEURO"
+      ],
+      "evidence_group": "acute_neurology",
+      "cross_check_domains": [],
+      "action": "immediate_medical",
+      "interpretation_notes": "Source supports assessment, not a SIGNAL confidence grade. Local pathway and clinical review required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-MOT-006",
+      "domain": "Motor",
+      "entry_kind": "context",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 24,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Documented prematurity can change developmental-age interpretation.",
+      "follow_up_en": "What gestational age and birth date are documented?",
+      "follow_up_ur_latn": "Paidaish ki tareekh aur hamal ke haftay kya likhay hain?",
+      "source_ids": [
+        "AAP-PRETERM"
+      ],
+      "evidence_group": "age_context",
+      "cross_check_domains": [],
+      "action": "context_only",
+      "interpretation_notes": "Use documented adjusted age for developmental monitoring up to 2 years; do not postpone acute-care routes.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SOC-001",
+      "domain": "Social_Communication",
+      "entry_kind": "concern",
+      "age_min_months": 12,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Persistent differences in social interaction affect participation.",
+      "follow_up_en": "What happens with familiar people across everyday situations?",
+      "follow_up_ur_latn": "Rozmarra mein jaan pehchan walon ke saath kya hota hai?",
+      "source_ids": [
+        "NICE-SOCIAL"
+      ],
+      "evidence_group": "social_participation",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language",
+        "Attachment"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "No single behaviour establishes autism; eye contact or affection does not exclude it.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SOC-002",
+      "domain": "Social_Communication",
+      "entry_kind": "concern",
+      "age_min_months": 72,
+      "age_max_months_exclusive": 180,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Social communication or coping with change causes difficulty.",
+      "follow_up_en": "What does the child describe as difficult?",
+      "follow_up_ur_latn": "Bacha khud kis cheez ko mushkil kehta hai?",
+      "source_ids": [
+        "NHS-SOCIAL"
+      ],
+      "evidence_group": "social_participation",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language",
+        "Attention"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Source supports assessment, not a SIGNAL confidence grade. Local pathway and clinical review required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-RF-026"
+      ]
+    },
+    {
+      "citation_ref": "V3-SOC-003",
+      "domain": "Social_Communication",
+      "entry_kind": "concern",
+      "age_min_months": 180,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Social demands remain difficult despite apparently fluent speech.",
+      "follow_up_en": "Which situations need support or recovery time?",
+      "follow_up_ur_latn": "Kin halaat mein madad ya araam ka waqt chahiye?",
+      "source_ids": [
+        "NHS-SOCIAL"
+      ],
+      "evidence_group": "social_participation",
+      "cross_check_domains": [
+        "Speech_Language",
+        "Attachment"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Do not infer absence of need from quiet or compliant behaviour.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-RF-026"
+      ]
+    },
+    {
+      "citation_ref": "V3-ATT-001",
+      "domain": "Attention",
+      "entry_kind": "context",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 60,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Preschool distractibility alone is not an attention diagnosis.",
+      "follow_up_en": "How do sleep, stress and the setting affect behaviour?",
+      "follow_up_ur_latn": "Neend, pareshani aur mahaul ka kya asar hai?",
+      "source_ids": [
+        "NHS-ATTENTION"
+      ],
+      "evidence_group": "attention_context",
+      "cross_check_domains": [
+        "Hearing",
+        "Vision",
+        "Speech_Language"
+      ],
+      "action": "context_only",
+      "interpretation_notes": "Infant attention-disorder grading is not supported.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-ATT-002",
+      "domain": "Attention",
+      "entry_kind": "concern",
+      "age_min_months": 60,
+      "age_max_months_exclusive": 144,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Persistent attention difficulties impair more than one setting.",
+      "follow_up_en": "What impairment is reported in care and education settings?",
+      "follow_up_ur_latn": "Ghar aur taleem ke mahaul mein kya mushkil hai?",
+      "source_ids": [
+        "NICE-ATTENTION"
+      ],
+      "evidence_group": "attention_function",
+      "cross_check_domains": [
+        "Hearing",
+        "Vision",
+        "Speech_Language"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Gather multiple observers and developmental history; no checklist-only diagnosis.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-ATT-003",
+      "domain": "Attention",
+      "entry_kind": "concern",
+      "age_min_months": 144,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Attention or organisation problems limit daily functioning.",
+      "follow_up_en": "Which difficulties does the young person report across settings?",
+      "follow_up_ur_latn": "Mukhtalif jagahon par naujawan kya mushkil batata hai?",
+      "source_ids": [
+        "NICE-ATTENTION"
+      ],
+      "evidence_group": "attention_function",
+      "cross_check_domains": [
+        "Hearing",
+        "Speech_Language"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Consider sleep, distress and learning access; severe impairment needs direct specialist referral.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-ATT-004",
+      "domain": "Attention",
+      "entry_kind": "context",
+      "age_min_months": 60,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Quiet inattention can be overlooked without disruptive behaviour.",
+      "follow_up_en": "What tasks are missed even when behaviour seems quiet?",
+      "follow_up_ur_latn": "Khamosh rehnay ke bawajood kaunse kaam reh jatay hain?",
+      "source_ids": [
+        "NHS-ATTENTION"
+      ],
+      "evidence_group": "attention_context",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "context_only",
+      "interpretation_notes": "Source supports assessment, not a SIGNAL confidence grade. Local pathway and clinical review required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-REL-001",
+      "domain": "Attachment",
+      "entry_kind": "context",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Care history and stable relationships matter when interpreting distress.",
+      "follow_up_en": "Who knows the child well and what care changes occurred?",
+      "follow_up_ur_latn": "Bachay ko kaun jaanta hai aur dekh bhal mein kya badla?",
+      "source_ids": [
+        "NICE-ATTACH"
+      ],
+      "evidence_group": "care_context",
+      "cross_check_domains": [
+        "Social_Communication",
+        "Speech_Language"
+      ],
+      "action": "context_only",
+      "interpretation_notes": "Institutional residence alone does not diagnose attachment difficulty.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-REL-002",
+      "domain": "Attachment",
+      "entry_kind": "concern",
+      "age_min_months": 12,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "A distressed child rarely seeks comfort from familiar caregivers.",
+      "follow_up_en": "What happens with a trusted adult when the child is upset?",
+      "follow_up_ur_latn": "Pareshani mein bharosay walay baray ke saath kya hota hai?",
+      "source_ids": [
+        "AACAP-ATTACH"
+      ],
+      "evidence_group": "relationship_pattern",
+      "cross_check_domains": [
+        "Social_Communication",
+        "Hearing"
+      ],
+      "action": "relationship_review",
+      "interpretation_notes": "Product band is not a diagnostic age threshold; trained assessment required.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-REL-003",
+      "domain": "Attachment",
+      "entry_kind": "concern",
+      "age_min_months": 12,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "A child repeatedly approaches unfamiliar adults without checking back.",
+      "follow_up_en": "What happened during a naturally occurring situation?",
+      "follow_up_ur_latn": "Aam halaat mein kya hua tha?",
+      "source_ids": [
+        "AACAP-ATTACH"
+      ],
+      "evidence_group": "relationship_pattern",
+      "cross_check_domains": [
+        "Attention",
+        "Social_Communication"
+      ],
+      "action": "relationship_review",
+      "interpretation_notes": "Never stage a stranger or separation test. A single friendly interaction is insufficient.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-REL-004",
+      "domain": "Attachment",
+      "entry_kind": "concern",
+      "age_min_months": 72,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Persistent relationship difficulties affect life in care.",
+      "follow_up_en": "Which relationships feel safe and where is support needed?",
+      "follow_up_ur_latn": "Kaunse rishtay mehfooz lagtay hain aur madad kahan chahiye?",
+      "source_ids": [
+        "NICE-ATTACH"
+      ],
+      "evidence_group": "relationship_pattern",
+      "cross_check_domains": [
+        "Social_Communication"
+      ],
+      "action": "relationship_review",
+      "interpretation_notes": "Do not extrapolate infant attachment tests to adolescents; specialist assessment is age-appropriate.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SAFE-001",
+      "domain": "Safeguarding",
+      "entry_kind": "safeguarding",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Abuse or neglect is disclosed or a credible concern is raised.",
+      "follow_up_en": "Is the child currently safe? Do not investigate through the chat.",
+      "follow_up_ur_latn": "Bacha abhi mehfooz hai? Chat par tehqeeq na karein.",
+      "source_ids": [
+        "NICE-SAFE"
+      ],
+      "evidence_group": "safeguarding",
+      "cross_check_domains": [],
+      "action": "safeguarding_pathway",
+      "interpretation_notes": "Preserve the account, use non-leading communication and follow an approved local pathway. No automatic abuse diagnosis.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SAFE-002",
+      "domain": "Safety",
+      "entry_kind": "urgent",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 60,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Severe breathing difficulty or unresponsiveness is reported.",
+      "follow_up_en": "Is emergency help being obtained now?",
+      "follow_up_ur_latn": "Kya abhi emergency madad li ja rahi hai?",
+      "source_ids": [
+        "NHS-ACUTE"
+      ],
+      "evidence_group": "acute_illness",
+      "cross_check_domains": [],
+      "action": "immediate_medical",
+      "interpretation_notes": "Interrupt screening; do not complete a five-turn developmental interview first.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SAFE-003",
+      "domain": "Safety",
+      "entry_kind": "context",
+      "age_min_months": 120,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "age_band",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Distress, withdrawal or self-harm concerns require an appropriate mental-health pathway.",
+      "follow_up_en": "Can the young person speak safely with a qualified helper?",
+      "follow_up_ur_latn": "Kya naujawan mehfooz tor par maher se baat kar sakta hai?",
+      "source_ids": [
+        "WHO-ADOLESCENT"
+      ],
+      "evidence_group": "mental_health",
+      "cross_check_domains": [],
+      "action": "mental_health_review",
+      "interpretation_notes": "Not a developmental severity count; immediate danger requires emergency escalation through the local protocol.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-CTX-001",
+      "domain": "Context",
+      "entry_kind": "context",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Caregiver familiarity and direct observation affect evidential confidence.",
+      "follow_up_en": "How long and in what situations have you observed the child?",
+      "follow_up_ur_latn": "Kitne arsay se aur kin halaat mein bachay ko dekha hai?",
+      "source_ids": [
+        "CDC-SCREEN"
+      ],
+      "evidence_group": "observer_context",
+      "cross_check_domains": [],
+      "action": "context_only",
+      "interpretation_notes": "Unknown is not absent. This evidence-quality field is a SIGNAL implementation proposal.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-RF-022"
+      ]
+    },
+    {
+      "citation_ref": "V3-CTX-002",
+      "domain": "Context",
+      "entry_kind": "context",
+      "age_min_months": 0,
+      "age_max_months_exclusive": 216,
+      "age_semantics": "any_age",
+      "threshold_months": null,
+      "age_basis": "chronological_age",
+      "observation": "Screening observations do not establish a diagnosis.",
+      "follow_up_en": "What assessment or referral has already taken place?",
+      "follow_up_ur_latn": "Pehle kaunsi jaanch ya referral hui hai?",
+      "source_ids": [
+        "ASHA-MILESTONES"
+      ],
+      "evidence_group": "assessment_context",
+      "cross_check_domains": [],
+      "action": "context_only",
+      "interpretation_notes": "The product age range is not an extension of ASHA's birth-to-five norms.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": []
+    },
+    {
+      "citation_ref": "V3-SL-M-004-4",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 4,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 4,
+      "age_basis": "developmental_age",
+      "observation": "Cooing includes open vowel-like sounds.",
+      "follow_up_en": "Which comfortable cooing sounds occur?",
+      "follow_up_ur_latn": "Araam mein kaunsi cooing awazein aati hain?",
+      "source_ids": [
+        "CDC-04"
+      ],
+      "evidence_group": "early_vocalisation",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Not observed is not absent. Surveillance item requires accessible communication and contextual review; no automatic clinical grade.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-001"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-M-012-4",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 12,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 12,
+      "age_basis": "developmental_age",
+      "observation": "Uses a familiar waving gesture.",
+      "follow_up_en": "How does the child communicate goodbye?",
+      "follow_up_ur_latn": "Bacha alvida kaise kehta ya ishara karta hai?",
+      "source_ids": [
+        "CDC-12"
+      ],
+      "evidence_group": "gestures",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Not observed is not absent. Surveillance item requires accessible communication and contextual review; no automatic clinical grade.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-008",
+        "SL-RF-004",
+        "SL-RF-007"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-M-015-4",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 15,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 15,
+      "age_basis": "developmental_age",
+      "observation": "Follows a direction supported by words and gesture.",
+      "follow_up_en": "What happens when a word and gesture are used together?",
+      "follow_up_ur_latn": "Jab aap bachche ko koi baat kehne ke saath ishara bhi karte hain, to woh kya karta hai?",
+      "source_ids": [
+        "CDC-15"
+      ],
+      "evidence_group": "receptive_language",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Not observed is not absent. Surveillance item requires accessible communication and contextual review; no automatic clinical grade.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-013"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-M-018-4",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 18,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 18,
+      "age_basis": "developmental_age",
+      "observation": "Follows a one-step request without an added gesture.",
+      "follow_up_en": "Which familiar request is followed without pointing?",
+      "follow_up_ur_latn": "Isharay ke baghair kaunsi saada baat samajhta hai?",
+      "source_ids": [
+        "CDC-18"
+      ],
+      "evidence_group": "receptive_language",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Not observed is not absent. Surveillance item requires accessible communication and contextual review; no automatic clinical grade.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-M-012",
+        "SL-M-018"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-M-030-4",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 30,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 30,
+      "age_basis": "developmental_age",
+      "observation": "Follows an instruction containing two steps.",
+      "follow_up_en": "Can you give an everyday two-step example?",
+      "follow_up_ur_latn": "Roz ki do qadam wali hidayat ki misaal dein?",
+      "source_ids": [
+        "CDC-30"
+      ],
+      "evidence_group": "receptive_language",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Not observed is not absent. Surveillance item requires accessible communication and contextual review; no automatic clinical grade.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "SL-M-021"
+      ]
+    },
+    {
+      "citation_ref": "V3-SL-M-060-4",
+      "domain": "Speech_Language",
+      "entry_kind": "milestone",
+      "age_min_months": 60,
+      "age_max_months_exclusive": 72,
+      "age_semantics": "by_age",
+      "threshold_months": 60,
+      "age_basis": "developmental_age",
+      "observation": "Sustains more than three conversational exchanges.",
+      "follow_up_en": "How long does a shared conversation continue?",
+      "follow_up_ur_latn": "Do tarfa guftagu kitni dair chalti hai?",
+      "source_ids": [
+        "CDC-60"
+      ],
+      "evidence_group": "conversation",
+      "cross_check_domains": [
+        "Hearing"
+      ],
+      "action": "developmental_review",
+      "interpretation_notes": "Not observed is not absent. Surveillance item requires accessible communication and contextual review; no automatic clinical grade.",
+      "clinical_grade": null,
+      "review_status": "needs_clinical_review",
+      "reviewer": null,
+      "reviewed_on": null,
+      "translation_status": "draft_ur_latn",
+      "legacy_refs": [
+        "HEAR-M-014",
+        "SL-M-031"
+      ]
+    }
+  ]
+}

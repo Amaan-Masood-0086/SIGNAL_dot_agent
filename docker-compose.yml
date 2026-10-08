@@ -4,7 +4,12 @@
 # migrations/administration only.
 services:
   db:
-    image: postgres:16-alpine
+    # pgvector build of Postgres 16 (ADR-11). A NEW volume name is deliberate:
+    # the previous alpine (musl) data directory must not be reopened by a
+    # Debian (glibc) server — collation differences can silently corrupt
+    # text indexes. The dev database is synthetic; the seed scripts in the
+    # README rebuild it.
+    image: pgvector/pgvector:pg16
     # Observed exiting 255 on its own twice in one session — a host sleep or
     # Docker Desktop restart is enough. Every SIGNAL surface then fails at
     # once, and the failure reads as "password authentication failed" rather
@@ -17,9 +22,10 @@ services:
       POSTGRES_PASSWORD: signal_dev_only
       POSTGRES_DB: signal_dev
     ports:
-      - "5432:5432"
+      # Override when 5432 is taken by another project: $env:SIGNAL_DB_PORT=5433
+      - "${SIGNAL_DB_PORT:-5432}:5432"
     volumes:
-      - signal_pgdata:/var/lib/postgresql/data
+      - signal_pgdata_pgv:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U signal -d signal_dev"]
       interval: 5s
@@ -27,4 +33,4 @@ services:
       retries: 10
 
 volumes:
-  signal_pgdata:
+  signal_pgdata_pgv:

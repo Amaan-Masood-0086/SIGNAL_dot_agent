@@ -1,0 +1,899 @@
+[
+  {
+    "legacy_ref": "HEAR-M-001",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-001"
+    ],
+    "reason": "Same sound-response observation; avoid duplicate cross-domain evidence or deliberate loud testing.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-002",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SOC-M-002-3"
+    ],
+    "reason": "Related familiar-adult response; voice quieting and smiling are not identical measures.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-003",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-M-004-2",
+      "V3-HEAR-001"
+    ],
+    "reason": "Related sound orientation; no arbitrary expiry of ongoing hearing concern.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-004",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-M-004-2",
+      "V3-HEAR-001"
+    ],
+    "reason": "Related sound orientation; no arbitrary expiry of ongoing hearing concern.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-005",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-M-004-2",
+      "V3-HEAR-001"
+    ],
+    "reason": "Related sound orientation; no arbitrary expiry of ongoing hearing concern.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-006",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-M-004-2",
+      "V3-HEAR-001"
+    ],
+    "reason": "Related sound orientation; no arbitrary expiry of ongoing hearing concern.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-007",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-009-1",
+      "V3-HEAR-001"
+    ],
+    "reason": "Separate babbling surveillance from hearing assessment; absence does not expire at an exact month.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-008",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-M-004-2",
+      "V3-HEAR-001"
+    ],
+    "reason": "Related sound orientation; no arbitrary expiry of ongoing hearing concern.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-009",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SOC-M-009-3",
+      "V3-HEAR-003"
+    ],
+    "reason": "Name response has multiple explanations; not a stand-alone hearing diagnosis.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-010",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-M-004-2",
+      "V3-HEAR-001"
+    ],
+    "reason": "Related sound orientation; no arbitrary expiry of ongoing hearing concern.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-011",
+    "disposition": "needs_specific_review",
+    "candidate_refs": [],
+    "reason": "Understanding no/bye-bye needs specific receptive-language coverage in a subsequent reviewed revision.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-012",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-018-4"
+    ],
+    "reason": "Related receptive-language observation; exact source threshold replaces a broad band.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-013",
+    "disposition": "needs_specific_review",
+    "candidate_refs": [],
+    "reason": "Pointing to named objects needs distinct sourced receptive-language content.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-014",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-M-036-1",
+      "V3-SL-M-060-4"
+    ],
+    "reason": "Conversation does not establish normal hearing.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-M-015",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-HEAR-003",
+      "V3-HEAR-008"
+    ],
+    "reason": "Everyday response at normal volume is not an audiometric pass.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-001",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-001"
+    ],
+    "reason": "Same sound-response observation; avoid duplicate cross-domain evidence or deliberate loud testing.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-002",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-M-004-2",
+      "V3-HEAR-001"
+    ],
+    "reason": "Related sound orientation; no arbitrary expiry of ongoing hearing concern.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-003",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-HEAR-001",
+      "V3-SL-M-009-1"
+    ],
+    "reason": "Split the compound no-babbling OR no-voice-response statement.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-004",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SOC-M-009-3",
+      "V3-HEAR-003"
+    ],
+    "reason": "Name response has multiple explanations; not a stand-alone hearing diagnosis.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-005",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-009-1",
+      "V3-HEAR-001"
+    ],
+    "reason": "Separate babbling surveillance from hearing assessment; absence does not expire at an exact month.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-006",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-HEAR-005"
+    ],
+    "reason": "Fluctuation prompts assessment; observation does not diagnose OME.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-007",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-007"
+    ],
+    "reason": "Ear symptoms and history are contextual; avoid automatic escalation by repeated correlated signs.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-008",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-001",
+      "V3-HEAR-003"
+    ],
+    "reason": "Speech difficulty warrants a hearing cross-check; remove 'single most important' and automatic hearing HIGH.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-009",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-006",
+      "V3-VIS-005"
+    ],
+    "reason": "Keep correlated listening signs together and check vision when proximity is the observation.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-010",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-006",
+      "V3-VIS-005"
+    ],
+    "reason": "Keep correlated listening signs together and check vision when proximity is the observation.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-011",
+    "disposition": "needs_specific_review",
+    "candidate_refs": [
+      "V3-HEAR-008"
+    ],
+    "reason": "Compensatory behaviour needs assessment; related functional row is not a literal sign replacement.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-012",
+    "disposition": "needs_specific_review",
+    "candidate_refs": [
+      "V3-HEAR-008"
+    ],
+    "reason": "Compensatory behaviour needs assessment; related functional row is not a literal sign replacement.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-013",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SOC-M-009-3",
+      "V3-HEAR-003"
+    ],
+    "reason": "Name response has multiple explanations; not a stand-alone hearing diagnosis.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-014",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-HEAR-003"
+    ],
+    "reason": "Preserve the referral implication of concern without asserting diagnostic confidence.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-015",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-007",
+      "V3-MOT-004"
+    ],
+    "reason": "Regression needs a separate action pathway, not repeated votes or a diagnosis.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RF-016",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-007"
+    ],
+    "reason": "Ear symptoms and history are contextual; avoid automatic escalation by repeated correlated signs.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RISK-01",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-HEAR-011"
+    ],
+    "reason": "Do not combine family history and consanguinity into an automatic severity increase.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "HEAR-RISK-02",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-HEAR-004"
+    ],
+    "reason": "Preserve no-reassurance-from-prior-pass principle; remove unsupported prevalence percentage.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-001",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-M-004-4"
+    ],
+    "reason": "Replace wide birth-to-six-month expectation with an explicit surveillance age.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-002",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-001"
+    ],
+    "reason": "Same sound-response observation; avoid duplicate cross-domain evidence or deliberate loud testing.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-003",
+    "disposition": "needs_specific_review",
+    "candidate_refs": [],
+    "reason": "Different cries are not retained as a graded developmental cutoff; source-specific review needed.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-004",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SOC-M-002-3"
+    ],
+    "reason": "Related familiar-adult response; voice quieting and smiling are not identical measures.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-005",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-009-1",
+      "V3-HEAR-001"
+    ],
+    "reason": "Separate babbling surveillance from hearing assessment; absence does not expire at an exact month.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-006",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-009-1",
+      "V3-HEAR-001"
+    ],
+    "reason": "Separate babbling surveillance from hearing assessment; absence does not expire at an exact month.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-007",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SOC-M-009-3",
+      "V3-HEAR-003"
+    ],
+    "reason": "Name response has multiple explanations; not a stand-alone hearing diagnosis.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-008",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-012-4",
+      "V3-SOC-M-018-3"
+    ],
+    "reason": "Distinguish waving, requesting and sharing interest rather than merging all gestures.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-009",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-M-012-1",
+      "V3-SL-M-015-1"
+    ],
+    "reason": "Separate caregiver naming from other meaningful words and record language context.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-010",
+    "disposition": "needs_specific_review",
+    "candidate_refs": [],
+    "reason": "Understanding no/bye-bye needs specific receptive-language coverage in a subsequent reviewed revision.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-011",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-M-015-1"
+    ],
+    "reason": "CDC uses skills attained by most children; do not call it the 75th percentile.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-012",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-M-018-1"
+    ],
+    "reason": "Explicit by-age threshold persists; remove the incorrect percentile description.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-013",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-M-015-4"
+    ],
+    "reason": "Distinguish gestures-supported understanding from unaided understanding.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-014",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SOC-M-018-3"
+    ],
+    "reason": "Use shared-interest context rather than conflating requesting with showing.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-015",
+    "disposition": "retired_numeric_cutoff",
+    "candidate_refs": [
+      "V3-SL-M-018-1",
+      "V3-SL-M-030-1",
+      "V3-SL-001"
+    ],
+    "reason": "Retire average vocabulary-size figures as automatic failure cutoffs; do not conflate research means with referral criteria.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-016",
+    "disposition": "retired_numeric_cutoff",
+    "candidate_refs": [
+      "V3-SL-M-018-1",
+      "V3-SL-M-030-1",
+      "V3-SL-001"
+    ],
+    "reason": "Retire average vocabulary-size figures as automatic failure cutoffs; do not conflate research means with referral criteria.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-017",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-024-1",
+      "V3-SL-001"
+    ],
+    "reason": "Word-combination evidence stays available after the threshold; no unsupported automatic HIGH mapping.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-018",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-018-4"
+    ],
+    "reason": "Related receptive-language observation; exact source threshold replaces a broad band.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-019",
+    "disposition": "retired_numeric_cutoff",
+    "candidate_refs": [
+      "V3-SL-M-036-2",
+      "V3-SL-006"
+    ],
+    "reason": "Retire universal 50/75/100-percent intelligibility cutoffs; language and assessment method matter.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-020",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-030-2",
+      "V3-SL-M-048-1"
+    ],
+    "reason": "Use distinct age-specific observations, not a mixed sentence-length range.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-021",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-M-030-4"
+    ],
+    "reason": "Two-step comprehension is a sourced by-age surveillance item.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-022",
+    "disposition": "retired_numeric_cutoff",
+    "candidate_refs": [
+      "V3-SL-M-018-1",
+      "V3-SL-M-030-1",
+      "V3-SL-001"
+    ],
+    "reason": "Retire average vocabulary-size figures as automatic failure cutoffs; do not conflate research means with referral criteria.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-023",
+    "disposition": "retired_numeric_cutoff",
+    "candidate_refs": [
+      "V3-SL-M-036-2",
+      "V3-SL-006"
+    ],
+    "reason": "Retire universal 50/75/100-percent intelligibility cutoffs; language and assessment method matter.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-024",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-060-1"
+    ],
+    "reason": "Use a defined connected-events observation; related earlier story skills need separate sourcing.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-025",
+    "disposition": "needs_specific_review",
+    "candidate_refs": [],
+    "reason": "Specific who/why/how question thresholds need row-level review before reinstatement.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-026",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-030-2",
+      "V3-SL-M-048-1"
+    ],
+    "reason": "Use distinct age-specific observations, not a mixed sentence-length range.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-027",
+    "disposition": "retired_numeric_cutoff",
+    "candidate_refs": [
+      "V3-SL-M-036-2",
+      "V3-SL-006"
+    ],
+    "reason": "Retire universal 50/75/100-percent intelligibility cutoffs; language and assessment method matter.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-028",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-M-048-1",
+      "V3-SL-004"
+    ],
+    "reason": "Complex grammar is language-specific; related sentence/functional content is not an equivalent cutoff.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-029",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-060-1"
+    ],
+    "reason": "Use a defined connected-events observation; related earlier story skills need separate sourcing.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-030",
+    "disposition": "needs_specific_review",
+    "candidate_refs": [],
+    "reason": "Specific who/why/how question thresholds need row-level review before reinstatement.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-031",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-M-060-4"
+    ],
+    "reason": "Explicit conversation example with source and observation context.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-032",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-006"
+    ],
+    "reason": "Do not import English phoneme acquisition as universal Urdu norms.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-033",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-003",
+      "V3-SL-004",
+      "V3-SL-005"
+    ],
+    "reason": "Split 6–18 into functional school-age/adolescent contexts without invented yearly norms.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-034",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-003",
+      "V3-SL-004",
+      "V3-SL-005"
+    ],
+    "reason": "Split 6–18 into functional school-age/adolescent contexts without invented yearly norms.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-M-035",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-003",
+      "V3-SL-004",
+      "V3-SL-005"
+    ],
+    "reason": "Split 6–18 into functional school-age/adolescent contexts without invented yearly norms.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-001",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-HEAR-001"
+    ],
+    "reason": "Same sound-response observation; avoid duplicate cross-domain evidence or deliberate loud testing.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-002",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SOC-M-002-3",
+      "V3-SOC-M-006-3"
+    ],
+    "reason": "Separate social-response surveillance from an unsupported fixed MODERATE grade at six months.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-003",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-009-1",
+      "V3-HEAR-001"
+    ],
+    "reason": "Separate babbling surveillance from hearing assessment; absence does not expire at an exact month.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-004",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-012-4",
+      "V3-SOC-M-018-3"
+    ],
+    "reason": "Distinguish waving, requesting and sharing interest rather than merging all gestures.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-005",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SOC-M-009-3",
+      "V3-HEAR-003"
+    ],
+    "reason": "Name response has multiple explanations; not a stand-alone hearing diagnosis.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-006",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-M-015-1",
+      "V3-SL-M-018-1",
+      "V3-SL-001"
+    ],
+    "reason": "Do not retain an unsupported exact-16-month HIGH rule; nearby sourced items are related, not equivalent.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-007",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-012-4",
+      "V3-SOC-M-018-3"
+    ],
+    "reason": "Distinguish waving, requesting and sharing interest rather than merging all gestures.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-008",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-007",
+      "V3-MOT-004"
+    ],
+    "reason": "Regression needs a separate action pathway, not repeated votes or a diagnosis.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-009",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-024-1",
+      "V3-SL-001"
+    ],
+    "reason": "Word-combination evidence stays available after the threshold; no unsupported automatic HIGH mapping.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-010",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SL-001"
+    ],
+    "reason": "Use the complete context of ASHA's common criterion; remove unsourced spontaneous-resolution reassurance.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-011",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-007",
+      "V3-MOT-004"
+    ],
+    "reason": "Regression needs a separate action pathway, not repeated votes or a diagnosis.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-012",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-006"
+    ],
+    "reason": "Functional intelligibility needs familiar-language assessment, not guessed severity.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-013",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-024-1",
+      "V3-SL-001"
+    ],
+    "reason": "Word-combination evidence stays available after the threshold; no unsupported automatic HIGH mapping.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-014",
+    "disposition": "needs_specific_review",
+    "candidate_refs": [],
+    "reason": "Echolalia requires specific evidence/context review; no automatic diagnostic interpretation carried forward.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-015",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-006"
+    ],
+    "reason": "Functional intelligibility needs familiar-language assessment, not guessed severity.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-016",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-030-2",
+      "V3-SL-M-048-1"
+    ],
+    "reason": "Use distinct age-specific observations, not a mixed sentence-length range.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-017",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-006"
+    ],
+    "reason": "Functional intelligibility needs familiar-language assessment, not guessed severity.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-018",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-006"
+    ],
+    "reason": "Functional intelligibility needs familiar-language assessment, not guessed severity.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-019",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-M-060-1"
+    ],
+    "reason": "Use a defined connected-events observation; related earlier story skills need separate sourcing.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-020",
+    "disposition": "needs_specific_review",
+    "candidate_refs": [
+      "V3-SL-006",
+      "V3-SL-003"
+    ],
+    "reason": "Preschool word-finding requires further age-specific review; school-age candidate is not an automatic substitute.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-021",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-007",
+      "V3-MOT-004"
+    ],
+    "reason": "Regression needs a separate action pathway, not repeated votes or a diagnosis.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-022",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-CTX-001",
+      "V3-HEAR-003"
+    ],
+    "reason": "Take concern seriously, clarify it and offer appropriate review; concern is not a confirmed HIGH-confidence finding.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-023",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-003",
+      "V3-SL-004",
+      "V3-SL-005"
+    ],
+    "reason": "Split 6–18 into functional school-age/adolescent contexts without invented yearly norms.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-024",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-003",
+      "V3-SL-004",
+      "V3-SL-005"
+    ],
+    "reason": "Split 6–18 into functional school-age/adolescent contexts without invented yearly norms.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-025",
+    "disposition": "merged",
+    "candidate_refs": [
+      "V3-SL-003",
+      "V3-SL-004",
+      "V3-SL-005"
+    ],
+    "reason": "Split 6–18 into functional school-age/adolescent contexts without invented yearly norms.",
+    "automatic_replacement": false
+  },
+  {
+    "legacy_ref": "SL-RF-026",
+    "disposition": "reframed",
+    "candidate_refs": [
+      "V3-SOC-002",
+      "V3-SOC-003"
+    ],
+    "reason": "Group avoidance has multiple explanations; capture participation and the child's own account.",
+    "automatic_replacement": false
+  }
+]

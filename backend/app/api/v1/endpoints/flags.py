@@ -170,6 +170,12 @@ def list_session_flags(
         .limit(page_size)
     ).scalars().all()
 
+    AuditService(db).append(
+        actor_id=str(current_staff.staff_id), action="flag.list",
+        resource_type="session", resource_id=str(session.id),
+        institution_id=str(current_staff.institution_id),
+    )
+
     result = FlagPage(
         items=[_flag_read(db, row) for row in rows],
         total=total,

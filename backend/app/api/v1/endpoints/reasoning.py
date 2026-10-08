@@ -58,6 +58,7 @@ FOLLOW_UP_MARKER = {"role": "risk_reasoning", "follow_up": True}
 
 class ReasoningRequest(BaseModel):
     raw_input: str = Field(min_length=1, max_length=10_000)
+    request_id: uuid.UUID | None = None
     # Which language the caretaker READS. "auto" mirrors whatever they wrote,
     # which is right until it isn't: plenty of caretakers type Roman English
     # because the keyboard is easier while reading Urdu far more comfortably,
@@ -117,6 +118,21 @@ def _is_follow_up_row(row: Observation) -> bool:
     return bool(row.extracted_signals) and row.extracted_signals.get("follow_up") is True
 
 
+@router.get("/{session_id}/result")
+def saved_result(
+    session_id: uuid.UUID,
+    current_staff: CurrentStaff = Depends(get_current_verified_staff),
+    db: Session = Depends(get_tenant_db),
+):
+    session = db.get(ConversationSession, session_id)
+    if session is None or session.institution_id != current_staff.institution_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    rows = db.execute(select(Observation).where(Observation.session_id == session.id).order_by(Observation.turn_number.desc())).scalars()
+    result = next((row.extracted_signals["reasoning_result"] for row in rows if row.extracted_signals and "reasoning_result" in row.extracted_signals), None)
+    AuditService(db).append(actor_id=str(current_staff.staff_id), action="reasoning.read", resource_type="session", resource_id=str(session.id), institution_id=str(current_staff.institution_id))
+    return envelope(result)
+
+
 @router.post("/{session_id}/reason")
 def reason(
     session_id: uuid.UUID,
@@ -128,10 +144,20 @@ def reason(
     db: Session = Depends(get_tenant_db),
     provider: LLMProvider | None = Depends(get_reasoning_provider),
 ):
-    session = db.get(ConversationSession, session_id)
+    session = db.execute(select(ConversationSession).where(ConversationSession.id == session_id).with_for_update()).scalar_one_or_none()
     if session is None or session.institution_id != current_staff.institution_id:
         # Uniform 403 — existence never leaks across the tenant boundary.
         raise HTTPException(status_code=403, detail="Access denied")
+    saved_rows = db.execute(select(Observation).where(Observation.session_id == session.id).order_by(Observation.turn_number.desc())).scalars().all()
+    for row in saved_rows:
+        metadata = row.extracted_signals or {}
+        if payload.request_id and metadata.get("request_id") == str(payload.request_id):
+            if row.raw_input != payload.raw_input or metadata.get("response_language") != payload.response_language:
+                raise HTTPException(status_code=409, detail="Request id already used for different input")
+            if "reasoning_result" in metadata:
+                return envelope(metadata["reasoning_result"])
+    if any((row.extracted_signals or {}).get("reasoning_result", {}).get("status") in {"flagged", "insufficient_information", "safeguarding_escalation"} for row in saved_rows):
+        raise HTTPException(status_code=409, detail="A saved conclusion already exists for this session")
     if session.status != "in_progress":
         raise HTTPException(status_code=409, detail="Session is not in progress")
 
@@ -240,7 +266,7 @@ def reason(
         institution_id=str(current_staff.institution_id),
     )
 
-    return envelope({
+    response = {
         "status": result.outcome,
         "turn": result.turn,
         "max_turns": MAX_TURNS,
@@ -252,7 +278,15 @@ def reason(
         "age_uncertain": result.age_uncertain,
         "loop_exhausted": result.loop_exhausted,
         "flag_id": flag_id,
-    })
+    }
+    caretaker_row.extracted_signals = {
+        "signals": list(result.signals),
+        "request_id": str(payload.request_id) if payload.request_id else None,
+        "response_language": payload.response_language,
+        "reasoning_result": response,
+    }
+    db.flush()
+    return envelope(response)
 
 
 def _child_or_fail(db: Session, session: ConversationSession):

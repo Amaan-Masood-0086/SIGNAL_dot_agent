@@ -33,8 +33,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.child import Child
+from app.core.config import get_settings
 from app.models.milestone import Milestone
 from app.models.session import Session as ConversationSession
+from app.services.embeddings import Embedder, get_embedder
 from app.services.flag_service import FlagService
 from app.services.knowledge import (
     ENTRY_TYPE_MILESTONE,
@@ -42,7 +44,7 @@ from app.services.knowledge import (
     GRADE_INSUFFICIENT_INFORMATION,
     KnowledgeEntry,
     grade,
-    retrieve_in_scope_entries,
+    retrieve_for_prompt,
 )
 from app.services.audit import AuditService
 from app.services.llm import AGENT_EXPLANATION, AGENT_OBSERVATION, AGENT_RISK_REASONING, LLMProvider
@@ -109,6 +111,13 @@ def resolve_age_context(child: Child, reference_date: datetime.date) -> AgeConte
         )
         return AgeContext(age_months=max(months, 0), dob_confirmed=True)
 
+    if child.age_reference_date is not None:
+        from app.services.knowledge_v3 import advance_estimated_age
+        lower, upper = advance_estimated_age(
+            child.estimated_age_lower_months, child.estimated_age_upper_months,
+            child.age_reference_date, reference_date,
+        )
+        return AgeContext(age_months=lower, dob_confirmed=False, estimated_age_range=f"{lower}-{upper} months")
     match = re.search(r"(\d+)\s*[-\u2013]\s*(\d+)", child.estimated_age_range or "")
     if match is None:
         raise PipelineError(
@@ -151,9 +160,15 @@ _SAFEGUARDING_TEXT = (
 
 
 class RiskPipeline:
-    def __init__(self, db: Session, provider: LLMProvider):
+    def __init__(
+        self, db: Session, provider: LLMProvider, *, embedder: Embedder | None = None
+    ):
         self._db = db
         self.provider = provider
+        settings = get_settings()
+        self._retrieval_mode = settings.RETRIEVAL_MODE
+        self._top_k = settings.RETRIEVAL_TOP_K_PER_DOMAIN
+        self._embedder = embedder if embedder is not None else get_embedder(settings)
         self._observation = ObservationAgent(provider)
         self._reasoning = RiskReasoningAgent(provider)
         self._explanation = ExplanationAgent(provider)
@@ -226,7 +241,14 @@ class RiskPipeline:
 
         # 2) Retrieval — ONE joint call, both domains (ADR-05), plus
         # already-passed milestones as protective-evidence candidates.
-        retrieved = retrieve_in_scope_entries(self._db, age_context.age_months)
+        retrieved = retrieve_for_prompt(
+            self._db,
+            age_context.age_months,
+            query_text=" ".join(caretaker_turns),
+            mode=self._retrieval_mode,
+            embedder=self._embedder,
+            top_k_per_domain=self._top_k,
+        )
         universe = self._with_passed_milestones(retrieved, age_context.age_months)
 
         # 2b) Case memory (FEAT-07): this child's flags from earlier

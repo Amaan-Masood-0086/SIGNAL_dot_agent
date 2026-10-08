@@ -32,6 +32,8 @@ class FlagRead(BaseModel):
     domain: str
     confidence_grade: str
     status: str
+    kb_release_id: str = "v2-active"
+    kb_entry_revision: str | None
     explanation_text: str | None
     created_at: datetime.datetime
     reasoning_trail: list[TrailEntryRead]

@@ -130,11 +130,15 @@ def test_expired_token_401(client, rsa_keypair, settings):
     assert resp.status_code == 401
 
 
-def test_token_stub_refused_outside_synthetic_environment(rsa_keypair):
+def test_token_stub_refused_outside_synthetic_environment(rsa_keypair, monkeypatch):
     """The stub login endpoint exists for synthetic dev only — 403 elsewhere."""
     private_pem, public_pem = rsa_keypair
     from app.core.config import Settings
     from app.main import create_app
+
+    # This test isolates the auth environment gate. Database-role startup
+    # enforcement has its own integration tests and must not mask this 403.
+    monkeypatch.setattr("app.main.assert_tenant_role_safe", lambda settings: None)
 
     settings = Settings(
         _env_file=None,

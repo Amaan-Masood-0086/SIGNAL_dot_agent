@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import csv
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Sequence
@@ -24,7 +25,10 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
-from app.models.milestone import Milestone
+from app.models.milestone import ENTRY_TYPES, MILESTONE_DOMAINS, Milestone
+from app.services.embeddings import Embedder, EmbeddingError
+
+logger = logging.getLogger(__name__)
 
 # Default CSV location (repo root); tests and the ingest script pass an
 # explicit path.
@@ -89,11 +93,24 @@ def parse_knowledge_csv(csv_path: str | Path) -> list[KnowledgeEntry]:
     loader refuses a partially-ingested knowledge base.
     """
     entries: list[KnowledgeEntry] = []
-    with open(csv_path, newline="", encoding="utf-8") as handle:
-        for line_number, row in enumerate(csv.DictReader(handle), start=2):
+    seen: set[str] = set()
+    expected_columns = set(KnowledgeEntry.__dataclass_fields__)
+    with open(csv_path, newline="", encoding="utf-8-sig") as handle:
+        reader = csv.DictReader(handle)
+        # Never silently discard clinical metadata from another schema (v3
+        # includes review gates and action routes that this loader cannot use).
+        if (reader.fieldnames is None or set(reader.fieldnames) != expected_columns
+                or len(reader.fieldnames) != len(expected_columns)):
+            raise ValueError("Legacy KB requires the exact v2 columns; use the v3 validator for v3 content")
+        for line_number, row in enumerate(reader, start=2):
+            if None in row or any(value is None for value in row.values()):
+                raise ValueError(f"Row {line_number}: incorrect number of CSV cells")
             citation_ref = _none_if_blank(row.get("citation_ref"))
             if citation_ref is None:
                 raise ValueError(f"Row {line_number}: missing citation_ref")
+            if citation_ref in seen or len(citation_ref) > 32:
+                raise ValueError(f"Row {line_number}: duplicate or oversized citation_ref")
+            seen.add(citation_ref)
             try:
                 age_min = int(row["age_min_months"])
                 age_max = int(row["age_max_months"])
@@ -101,6 +118,8 @@ def parse_knowledge_csv(csv_path: str | Path) -> list[KnowledgeEntry]:
                 raise ValueError(
                     f"Row {line_number} ({citation_ref}): invalid age range"
                 ) from exc
+            if not 0 <= age_min <= age_max <= 216:
+                raise ValueError(f"Row {line_number} ({citation_ref}): invalid age bounds")
             severity = _none_if_blank(row.get("severity"))
             entry_type = _none_if_blank(row.get("entry_type"))
             domain = _none_if_blank(row.get("domain"))
@@ -124,11 +143,26 @@ def parse_knowledge_csv(csv_path: str | Path) -> list[KnowledgeEntry]:
                 raise ValueError(
                     f"Row {line_number} ({citation_ref}): missing {', '.join(missing)}"
                 )
-            if entry_type != "milestone" and severity is None:
+            if entry_type not in ENTRY_TYPES or domain not in MILESTONE_DOMAINS:
+                raise ValueError(f"Row {line_number} ({citation_ref}): unsupported type or domain")
+            valid_severities = {
+                "milestone": {None}, "red_flag": {"HIGH", "MODERATE"},
+                "risk_modifier": {"MODIFIER"},
+            }
+            if severity not in valid_severities[entry_type]:
                 raise ValueError(
                     f"Row {line_number} ({citation_ref}): "
-                    f"{entry_type} rows require a severity"
+                    f"invalid severity for {entry_type}"
                 )
+            if phase_scope not in {"in scope", "in scope (any age)", "PHASE 2 (6+)"}:
+                raise ValueError(f"Row {line_number} ({citation_ref}): unsupported phase_scope")
+            if not phase_scope.startswith(PHASE_2_PREFIX) and age_max > 72:
+                raise ValueError(f"Row {line_number} ({citation_ref}): active v2 age exceeds Phase 1")
+            cross_domain = _none_if_blank(row.get("cross_check_domain"))
+            if cross_domain is not None and cross_domain not in MILESTONE_DOMAINS:
+                raise ValueError(f"Row {line_number} ({citation_ref}): unsupported cross-check domain")
+            if len(source) > 300 or len(phase_scope) > 32 or len(provenance) > 120:
+                raise ValueError(f"Row {line_number} ({citation_ref}): text exceeds database column limits")
             entries.append(
                 KnowledgeEntry(
                     citation_ref=citation_ref,
@@ -219,6 +253,64 @@ def retrieve_in_scope_entries(db: Session, age_months: int) -> list[Milestone]:
         .order_by(Milestone.domain, Milestone.citation_ref)
     )
     return list(db.execute(statement).scalars().all())
+
+
+def retrieve_semantic_entries(
+    db: Session, age_months: int, query_vector: Sequence[float], *, top_k_per_domain: int
+) -> list[Milestone]:
+    """ADR-11 semantic narrowing of the in-scope set.
+
+    Always keeps every in-window HIGH red flag (age-independent warning signs
+    must not depend on a similarity score) plus the `top_k_per_domain` nearest
+    rows of EACH domain, so hearing and language stay joint (ADR-05). Same
+    deterministic ordering as the full set.
+
+    Raises LookupError if any in-window row lacks a current embedding — the
+    caller must then use the full set rather than rank a partial one.
+    """
+    window = retrieve_in_scope_entries(db, age_months)
+    if any(m.embedding is None for m in window):
+        raise LookupError("in-window knowledge rows without embeddings")
+    keep = {
+        m.citation_ref
+        for m in window
+        if m.entry_type == ENTRY_TYPE_RED_FLAG and m.severity == SEVERITY_HIGH
+    }
+    for domain in {m.domain for m in window}:
+        nearest = db.execute(
+            select(Milestone.citation_ref)
+            .where(Milestone.citation_ref.in_([m.citation_ref for m in window if m.domain == domain]))
+            .order_by(Milestone.embedding.cosine_distance(query_vector))
+            .limit(top_k_per_domain)
+        ).scalars()
+        keep.update(nearest)
+    return [m for m in window if m.citation_ref in keep]
+
+
+def retrieve_for_prompt(
+    db: Session,
+    age_months: int,
+    *,
+    query_text: str,
+    mode: str,
+    embedder: Embedder | None,
+    top_k_per_domain: int,
+) -> list[Milestone]:
+    """Entry point used by the pipeline. Never returns FEWER rows than is safe:
+    any embedding problem yields the full ADR-04 set."""
+    if mode != "semantic":
+        return retrieve_in_scope_entries(db, age_months)
+    if embedder is None or not query_text.strip():
+        logger.warning("semantic retrieval requested but unavailable; using full context")
+        return retrieve_in_scope_entries(db, age_months)
+    try:
+        vector = embedder.embed([query_text])[0]
+        return retrieve_semantic_entries(
+            db, age_months, vector, top_k_per_domain=top_k_per_domain
+        )
+    except (EmbeddingError, LookupError) as exc:
+        logger.warning("semantic retrieval fell back to full context: %s", exc)
+        return retrieve_in_scope_entries(db, age_months)
 
 
 # ── ADR-06 deterministic grading ────────────────────────────────────────────

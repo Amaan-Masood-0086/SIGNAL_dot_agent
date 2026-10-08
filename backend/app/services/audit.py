@@ -11,7 +11,7 @@ from __future__ import annotations
 import hashlib
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.models.audit_log import AuditLogEntry
@@ -45,6 +45,10 @@ class AuditService:
         institution_id: str | None = None,
     ) -> AuditLogEntry:
         """Append a new entry, chaining its hash to the previous entry."""
+        # Global chain allocation must serialize across API workers. Flush
+        # pending entries before reading the tip when autoflush is disabled.
+        self._session.execute(text("SELECT pg_advisory_xact_lock(736194021)"))
+        self._session.flush()
         last_hash, last_sequence = self._last_hash_and_sequence()
         entry = AuditLogEntry(
             sequence=last_sequence + 1,

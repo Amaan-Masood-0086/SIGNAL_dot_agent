@@ -17,6 +17,9 @@ import uuid
 import pytest
 from fastapi.testclient import TestClient
 
+# Relative, not a literal: a fixed date silently turns into a 'missed review' once it passes.
+FUTURE_REVIEW_DATE = (datetime.date.today() + datetime.timedelta(days=14)).isoformat()
+
 
 @pytest.fixture(scope="module")
 def loaded_kb(pg_engine):
@@ -145,7 +148,7 @@ def test_confirmed_referral_created_and_audited(
         json={
             "caretaker_confirmed": True,
             "responsible_person": "Sister Ayesha",
-            "review_date": "2026-09-15",
+            "review_date": FUTURE_REVIEW_DATE,
         },
     )
     assert resp.status_code == 201, resp.text
@@ -225,7 +228,7 @@ def test_referral_status_update_and_close(
     created = client.post(
         f"/api/v1/flags/{flag.id}/referral",
         headers=_auth(token),
-        json={"caretaker_confirmed": True, "review_date": "2026-09-15"},
+        json={"caretaker_confirmed": True, "review_date": FUTURE_REVIEW_DATE},
     ).json()["data"]
 
     patched = client.patch(
@@ -278,3 +281,20 @@ def test_missed_review_date_escalates(
         json={"status": "closed"},
     )
     assert closed.json()["data"]["escalated"] is False
+
+
+def test_referral_queue_is_scoped_paginated_and_duplicate_open_is_rejected(client, settings, rsa_keypair, db_session, loaded_kb):
+    inst, staff, flag = _seed_flagged(db_session)
+    token = _mint(settings, rsa_keypair, institution_id=inst.id, staff_id=staff.id)
+    endpoint = f"/api/v1/flags/{flag.id}/referral"
+    body = {"caretaker_confirmed": True, "responsible_person": "Review owner", "review_date": "2020-01-01"}
+    assert client.post(endpoint, headers=_auth(token), json=body).status_code == 201
+    assert client.post(endpoint, headers=_auth(token), json=body).status_code == 409
+    own = client.get("/api/v1/referrals?page_size=1&overdue=true", headers=_auth(token)).json()["data"]
+    assert own["total"] == 1 and len(own["items"]) == 1
+    assert client.get("/api/v1/referrals?page=2&page_size=1", headers=_auth(token)).json()["data"]["items"] == []
+    other_inst, other_staff, _ = _seed_flagged(db_session)
+    other_token = _mint(settings, rsa_keypair, institution_id=other_inst.id, staff_id=other_staff.id)
+    assert client.get("/api/v1/referrals", headers=_auth(other_token)).json()["data"]["total"] == 0
+    assert client.get(f"/api/v1/referrals?flag_id={flag.id}", headers=_auth(other_token)).status_code == 403
+    assert client.get("/api/v1/referrals?page_size=101", headers=_auth(token)).status_code == 422

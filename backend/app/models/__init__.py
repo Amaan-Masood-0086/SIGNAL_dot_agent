@@ -7,6 +7,9 @@ from app.models.audit_log import AuditLogEntry
 from app.models.child import Child
 from app.models.flag import Flag
 from app.models.institution import Institution
+from app.models.knowledge_review import KnowledgeReviewNote
+from app.models.knowledge_release import KnowledgeRelease
+from app.models.knowledge_revision import KnowledgeRevision
 from app.models.milestone import Milestone
 from app.models.observation import Observation
 from app.models.provider_credential import ProviderCredential
@@ -21,6 +24,9 @@ __all__ = [
     "Child",
     "Flag",
     "Institution",
+    "KnowledgeReviewNote",
+    "KnowledgeRelease",
+    "KnowledgeRevision",
     "Milestone",
     "Observation",
     "ProviderCredential",

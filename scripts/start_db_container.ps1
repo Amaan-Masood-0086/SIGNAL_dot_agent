@@ -8,7 +8,7 @@ for ($i = 0; $i -lt 40; $i++) {
 if (-not $ok) { Write-Output "docker NOT ready"; exit 1 }
 Write-Output "docker ready"
 
-Set-Location "s:\Projects\Hackthon Project\SIGNAL_dot_agent"
+Set-Location (Join-Path $PSScriptRoot "..")
 docker compose up -d db
 if ($LASTEXITCODE -ne 0) { Write-Output "compose up FAILED"; exit 1 }
 

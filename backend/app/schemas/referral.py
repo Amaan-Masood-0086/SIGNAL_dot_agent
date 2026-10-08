@@ -21,6 +21,8 @@ class ReferralUpdate(BaseModel):
     status: ReferralStatus | None = None
     responsible_person: str | None = Field(default=None, max_length=200)
     review_date: datetime.date | None = None
+    outcome: Literal["confirmed", "ruled_out", "lost_to_followup", "not_yet_assessed"] | None = None
+    clinician_note: str | None = Field(default=None, max_length=2000)
 
 
 class ReferralRead(BaseModel):
@@ -33,4 +35,13 @@ class ReferralRead(BaseModel):
     review_date: datetime.date | None
     escalated: bool
     caretaker_confirmed: bool
+    outcome: str
+    clinician_note: str | None
     created_at: datetime.datetime
+
+
+class ReferralPage(BaseModel):
+    items: list[ReferralRead]
+    total: int
+    page: int
+    page_size: int

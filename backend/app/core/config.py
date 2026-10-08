@@ -40,8 +40,8 @@ class Settings(BaseSettings):
     # `signal_app` role (no superuser, no BYPASSRLS) so the RLS policies
     # created in migration 0001 actually bind. Every caretaker-facing
     # endpoint runs here, and the isolation no longer depends on a handler
-    # remembering its WHERE clause. Falls back to DATABASE_URL when unset so
-    # existing single-URL setups keep working.
+    # remembering its WHERE clause. There is deliberately no fallback to the
+    # privileged DATABASE_URL: omission must fail closed.
     TENANT_DATABASE_URL: str | None = None
 
     # JWT (RS256 per sdlc-security.md OWASP A02). Keys are PEM strings from
@@ -93,6 +93,17 @@ class Settings(BaseSettings):
     # previous vendor — the admin usage page says so explicitly.
     LLM_COST_PER_MILLION_INPUT: float = 0.15
     LLM_COST_PER_MILLION_OUTPUT: float = 0.60
+
+    # ADR-11 — pgvector semantic retrieval. "full_context" (default) injects
+    # every in-scope row (ADR-04); "semantic" narrows the prompt but always
+    # keeps HIGH red flags and the top-K rows of EACH domain, and falls back
+    # to full context on any embedding failure. Keys are env-only (ADR-09).
+    RETRIEVAL_MODE: str = "full_context"
+    RETRIEVAL_TOP_K_PER_DOMAIN: int = 8
+    EMBEDDING_BASE_URL: str | None = None
+    EMBEDDING_MODEL: str | None = None
+    EMBEDDING_API_KEY: str | None = None
+    EMBEDDING_TIMEOUT_SECONDS: float = 15.0
 
 
 @lru_cache

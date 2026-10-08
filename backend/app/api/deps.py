@@ -196,6 +196,11 @@ def _verified_tenant_engine(settings: Settings) -> Engine:
     return engine
 
 
+def assert_tenant_role_safe(settings: Settings) -> None:
+    """Boot-time guard: production must never run tenant traffic as a bypass role."""
+    _verified_tenant_engine(settings)
+
+
 def get_tenant_db(
     current_staff: "CurrentStaff" = Depends(get_current_verified_staff),
     settings: Settings = Depends(get_settings),

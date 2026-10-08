@@ -14,9 +14,10 @@ Speech_Language per ADR-07 (the system never emits a diagnostic label).
 from __future__ import annotations
 
 from sqlalchemy import CheckConstraint, Enum, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, deferred, mapped_column
 
 from app.db.base import Base
+from app.db.vector import Vector
 
 from .types import IdMixin, TimestampMixin
 
@@ -70,3 +71,13 @@ class Milestone(IdMixin, TimestampMixin, Base):
     # stored but excluded from every pipeline query (FEAT-04 rule 5).
     phase_scope: Mapped[str] = mapped_column(String(32), nullable=False)
     provenance: Mapped[str] = mapped_column(String(120), nullable=False)
+
+    # ADR-11: optional semantic-retrieval vector. Deferred so the default
+    # full-context path never transfers ~4 KB per row it does not use. Written
+    # only by the privileged embed script; signal_app stays SELECT-only.
+    embedding: Mapped[list[float] | None] = deferred(
+        mapped_column(Vector(), nullable=True)
+    )
+    embedding_model: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    # sha256 of the embedded text — detects an edited description.
+    embedding_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)

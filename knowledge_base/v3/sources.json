@@ -1,0 +1,371 @@
+[
+  {
+    "source_id": "CDC-02",
+    "title": "CDC milestones by 2 months",
+    "url": "https://www.cdc.gov/act-early/milestones/2-months.html",
+    "locator": "What most babies do by 2 months",
+    "limitations": "US developmental surveillance; not a diagnostic cutoff.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-04",
+    "title": "CDC milestones by 4 months",
+    "url": "https://www.cdc.gov/act-early/milestones/4-months.html",
+    "locator": "What most babies do by 4 months",
+    "limitations": "US developmental surveillance; not a diagnostic cutoff.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-06",
+    "title": "CDC milestones by 6 months",
+    "url": "https://www.cdc.gov/act-early/milestones/6-months.html",
+    "locator": "What most babies do by 6 months",
+    "limitations": "US developmental surveillance; not a diagnostic cutoff.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-09",
+    "title": "CDC milestones by 9 months",
+    "url": "https://www.cdc.gov/act-early/milestones/9-months.html",
+    "locator": "What most babies do by 9 months",
+    "limitations": "US developmental surveillance; not a diagnostic cutoff.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-12",
+    "title": "CDC milestones by 1 year",
+    "url": "https://www.cdc.gov/act-early/milestones/1-year.html",
+    "locator": "What most children do by 1 year",
+    "limitations": "US developmental surveillance; not a diagnostic cutoff.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-15",
+    "title": "CDC milestones by 15 months",
+    "url": "https://www.cdc.gov/act-early/milestones/15-months.html",
+    "locator": "What most children do by 15 months",
+    "limitations": "US developmental surveillance; not a diagnostic cutoff.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-18",
+    "title": "CDC milestones by 18 months",
+    "url": "https://www.cdc.gov/act-early/milestones/18-months.html",
+    "locator": "What most children do by 18 months",
+    "limitations": "US developmental surveillance; not a diagnostic cutoff.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-24",
+    "title": "CDC milestones by 2 years",
+    "url": "https://www.cdc.gov/act-early/milestones/2-years.html",
+    "locator": "What most children do by 2 years",
+    "limitations": "US developmental surveillance; not a diagnostic cutoff.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-30",
+    "title": "CDC milestones by 30 months",
+    "url": "https://www.cdc.gov/act-early/milestones/30-months.html",
+    "locator": "Language and movement milestones",
+    "limitations": "US developmental surveillance; not a diagnostic cutoff.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-36",
+    "title": "CDC milestones by 3 years",
+    "url": "https://www.cdc.gov/act-early/milestones/3-years.html",
+    "locator": "Language and movement milestones",
+    "limitations": "US developmental surveillance; not a diagnostic cutoff.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-48",
+    "title": "CDC milestones by 4 years",
+    "url": "https://www.cdc.gov/act-early/milestones/4-years.html",
+    "locator": "Language and movement milestones",
+    "limitations": "US developmental surveillance; not a diagnostic cutoff.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-60",
+    "title": "CDC milestones by 5 years",
+    "url": "https://www.cdc.gov/act-early/milestones/5-years.html",
+    "locator": "Language, attention and movement milestones",
+    "limitations": "Do not extend preschool checklist norms to adolescents.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "CDC-SCREEN",
+    "title": "CDC monitoring and screening",
+    "url": "https://www.cdc.gov/act-early/about/developmental-monitoring-and-screening.html",
+    "locator": "Developmental monitoring versus screening",
+    "limitations": "US service schedules need local adaptation.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "ASHA-MILESTONES",
+    "title": "ASHA developmental milestones",
+    "url": "https://www.asha.org/public/developmental-milestones/",
+    "locator": "Communication milestones and limitations",
+    "limitations": "ASHA says these resources are not screening or diagnostic tools.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "ASHA-LANGUAGE",
+    "title": "ASHA spoken language disorders",
+    "url": "https://www.asha.org/practice-portal/clinical-topics/spoken-language-disorders/",
+    "locator": "Signs and symptoms; assessment; cultural considerations",
+    "limitations": "Preschool/school age 3–21; descriptive functional evidence, not yearly norms.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "ASHA-MULTI",
+    "title": "ASHA multilingual service delivery",
+    "url": "https://www.asha.org/practice-portal/professional-issues/multilingual-service-delivery/",
+    "locator": "Assessment and language differences",
+    "limitations": "English norms cannot be assumed valid for Urdu/Punjabi/Sindhi/Pashto.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "ASHA-SPEECH",
+    "title": "ASHA speech sound disorders",
+    "url": "https://www.asha.org/practice-portal/clinical-topics/articulation-and-phonology/",
+    "locator": "Cultural and linguistic considerations",
+    "limitations": "Speech sounds must be assessed against languages and dialects used.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "ASHA-HEAR",
+    "title": "ASHA hearing loss in children",
+    "url": "https://www.asha.org/practice-portal/clinical-topics/hearing-loss-in-children/",
+    "locator": "Assessment and risk factors",
+    "limitations": "Pediatric hearing assessment; risk factors do not independently diagnose hearing loss.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "ASHA-SCHOOL-HEAR",
+    "title": "ASHA school hearing health",
+    "url": "https://www.asha.org/news/2023/back-to-school-wellness-making-hearing-health-a-priority/",
+    "locator": "Signs of hearing loss in school-aged children",
+    "limitations": "School-age functional concerns; not instrument thresholds.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NIDCD-EARLY",
+    "title": "NIDCD hearing and communication checklist",
+    "url": "https://www.nidcd.nih.gov/health/your-babys-hearing-and-communicative-development-checklist",
+    "locator": "Birth to 3 months; 4 to 6 months; 7 months to 1 year",
+    "limitations": "Observation does not establish an audiometric pass.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NIDCD-NEWBORN",
+    "title": "NIDCD newborn screening and next steps",
+    "url": "https://www.nidcd.nih.gov/health/your-babys-hearing-screening-and-next-steps",
+    "locator": "Screening, follow-up and intervention",
+    "limitations": "US early-hearing pathway; local service mapping required.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NIDCD-SUDDEN",
+    "title": "NIDCD sudden deafness",
+    "url": "https://www.nidcd.nih.gov/health/sudden-deafness",
+    "locator": "Sudden deafness symptoms and immediate care",
+    "limitations": "General medical emergency guidance; not a pediatric diagnostic score.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NIDCD-NOISE",
+    "title": "NIDCD noise-related hearing damage",
+    "url": "https://www.nidcd.nih.gov/health/how-does-noise-damage-your-hearing",
+    "locator": "Noise and hearing damage",
+    "limitations": "Exposure context; no app-administered loud-sound test.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NICE-OME",
+    "title": "NICE NG233 OME under 12s",
+    "url": "https://www.nice.org.uk/guidance/ng233/chapter/Recommendations",
+    "locator": "1.2 recognition/assessment; 1.3 reassessment",
+    "limitations": "Applies under 12; three-month reassessment follows clinical assessment, not a blanket wait.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NICE-SOCIAL",
+    "title": "NICE CG128 autism recognition/referral",
+    "url": "https://www.nice.org.uk/guidance/cg128/chapter/Recommendations",
+    "locator": "1.2 recognition; 1.4.2–1.4.4 regression/referral",
+    "limitations": "Under 19; SIGNAL records social-communication observations without diagnosis.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NICE-ATTENTION",
+    "title": "NICE NG87 attention assessment",
+    "url": "https://www.nice.org.uk/guidance/ng87/chapter/recommendations",
+    "locator": "1.2.6–1.2.9; 1.3.1–1.3.6",
+    "limitations": "Specialist assessment, impact across settings; checklist counts alone are insufficient.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NICE-ATTACH",
+    "title": "NICE NG26 attachment difficulties",
+    "url": "https://www.nice.org.uk/guidance/NG26/chapter/recommendations",
+    "locator": "1.3 assessment of attachment difficulties",
+    "limitations": "Children in/adopted from care; trained assessment required. Search-index evidence used; direct page returned 403.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_search_excerpt"
+  },
+  {
+    "source_id": "NICE-NEURO",
+    "title": "NICE NG127 neurological referral under 16",
+    "url": "https://www.nice.org.uk/guidance/ng127/chapter/recommendations-for-children-aged-under-16",
+    "locator": "1.24 weakness; 1.25 motor delay/regression",
+    "limitations": "Under 16 only; do not silently extend thresholds to 16–18. Search-index evidence used; direct page returned 403.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_search_excerpt"
+  },
+  {
+    "source_id": "NICE-SAFE",
+    "title": "NICE NG76 child abuse and neglect",
+    "url": "https://www.nice.org.uk/guidance/ng76/chapter/recommendations",
+    "locator": "Communication and response to concerns",
+    "limitations": "UK pathway; Pakistani reporting/legal obligations not established by this source.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "AAP-PRETERM",
+    "title": "AAP adjusted age for preterm development",
+    "url": "https://www.healthychildren.org/English/ages-stages/baby/preemie/Pages/Preemie-Milestones.aspx",
+    "locator": "Adjusted age until 2 years",
+    "limitations": "Requires documented gestational age; do not infer prematurity from small size.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "AAPOS-VISION",
+    "title": "AAPOS vision screening recommendations",
+    "url": "https://www.aapos.org/syndicated/vision-screening",
+    "locator": "Age-specific referral criteria",
+    "limitations": "Requires trained examination or calibrated screening; not camera/photo diagnosis.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NHS-WHITE",
+    "title": "NHS white pupil/reflection symptoms",
+    "url": "https://www.nhs.uk/conditions/retinoblastoma/symptoms/",
+    "locator": "Urgent advice",
+    "limitations": "The sign warrants assessment; it does not establish its cause.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NHS-VISION",
+    "title": "NHS vision loss",
+    "url": "https://www.nhs.uk/conditions/vision-loss/",
+    "locator": "Urgent and emergency advice",
+    "limitations": "General acute-care guidance; no medication recommendations.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NHS-COORD",
+    "title": "NHS childhood coordination difficulties",
+    "url": "https://www.nhs.uk/conditions/developmental-coordination-disorder-dyspraxia/symptoms/",
+    "locator": "Problems in older children",
+    "limitations": "Functional concerns; isolated clumsiness is not diagnostic.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NHS-ATTENTION",
+    "title": "NHS attention in children/young people",
+    "url": "https://www.nhs.uk/conditions/adhd-children-teenagers/",
+    "locator": "Symptoms and alternative explanations",
+    "limitations": "Inattention may be quiet; common preschool behaviour is not a diagnosis.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NHS-SOCIAL",
+    "title": "NHS social communication signs",
+    "url": "https://www.nhs.uk/conditions/autism/signs-in-children/",
+    "locator": "Signs in older children and young people",
+    "limitations": "Descriptive observations, not a stand-alone diagnosis.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "WHO-ADOLESCENT",
+    "title": "WHO adolescent mental health",
+    "url": "https://www.who.int/news-room/fact-sheets/detail/adolescent-mental-health",
+    "locator": "Risks and support",
+    "limitations": "Additional safety context, not an eighth developmental grading domain.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "NHS-ACUTE",
+    "title": "NHS urgent help for children under 5",
+    "url": "https://www.nhs.uk/baby/health/when-to-get-urgent-medical-help-for-babies-and-children-under-5/",
+    "locator": "Emergency signs",
+    "limitations": "Under 5; replace UK phone numbers with verified local routes before activation.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_web_evidence"
+  },
+  {
+    "source_id": "ASHA-LLE",
+    "title": "ASHA late language emergence",
+    "url": "https://www.asha.org/practice-portal/clinical-topics/late-language-emergence/",
+    "locator": "Signs/symptoms and multilingual assessment",
+    "limitations": "Common research criteria, not locally validated clinical grades.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_search_excerpt"
+  },
+  {
+    "source_id": "AACAP-ATTACH",
+    "title": "AACAP attachment disorders facts for families",
+    "url": "https://www.aacap.org/AACAP/Families_and_Youth/Facts_for_Families/FFF-Guide/Attachment-Disorders-085.aspx",
+    "locator": "Comfort-seeking, unfamiliar adults and comprehensive assessment",
+    "limitations": "Young children; no app-generated diagnosis or provoked behaviour tests.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_search_excerpt"
+  },
+  {
+    "source_id": "CDC-HEAR",
+    "title": "CDC hearing loss in children",
+    "url": "https://www.cdc.gov/hearing-loss-children/about/index.html",
+    "locator": "Signs; previous screen; testing when concerned",
+    "limitations": "A screen pass does not rule out a later concern.",
+    "accessed_on": "2026-09-09",
+    "verification": "primary_search_excerpt"
+  }
+]

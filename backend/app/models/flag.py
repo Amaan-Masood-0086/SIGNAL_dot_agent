@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import Enum, ForeignKey, Text
+from sqlalchemy import Enum, ForeignKey, Text, String
 from sqlalchemy import Uuid as UuidType
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -57,3 +57,6 @@ class Flag(IdMixin, TimestampMixin, Base):
     status: Mapped[str] = mapped_column(
         Enum(*FLAG_STATUSES, name="flag_status", native_enum=False), nullable=False
     )
+    # Immutable basis metadata for historical reproducibility (D3).
+    kb_release_id: Mapped[str] = mapped_column(String(120), nullable=False, server_default="v2-active")
+    kb_entry_revision: Mapped[str | None] = mapped_column(String(64), nullable=True)

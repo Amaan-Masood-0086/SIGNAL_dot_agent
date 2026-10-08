@@ -379,3 +379,66 @@ def test_deactivated_staff_cannot_reason(client, settings, rsa_keypair, db_sessi
         json={"raw_input": "should be refused"},
     )
     assert resp.status_code == 403
+
+
+def test_complete_loop_recovery_retry_referral_and_follow_up(client, settings, rsa_keypair, db_session, loaded_kb):
+    inst, staff, child = _seed(db_session, child_age_months=8)
+    token = _mint(settings, rsa_keypair, institution_id=inst.id, staff_id=staff.id)
+    headers = _auth(token)
+    session_id = _open_session(client, token, child.id)
+    provider = ScriptedProvider(
+        _obs(["no response to sounds"]),
+        _reason(concluded=False, follow_up_question="Does he react to a door slamming?"),
+        _obs(["no response to loud sounds"]),
+        _reason(confirmed_red_flags=["HEAR-RF-003"]),
+        "Please see a doctor soon.",
+    )
+    _with_provider(client, provider)
+    url = f"/api/v1/sessions/{session_id}"
+    first = {"raw_input": "He does not react to sound", "request_id": str(uuid.uuid4())}
+    question = client.post(url + "/reason", headers=headers, json=first).json()["data"]
+    assert question["status"] == "follow_up"
+    assert client.get(url + "/result", headers=headers).json()["data"] == question
+    assert client.post(url + "/reason", headers=headers, json=first).json()["data"] == question
+    assert len(provider.calls) == 2
+    second = {"raw_input": "No response to that either", "request_id": str(uuid.uuid4())}
+    conclusion = client.post(url + "/reason", headers=headers, json=second).json()["data"]
+    assert conclusion["status"] == "flagged"
+    assert client.get(url + "/result", headers=headers).json()["data"] == conclusion
+    assert client.post(url + "/reason", headers=headers, json=second).json()["data"] == conclusion
+    assert len(provider.calls) == 5
+    assert client.post(url + "/reason", headers=headers, json={**second, "raw_input": "different"}).status_code == 409
+    flag = client.get(f"/api/v1/flags/{conclusion['flag_id']}", headers=headers).json()["data"]
+    assert flag["reasoning_trail"][0]["basis"]
+    created = client.post(f"/api/v1/flags/{flag['id']}/referral", headers=headers, json={"caretaker_confirmed": True, "responsible_person": "Synthetic review owner", "review_date": "2020-01-01"})
+    assert created.status_code == 201
+    referral = created.json()["data"]
+    assert referral["escalated"] is True
+    queue = client.get("/api/v1/referrals?overdue=true", headers=headers).json()["data"]
+    assert [item["id"] for item in queue["items"]] == [referral["id"]]
+    for state in ("pending_capacity", "closed"):
+        updated = client.patch(f"/api/v1/referrals/{referral['id']}", headers=headers, json={"status": state})
+        assert updated.status_code == 200
+    assert updated.json()["data"]["escalated"] is False
+    assert client.get("/api/v1/referrals?overdue=true", headers=headers).json()["data"]["total"] == 0
+    assert client.post(url + "/complete", headers=headers).status_code == 200
+    assert client.get(url + "/result", headers=headers).json()["data"] == conclusion
+
+
+@pytest.mark.parametrize("outcome", ["insufficient_information", "safeguarding_escalation"])
+def test_nonflag_conclusions_are_durable(client, settings, rsa_keypair, db_session, loaded_kb, outcome):
+    inst, staff, child = _seed(db_session)
+    token = _mint(settings, rsa_keypair, institution_id=inst.id, staff_id=staff.id)
+    session_id = _open_session(client, token, child.id)
+    provider = ScriptedProvider(_obs(["synthetic concern"], safeguarding=outcome == "safeguarding_escalation", key_missing=outcome == "insufficient_information"), _reason(key_items_missing=True))
+    _with_provider(client, provider)
+    url = f"/api/v1/sessions/{session_id}"
+    response = client.post(url + "/reason", headers=_auth(token), json={"raw_input": "synthetic concern"})
+    assert response.status_code == 200, response.text
+    result = response.json()["data"]
+    assert result["status"] == outcome
+    assert client.get(url + "/result", headers=_auth(token)).json()["data"] == result
+    assert client.post(url + "/reason", headers=_auth(token), json={"raw_input": "another turn"}).status_code == 409
+    other_inst, other_staff, _ = _seed(db_session)
+    other_token = _mint(settings, rsa_keypair, institution_id=other_inst.id, staff_id=other_staff.id)
+    assert client.get(url + "/result", headers=_auth(other_token)).status_code == 403
