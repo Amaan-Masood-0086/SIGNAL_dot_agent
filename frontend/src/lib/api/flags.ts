@@ -29,3 +29,10 @@ export async function getFlag(token: string, flagId: string): Promise<FlagRead> 
   const raw = await backendFetch<unknown>(`/api/v1/flags/${flagId}`, token);
   return flagReadEnvelopeSchema.parse(raw).data;
 }
+
+export async function listSessionFlags(token: string, sessionId: string): Promise<FlagPage> {
+  const raw = await backendFetch<unknown>(
+    `/api/v1/sessions/${sessionId}/flags?page=1&page_size=100`, token,
+  );
+  return flagPageEnvelopeSchema.parse(raw).data;
+}

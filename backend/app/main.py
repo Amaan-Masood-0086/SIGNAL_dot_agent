@@ -7,12 +7,15 @@ NOT expose stack traces or internal details (backend contracts #7, MUST-NOT #1).
 from __future__ import annotations
 
 import json
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.api.v1.endpoints import admin as admin_endpoints
+from app.api.v1.endpoints import knowledge_review as knowledge_review_endpoints
+from app.api.v1.endpoints import knowledge_sandbox as knowledge_sandbox_endpoints
 from app.api.v1.endpoints import audit as audit_endpoints
 from app.api.v1.endpoints import auth as auth_endpoints
 from app.api.v1.endpoints import children as children_endpoints
@@ -26,12 +29,20 @@ from app.api.v1.endpoints import usage as usage_endpoints
 from app.core.config import Settings, get_settings
 from app.core.envelope import envelope
 from app.core.synthetic_gate import SyntheticDataViolation
+from app.api.deps import assert_tenant_role_safe
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
 
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        if settings.ENVIRONMENT not in {"synthetic_only", "test"}:
+            assert_tenant_role_safe(settings)
+        yield
+
     app = FastAPI(
+        lifespan=lifespan,
         title="SIGNAL API",
         version="0.1.0",
         # OpenAPI/docs hidden outside synthetic dev — no internal surface
@@ -111,6 +122,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.include_router(auth_endpoints.router, prefix="/api/v1")
     app.include_router(admin_endpoints.router, prefix="/api/v1")
+    app.include_router(knowledge_review_endpoints.router, prefix="/api/v1")
+    app.include_router(knowledge_sandbox_endpoints.router, prefix="/api/v1")
     app.include_router(audit_endpoints.router, prefix="/api/v1")
     app.include_router(children_endpoints.router, prefix="/api/v1")
     app.include_router(credentials_endpoints.router, prefix="/api/v1")

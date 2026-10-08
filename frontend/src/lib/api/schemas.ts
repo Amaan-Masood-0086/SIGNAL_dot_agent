@@ -134,6 +134,7 @@ export const reasoningInputSchema = z.object({
   // A closed enum, never free text — the caretaker's own words stay fenced
   // as data, so a language preference has to arrive as structure.
   response_language: z.enum(["auto", "ur", "en"]).default("auto"),
+  request_id: z.uuid().optional(),
 });
 export type ReasoningInput = z.infer<typeof reasoningInputSchema>;
 

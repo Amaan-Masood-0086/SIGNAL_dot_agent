@@ -25,15 +25,14 @@ export function StatTile({
 }) {
   const t = toneClasses[tone];
   return (
-    <div className="relative overflow-hidden rounded-xl border border-line bg-surface p-4">
-      <span aria-hidden="true" className={`absolute inset-x-0 top-0 h-0.5 ${t.rule}`} />
-      <p className="text-[11px] font-semibold tracking-[0.12em] text-ink-soft uppercase">
+    <div className="metric">
+      <p className="metric-label">
         {label}
       </p>
-      <p className={`mt-2 font-display text-3xl leading-none font-bold tracking-tight ${t.value}`}>
+      <p className={`metric-value ${t.value}`}>
         {value}
       </p>
-      {hint && <p className="mt-2 text-xs leading-relaxed text-ink-soft">{hint}</p>}
+      {hint && <p className="metric-hint">{hint}</p>}
     </div>
   );
 }

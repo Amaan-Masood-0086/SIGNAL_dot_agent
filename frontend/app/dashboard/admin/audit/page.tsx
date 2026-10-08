@@ -10,7 +10,7 @@ export default function AdminAuditPage() {
       <PageHeader
         eyebrow="Administration"
         title="Audit log"
-        lede="An append-only record of who did what, chained by hash so that any edit to history is detectable. The console itself is under the same regime it administers — provider tests and role changes appear here too."
+        lede="Review recorded actions across the system and verify the integrity of the audit history."
       />
       <div className="mt-6">
         <AuditPanel />

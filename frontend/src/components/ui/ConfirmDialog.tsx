@@ -35,7 +35,7 @@ export function ConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDialogElement>(null);
 
   // Callers pass inline arrows, so `onCancel` is a new function on every
   // render. Keeping it in a ref stops the effects below from re-running each
@@ -49,30 +49,24 @@ export function ConfirmDialog({
   // Focus moves ONLY on open. Re-running this on every render is what caused
   // the one-character-at-a-time typing bug.
   useEffect(() => {
-    if (open && !interactive) panelRef.current?.focus();
-  }, [open, interactive]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") cancelRef.current();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    const node = panelRef.current;
+    if (!open || !node) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    node.showModal();
+    document.body.style.overflow = "hidden";
+    return () => { node.close(); document.body.style.overflow = overflow; previousFocus?.focus(); };
   }, [open]);
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-ink/40" aria-hidden="true" onClick={onCancel} />
-      <div
+      <dialog
         ref={panelRef}
         role={interactive ? "dialog" : "alertdialog"}
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className="relative w-full max-w-md rounded-xl border border-line bg-surface p-6 shadow-[0_24px_60px_-20px_rgba(21,40,37,0.4)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine"
+        onCancel={event => { event.preventDefault(); if (!pending) cancelRef.current(); }}
+        className="fixed inset-0 m-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-xl border border-line bg-surface p-6 text-ink shadow-lg backdrop:bg-ink/40"
       >
         <h2 className="font-display text-lg font-semibold text-ink">{title}</h2>
         <div className="mt-2 text-sm leading-relaxed text-ink-soft">{description}</div>
@@ -90,7 +84,6 @@ export function ConfirmDialog({
             {pending ? "Working…" : confirmLabel}
           </Button>
         </div>
-      </div>
-    </div>
+      </dialog>
   );
 }

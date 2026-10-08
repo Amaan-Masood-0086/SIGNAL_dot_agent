@@ -63,6 +63,10 @@ def create_child(
             None if payload.dob_confirmed else payload.estimated_age_note
         ),
         is_synthetic=is_synthetic,
+        estimated_age_lower_months=payload.estimated_age_lower_months,
+        estimated_age_upper_months=payload.estimated_age_upper_months,
+        age_reference_date=payload.age_reference_date,
+        prematurity_context=payload.prematurity_context,
     )
     db.add(child)
     db.flush()
@@ -116,6 +120,12 @@ def list_children(
         .offset((page - 1) * page_size)
         .limit(page_size)
     ).scalars().all()
+
+    AuditService(db).append(
+        actor_id=str(current_staff.staff_id), action="child.list",
+        resource_type="institution", resource_id=str(current_staff.institution_id),
+        institution_id=str(current_staff.institution_id),
+    )
 
     result = ChildPage(
         items=[ChildRead.model_validate(row) for row in rows],

@@ -109,8 +109,9 @@ Built to OWASP Web / API / LLM Top 10 and a STRIDE threat model (`.ai/brain/THRE
 ## Slide 8 — Feasibility: what we have actually built
 
 - **13-feature Phase-1 backlog complete** (FEAT-01 … FEAT-13) + RBAC / admin console.
-- **440 backend tests passing** (1 skipped, 1 documented xfail) against **real PostgreSQL** — SQLite is never a fallback because RLS is an acceptance criterion.
-- **25 frontend tests**; typecheck / lint / build clean.
+- **498 backend tests** — 496 passed, 1 skipped, 1 documented xfail — against **real PostgreSQL**. SQLite is never a fallback because RLS is an acceptance criterion.
+- **25 frontend tests** passing; typecheck / lint / build clean.
+- **523 tests total.**
 - Curated **94-row clinical knowledge base** (ASHA, CDC "Learn the Signs", NIDCD, JCIH 2019, MacArthur-Bates CDI norms, late-talker literature).
 - End-to-end verified: login → intake → voice/text session → reasoning loop → graded flag → referral → audit chain intact.
 - Runs locally today: `docker compose up -d db`, seeded synthetic tenant + admin, `npm run dev`.

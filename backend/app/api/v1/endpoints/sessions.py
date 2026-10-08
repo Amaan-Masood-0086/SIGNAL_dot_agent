@@ -65,7 +65,8 @@ def _scoped_session(
 ) -> ConversationSession:
     """Fetch a session or fail closed — uniform 403 for not-found and
     cross-institution alike (no existence leakage)."""
-    session = db.get(ConversationSession, session_id)
+    # Shared lock with reasoning: turn assignment and completion cannot race.
+    session = db.execute(select(ConversationSession).where(ConversationSession.id == session_id).with_for_update()).scalar_one_or_none()
     if session is None or session.institution_id != current_staff.institution_id:
         raise HTTPException(status_code=403, detail="Access denied")
     return session
@@ -93,6 +94,8 @@ def create_session(
     child = db.get(Child, payload.child_id)
     if child is None or child.institution_id != current_staff.institution_id:
         raise HTTPException(status_code=403, detail="Access denied")
+    if child.archived_at is not None:
+        raise HTTPException(status_code=409, detail="Archived child cannot start a new session")
 
     institution = db.get(Institution, current_staff.institution_id)
     if institution is None:
@@ -201,6 +204,12 @@ def add_observation(
         )
     ).scalar_one()
     next_turn = (last_turn or 0) + 1
+
+    rows = db.execute(select(Observation).where(Observation.session_id == session.id)).scalars().all()
+    if any((row.extracted_signals or {}).get("reasoning_result", {}).get("status") in {"flagged", "insufficient_information", "safeguarding_escalation"} for row in rows):
+        raise HTTPException(status_code=409, detail="A saved conclusion already exists")
+    if sum(1 for row in rows if not (row.extracted_signals or {}).get("follow_up")) >= 5:
+        raise HTTPException(status_code=409, detail="Conversation cap reached")
 
     observation = Observation(
         institution_id=session.institution_id,

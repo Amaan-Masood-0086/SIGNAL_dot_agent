@@ -107,7 +107,7 @@ export function UsagePanel() {
             are model output, and the model only matches reality if the rates
             were set for the vendor actually in use — saying so is the
             difference between an estimate and a wrong number. */}
-        <p className="mt-2 rounded-lg bg-amber-soft px-3 py-2 text-[11px] leading-relaxed text-amber">
+        <p className="mt-2 rounded-lg bg-amber-soft px-3 py-2 text-xs leading-relaxed text-amber">
           <span className="font-semibold">Counts are exact; costs are estimates.</span>{" "}
           Cost is computed from per-million token rates and an audio-duration
           guess, using whatever rates are configured in the environment. If the
@@ -139,7 +139,7 @@ export function UsagePanel() {
                 key={provider.key}
                 className="rounded-lg border border-line px-4 py-3"
               >
-                <dt className="text-[11px] font-bold tracking-[0.12em] text-ink-soft uppercase">
+                <dt className="text-xs font-bold tracking-[0.12em] text-ink-soft uppercase">
                   {provider.label}
                 </dt>
                 <dd className="mt-1.5 flex flex-wrap items-baseline gap-x-3">
@@ -157,7 +157,7 @@ export function UsagePanel() {
                     {money(row.estimated_cost)}
                   </span>
                 </dd>
-                <p className="mt-1.5 text-[11px] text-ink-soft">
+                <dd className="mt-1.5 text-xs text-ink-soft">
                   {/* This is where the null matters most. An STT provider
                       test hits a free endpoint and honestly costs 0; an LLM
                       test connection is a real billed call whose price
@@ -171,7 +171,7 @@ export function UsagePanel() {
                       : row.unpriced_calls > 0
                         ? `${provider.note} · ${row.unpriced_calls} of ${row.calls} unpriced, so the figure is a floor`
                         : provider.note}
-                </p>
+                </dd>
               </div>
             );
           })}

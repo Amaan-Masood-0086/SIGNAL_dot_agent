@@ -1,165 +1,37 @@
 "use client";
-
 import Link from "next/link";
 import { useMemo, useState } from "react";
-
 import { Badge } from "@/src/components/ui/Badge";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { Icon } from "@/src/components/ui/Icon";
 import type { Child } from "@/src/lib/api/schemas";
 
-// Filtering is purely client-side over the pages the server already loaded —
-// it never issues a request, so a caretaker typing a child's name can never
-// leak that name into a URL, a log, or a query string.
-//
-// Archived children are passed in alongside the active roster rather than
-// hidden: an archive nobody can open is a black hole, and the first thing a
-// caretaker wants after archiving the wrong child is to find them again.
-export function ChildRoster({
-  items,
-  archived = [],
-}: {
-  items: Child[];
-  archived?: Child[];
+export function ChildRoster({ items, archived = [], total = items.length, archivedTotal = archived.length, archivedUnavailable = false }: {
+  items: Child[]; archived?: Child[]; total?: number; archivedTotal?: number; archivedUnavailable?: boolean;
 }) {
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<"all" | "confirmed" | "estimated" | "archived">(
-    "all",
-  );
-
-  const showingArchived = filter === "archived";
-  const source = showingArchived ? archived : items;
-
+  const [filter, setFilter] = useState<"all" | "confirmed" | "estimated" | "archived">("all");
+  const [sort, setSort] = useState("name");
+  const source = filter === "archived" ? archived : items;
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return source.filter((child) => {
-      if (filter === "confirmed" && !child.dob_confirmed) return false;
-      if (filter === "estimated" && child.dob_confirmed) return false;
-      return !needle || child.name.toLowerCase().includes(needle);
-    });
-  }, [source, query, filter]);
-
-  const filters = [
-    { id: "all", label: `Active (${items.length})` },
-    { id: "confirmed", label: "Confirmed DOB" },
-    { id: "estimated", label: "Estimated age" },
-    { id: "archived", label: `Archived (${archived.length})` },
-  ] as const;
-
-  return (
-    <div>
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-0 flex-1 sm:max-w-xs">
-          <label htmlFor="roster-search" className="sr-only">
-            Search children by name
-          </label>
-          <Icon
-            name="search"
-            className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-ink-soft"
-          />
-          <input
-            id="roster-search"
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by name"
-            maxLength={100}
-            className="min-h-11 w-full rounded-lg border border-line bg-surface py-2 pr-3 pl-9 text-sm text-ink placeholder:text-ink-soft/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-pine"
-          />
-        </div>
-        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter roster">
-          {filters.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => setFilter(option.id)}
-              aria-pressed={filter === option.id}
-              className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine ${
-                filter === option.id
-                  ? "border-pine bg-pine text-white"
-                  : "border-line bg-surface text-ink-soft hover:border-pine/40 hover:text-ink"
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {visible.length === 0 ? (
-        <div className="mt-4">
-          <EmptyState
-            icon={showingArchived ? "children" : "search"}
-            title={
-              showingArchived
-                ? "Nothing is archived"
-                : "No children match this view"
-            }
-            description={
-              showingArchived
-                ? "Children taken off the roster appear here, with the reason given and a way to put them back."
-                : "Clear the search box or switch back to Active to see the full roster."
-            }
-          />
-        </div>
-      ) : (
-        <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {visible.map((child) => (
-            <li key={child.id}>
-              <Link
-                href={`/dashboard/children/${child.id}`}
-                className="group flex h-full flex-col gap-3 rounded-xl border border-line bg-surface p-5 transition-colors duration-150 hover:border-pine/50 hover:bg-moss/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine"
-                aria-label={`Open profile for ${child.name}`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <span className="font-display text-lg font-semibold tracking-tight text-ink group-hover:text-pine-deep">
-                    {child.name}
-                  </span>
-                  <Badge
-                    tone={
-                      child.archived_at
-                        ? "warning"
-                        : child.dob_confirmed
-                          ? "neutral"
-                          : "warning"
-                    }
-                  >
-                    {child.archived_at
-                      ? "Archived"
-                      : child.dob_confirmed
-                        ? "Confirmed DOB"
-                        : "Estimated age"}
-                  </Badge>
-                </div>
-                {child.archived_at && (
-                  <p className="text-xs leading-relaxed text-ink-soft">
-                    <span className="font-semibold text-ink">Reason:</span>{" "}
-                    {child.archived_reason}
-                    <br />
-                    Archived {child.archived_at.slice(0, 10)} — open the profile
-                    to return them to the roster.
-                  </p>
-                )}
-                <div className="mt-auto flex items-end justify-between gap-2 text-xs text-ink-soft">
-                  <span className="min-w-0">
-                    {child.dob_confirmed
-                      ? `Born ${child.dob}`
-                      : `Age ${child.estimated_age_range ?? "—"}`}
-                    <br />
-                    Intake {child.intake_date}
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="shrink-0 font-semibold text-pine transition-transform duration-150 group-hover:translate-x-0.5"
-                  >
-                    Open →
-                  </span>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+    return source.filter(child => (filter !== "confirmed" || child.dob_confirmed) && (filter !== "estimated" || !child.dob_confirmed) && (!needle || child.name.toLowerCase().includes(needle))).sort((a, b) => sort === "recent" ? b.intake_date.localeCompare(a.intake_date) : a.name.localeCompare(b.name));
+  }, [source, query, filter, sort]);
+  const filters = [{ id: "all", label: "Active children", count: items.length }, { id: "confirmed", label: "Confirmed DOB" }, { id: "estimated", label: "Estimated age" }, { id: "archived", label: "Archived", count: archivedUnavailable ? undefined : archived.length }] as const;
+  const sourceTotal = filter === "archived" ? archivedTotal : total;
+  return <section className="roster-panel" aria-label="Children directory">
+    <div className="roster-toolbar"><div><h2 className="font-display text-lg font-semibold">Your children</h2><p className="mt-1 text-xs text-ink-soft">Open a profile to record an observation or review its history.</p></div>
+      <div className="flex w-full gap-2 sm:w-auto"><div className="relative min-w-0 flex-1"><label htmlFor="roster-search" className="sr-only">Search children by name</label><Icon name="search" className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-ink-soft" /><input id="roster-search" type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search children" maxLength={100} className="min-h-11 w-full rounded-lg border border-line bg-paper py-2 pr-3 pl-9 text-xs sm:w-52" /></div><label className="sr-only" htmlFor="roster-sort">Sort children</label><select id="roster-sort" value={sort} onChange={e => setSort(e.target.value)} className="min-h-11 rounded-lg border border-line bg-surface px-2 text-xs"><option value="name">Name A–Z</option><option value="recent">Newest intake</option></select></div>
     </div>
-  );
+    <div className="roster-tabs" role="group" aria-label="Filter roster">{filters.map(option => <button key={option.id} type="button" onClick={() => setFilter(option.id)} aria-pressed={filter === option.id} className="roster-tab">{option.label}{"count" in option && option.count !== undefined && <span className="ml-1.5 rounded bg-paper px-1.5 py-0.5 text-xs">{option.count}</span>}</button>)}</div>
+    {filter === "archived" && archivedUnavailable ? <div className="p-6" role="alert">Archived records could not be loaded. Refresh to try again.</div> : visible.length === 0 ? <div className="p-6"><EmptyState icon="search" title={query ? "No matching children" : filter === "archived" ? "No archived children" : "No children in this view"} description={query ? "Try a different name or clear the search to see this list." : "Switch to Active children to return to the current roster."} /></div> : <>
+      <div className="roster-columns" aria-hidden="true"><span>Child</span><span>Age information</span><span>Registered</span><span>Record status</span><span /></div>
+      <ul>{visible.map(child => <li key={child.id}><Link href={`/dashboard/children/${child.id}`} className="roster-row">
+        <div className="flex min-w-0 items-center gap-3"><span className="initial-avatar" aria-hidden="true">{child.name.split(/\s+/).slice(0, 2).map(n => n[0]).join("").toUpperCase()}</span><div className="min-w-0"><strong className="block truncate">{child.name}</strong><small>Child profile</small></div></div>
+        <div className="roster-age">{child.dob_confirmed ? child.dob : child.estimated_age_range ?? "Not recorded"}<small>{child.dob_confirmed ? "Date of birth" : "Recorded estimate"}</small></div>
+        <span className="roster-intake text-ink-soft">{child.intake_date}</span><div className="roster-status"><Badge tone={child.archived_at || !child.dob_confirmed ? "warning" : "neutral"}>{child.archived_at ? "Archived" : child.dob_confirmed ? "Confirmed DOB" : "Estimated age"}</Badge></div><Icon name="chevron-right" className="h-4 w-4 text-ink-soft" />
+      </Link></li>)}</ul>
+    </>}
+    <footer className="roster-footer" role="status">{visible.length} {visible.length === 1 ? "child" : "children"} shown{source.length < sourceTotal ? ` · Search covers ${source.length} loaded records of ${sourceTotal}` : ""}. Records stay within your institution.</footer>
+  </section>;
 }

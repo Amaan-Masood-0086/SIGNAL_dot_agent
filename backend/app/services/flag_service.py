@@ -17,6 +17,7 @@ table/service by design (sdlc-security rule 14; FEAT-11 owns the write).
 from __future__ import annotations
 
 import uuid
+import hashlib, json
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -44,6 +45,8 @@ class FlagService:
         reasoning_trail: list | None,
         status: str,
         explanation_text: str | None = None,
+        kb_release_id: str = "v2-active",
+        kb_entry_revision: str | None = None,
     ) -> Flag:
         if domain not in FLAG_DOMAINS:
             raise FlagValidationError(
@@ -68,6 +71,8 @@ class FlagService:
             reasoning_trail=reasoning_trail,
             explanation_text=explanation_text,
             status=status,
+            kb_release_id=kb_release_id,
+            kb_entry_revision=kb_entry_revision or hashlib.sha256(json.dumps(reasoning_trail, sort_keys=True).encode()).hexdigest(),
         )
         self._session.add(flag)
         return flag

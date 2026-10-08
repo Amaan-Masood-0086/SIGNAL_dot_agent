@@ -19,6 +19,7 @@ from app.db.base import Base
 from .types import IdMixin, TimestampMixin
 
 REFERRAL_STATUSES = ("referred", "pending_capacity", "closed")
+REFERRAL_OUTCOMES = ("confirmed", "ruled_out", "lost_to_followup", "not_yet_assessed")
 
 
 class Referral(IdMixin, TimestampMixin, Base):
@@ -42,3 +43,5 @@ class Referral(IdMixin, TimestampMixin, Base):
     caretaker_confirmed: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False
     )
+    outcome: Mapped[str] = mapped_column(Enum(*REFERRAL_OUTCOMES, name="referral_outcome", native_enum=False), nullable=False, default="not_yet_assessed", server_default="not_yet_assessed")
+    clinician_note: Mapped[str | None] = mapped_column(String(2000), nullable=True)

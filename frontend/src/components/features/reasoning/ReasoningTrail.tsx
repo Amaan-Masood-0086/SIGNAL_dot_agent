@@ -29,11 +29,11 @@ export function ReasoningTrail({
             className="rounded-lg border border-line bg-moss/50 p-3"
           >
             <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-              <span className="rounded bg-pine px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide text-white">
+              <span className="rounded bg-pine px-1.5 py-0.5 font-mono text-xs font-bold tracking-wide text-white">
                 {entry.citation_ref}
               </span>
               {entry.source && (
-                <span className="text-[11px] text-ink-soft">{entry.source}</span>
+                <span className="text-xs text-ink-soft">{entry.source}</span>
               )}
             </div>
             <p className="mt-1.5 text-xs leading-relaxed text-ink">
@@ -42,7 +42,7 @@ export function ReasoningTrail({
             {entry.kb_drifted && (
               // Showing the original wording is correct; hiding that the
               // reference has since changed would not be.
-              <p className="mt-1.5 text-[11px] leading-relaxed text-amber">
+              <p className="mt-1.5 text-xs leading-relaxed text-amber">
                 This knowledge-base entry has been revised since this result
                 was recorded. The wording above is the basis the grade was
                 actually made on.
@@ -61,13 +61,13 @@ export function ReasoningTrail({
           {refsOnly.map((ref) => (
             <li
               key={ref}
-              className="rounded bg-pine px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide text-white"
+              className="rounded bg-pine px-1.5 py-0.5 font-mono text-xs font-bold tracking-wide text-white"
             >
               {ref}
             </li>
           ))}
         </ul>
-        <p className="mt-2 text-[11px] text-ink-soft">
+        <p className="mt-2 text-xs text-ink-soft">
           The full text of these entries could not be loaded just now. They are
           recorded with the result and appear in the screening history.
         </p>

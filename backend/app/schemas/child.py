@@ -23,6 +23,25 @@ class ChildCreate(BaseModel):
     dob: datetime.date | None = None
     estimated_age_range: str | None = Field(default=None, max_length=50)
     estimated_age_note: str | None = None
+    estimated_age_lower_months: int | None = Field(default=None, ge=0, lt=216, strict=True)
+    estimated_age_upper_months: int | None = Field(default=None, ge=0, lt=216, strict=True)
+    age_reference_date: datetime.date | None = None
+    prematurity_context: str | None = Field(default=None, max_length=2000)
+
+    @model_validator(mode="after")
+    def structured_age(self):
+        fields = (self.estimated_age_lower_months, self.estimated_age_upper_months, self.age_reference_date)
+        if any(value is not None for value in fields):
+            if self.dob_confirmed or any(value is None for value in fields):
+                raise ValueError("Estimated bounds and reference date must be supplied together, without a confirmed DOB")
+            if self.estimated_age_lower_months > self.estimated_age_upper_months:
+                raise ValueError("Age bounds are reversed")
+            if self.age_reference_date > datetime.date.today():
+                raise ValueError("Age reference date cannot be in the future")
+            expected = f"{self.estimated_age_lower_months}-{self.estimated_age_upper_months} months"
+            if self.estimated_age_range != expected:
+                raise ValueError(f"estimated_age_range must match numeric bounds: {expected}")
+        return self
 
     @model_validator(mode="after")
     def adr02_dual_age_contract(self) -> "ChildCreate":
@@ -58,6 +77,10 @@ class ChildRead(BaseModel):
     dob: datetime.date | None
     estimated_age_range: str | None
     estimated_age_note: str | None
+    estimated_age_lower_months: int | None = None
+    estimated_age_upper_months: int | None = None
+    age_reference_date: datetime.date | None = None
+    prematurity_context: str | None = None
     is_synthetic: bool
     created_at: datetime.datetime
     # Archive state (migration 0006). Present on reads so a profile can show

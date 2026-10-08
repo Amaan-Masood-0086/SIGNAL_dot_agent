@@ -176,7 +176,14 @@ def test_observation_allows_30_per_minute_then_429(settings, rsa_keypair, db_ses
     url = f"/api/v1/sessions/{session_id}/observations"
     headers = {"Authorization": f"Bearer {token}"}
 
+    child_id = client.get(f"/api/v1/sessions/{session_id}", headers=headers).json()["data"]["child_id"]
     for attempt in range(30):
+        # The per-account rate limit spans sessions; each conversation now
+        # independently enforces its five-turn budget.
+        if attempt and attempt % 5 == 0:
+            opened = client.post("/api/v1/sessions", headers=headers, json={"child_id": child_id, "mode": "text"})
+            assert opened.status_code == 201
+            url = f"/api/v1/sessions/{opened.json()['data']['id']}/observations"
         resp = client.post(url, headers=headers, json={"raw_input": f"turn {attempt + 1}"})
         assert resp.status_code == 201, f"attempt {attempt + 1}: {resp.text}"
 

@@ -23,6 +23,35 @@ from sqlalchemy.orm import Session
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 
 
+def _bootstrap_test_environment() -> None:
+    """Make the suite hermetic: a checkout with no backend/.env (CI) must collect and run.
+
+    app.main builds the uvicorn `app` at import and several test modules call
+    get_settings(), both of which need ENVIRONMENT and a JWT keypair. Developers
+    got them from a local .env; CI has none. setdefault never overrides a value a
+    developer or CI job set explicitly. The key is generated per run, signs nothing
+    real, and the Fernet key is the documented throwaway test key.
+    """
+    os.environ.setdefault("ENVIRONMENT", "synthetic_only")
+    os.environ.setdefault(
+        "CREDENTIAL_ENCRYPTION_KEY", "MeogHhAdoVZ279u9hf3BlSQxH3rqq89e538bAoC8tQg="
+    )
+    if not (os.environ.get("JWT_PRIVATE_KEY") and os.environ.get("JWT_PUBLIC_KEY")):
+        key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        os.environ["JWT_PRIVATE_KEY"] = key.private_bytes(
+            serialization.Encoding.PEM,
+            serialization.PrivateFormat.PKCS8,
+            serialization.NoEncryption(),
+        ).decode()
+        os.environ["JWT_PUBLIC_KEY"] = key.public_key().public_bytes(
+            serialization.Encoding.PEM,
+            serialization.PublicFormat.SubjectPublicKeyInfo,
+        ).decode()
+
+
+_bootstrap_test_environment()
+
+
 @pytest.fixture(scope="session")
 def rsa_keypair() -> tuple[bytes, bytes]:
     """Throwaway RS256 keypair — JWT signing is RS256 per sdlc-security.md."""

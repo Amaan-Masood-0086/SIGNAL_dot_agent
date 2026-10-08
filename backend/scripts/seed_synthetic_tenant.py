@@ -25,6 +25,8 @@ from app.models.staff import Staff
 # identity the stub token carries.
 SYNTHETIC_STAFF_EMAIL = "synthetic-staff@signal.example"
 SYNTHETIC_STAFF_ID = uuid.uuid5(uuid.NAMESPACE_URL, f"signal:{SYNTHETIC_STAFF_EMAIL}")
+SYNTHETIC_ADMIN_EMAIL = "synthetic-admin@signal.example"
+SYNTHETIC_ADMIN_ID = uuid.uuid5(uuid.NAMESPACE_URL, f"signal:{SYNTHETIC_ADMIN_EMAIL}")
 
 
 def main() -> None:
@@ -66,6 +68,25 @@ def main() -> None:
             print("seeded synthetic staff")
         else:
             print("synthetic staff already present")
+
+        admin = session.execute(
+            select(Staff).where(Staff.id == SYNTHETIC_ADMIN_ID)
+        ).scalar_one_or_none()
+        if admin is None:
+            session.add(
+                Staff(
+                    id=SYNTHETIC_ADMIN_ID,
+                    institution_id=SYNTHETIC_INSTITUTION_ID,
+                    email=SYNTHETIC_ADMIN_EMAIL,
+                    hashed_password="unused-in-phase-1-stub",
+                    role="admin",
+                    is_synthetic=True,
+                )
+            )
+            session.commit()
+            print("seeded synthetic admin")
+        else:
+            print("synthetic admin already present")
     engine.dispose()
 
 

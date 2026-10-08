@@ -10,3 +10,6 @@ Thumbs.db
 
 # Tooling caches
 .qoder/
+
+# Office lock files
+~$*

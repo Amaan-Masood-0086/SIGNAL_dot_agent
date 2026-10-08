@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { GradeVerdict } from "@/src/components/features/reasoning/GradeVerdict";
 import { ReasoningTrail } from "@/src/components/features/reasoning/ReasoningTrail";
@@ -43,6 +43,9 @@ interface Props {
   session: Session;
   childName: string | null;
   initialTurns: Observation[];
+  savedFlags: FlagRead[];
+  savedFlagTotal: number;
+  initialResult: ReasoningResult | null;
 }
 
 function isSignalQuestion(turn: Observation): boolean {
@@ -52,15 +55,21 @@ function isSignalQuestion(turn: Observation): boolean {
   return signals?.follow_up === true;
 }
 
-export function SessionConversation({ session, childName, initialTurns }: Props) {
+export function SessionConversation({ session, childName, initialTurns, savedFlags, savedFlagTotal, initialResult }: Props) {
   const [turns, setTurns] = useState<Observation[]>(initialTurns);
   const [status, setStatus] = useState<Session["status"]>(session.status);
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<"ask" | "save" | "complete" | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<ReasoningResult | null>(null);
+  const [result, setResult] = useState<ReasoningResult | null>(savedFlags.length ? null : initialResult);
+  const requestRef = useRef<{ text: string; language: string; id: string } | null>(null);
   const [trail, setTrail] = useState<TrailEntryRead[] | null>(null);
   const draftRef = useRef<HTMLTextAreaElement>(null);
+  const threadRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const node = threadRef.current;
+    if (node) node.scrollTop = node.scrollHeight;
+  }, [turns, pending]);
 
   /**
    * Which language SIGNAL replies in.
@@ -74,14 +83,24 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
    * localStorage, wrapped: it is a display convenience, and a browser that
    * refuses storage must still render a working screen.
    */
-  const [language, setLanguage] = useState<"auto" | "ur" | "en">(() => {
-    try {
-      const saved = localStorage.getItem("signal.replyLanguage");
-      return saved === "ur" || saved === "en" ? saved : "auto";
-    } catch {
-      return "auto";
-    }
-  });
+  const [language, setLanguage] = useState<"auto" | "ur" | "en">("auto");
+  useEffect(() => {
+    // Read after hydration; server and first client render must agree.
+    const task = window.setTimeout(() => {
+      try {
+        const saved = localStorage.getItem("signal.replyLanguage");
+        if (saved === "ur" || saved === "en") setLanguage(saved);
+      } catch { /* A blocked preference store does not block capture. */ }
+    }, 0);
+    return () => window.clearTimeout(task);
+  }, []);
+
+  useEffect(() => {
+    if (!draft.trim()) return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [draft]);
 
   function chooseLanguage(next: "auto" | "ur" | "en") {
     setLanguage(next);
@@ -101,7 +120,7 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
 
   const active = status === "in_progress";
   const voiceMode = session.mode === "voice";
-  const concluded = result !== null && result.status !== "follow_up";
+  const concluded = savedFlags.length > 0 || (result !== null && result.status !== "follow_up");
 
   /**
    * The question SIGNAL is waiting on, if any.
@@ -158,7 +177,6 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
         | { detail: string };
       if (!response.ok || !("observation" in payload)) {
         setError("detail" in payload ? payload.detail : "The turn could not be saved.");
-        if (response.status === 409) setStatus("completed");
         return;
       }
       setTurns((previous) => [...previous, payload.observation]);
@@ -176,11 +194,14 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
     if (!text || pending) return;
     setPending("ask");
     setError(null);
+    if (requestRef.current?.text !== text || requestRef.current.language !== language) {
+      requestRef.current = { text, language, id: crypto.randomUUID() };
+    }
     try {
       const response = await fetch(`/api/sessions/${session.id}/reason`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ raw_input: text, response_language: language }),
+        body: JSON.stringify({ raw_input: text, response_language: language, request_id: requestRef.current.id }),
       });
       const payload = (await response.json()) as
         | { result: ReasoningResult }
@@ -190,6 +211,7 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
         return;
       }
       const next = payload.result;
+      requestRef.current = null;
       setResult(next);
       setDraft("");
       if (next.flag_id) await loadTrail(next.flag_id);
@@ -235,7 +257,7 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
   const empty = draft.trim().length === 0;
 
   return (
-    <main className="mx-auto w-full max-w-3xl p-5 sm:p-8">
+    <main className="screening-workspace mx-auto w-full max-w-6xl p-5 sm:p-8">
       <Link
         href={`/dashboard/children/${session.child_id}`}
         className="inline-flex items-center gap-1 text-sm font-medium text-pine hover:underline"
@@ -249,12 +271,12 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
           title={childName ?? "Session"}
           lede={
             voiceMode
-              ? "Speak or type each turn. Recorded speech becomes a transcript you review before it is used — the audio itself is never stored."
-              : "Type each turn. You can either just record it, or ask SIGNAL to screen it."
+              ? "Speak or type what you noticed. Review your words before sending them."
+              : "Describe what you noticed, then answer any follow-up questions."
           }
           actions={
             <Badge tone={active ? "neutral" : "success"}>
-              {active ? "In progress" : "Completed"}
+              {active ? "In progress" : status === "abandoned" ? "Abandoned" : "Completed"}
             </Badge>
           }
         />
@@ -266,38 +288,61 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
         </div>
       )}
 
+      <div className="chat-layout">
+      <div>
+      {savedFlags.length > 0 && (
+        <section aria-label="Saved screening results" className="mb-6 space-y-4">
+          <h2 className="font-display text-xl font-semibold">Saved screening results</h2>
+          <p className="text-sm text-ink-soft">Previously recorded results, restored without running another screening. This is screening guidance, not a diagnosis.</p>
+          {savedFlagTotal > savedFlags.length && <p className="text-sm text-ink-soft">Showing the latest {savedFlags.length} of {savedFlagTotal} results.</p>}
+          {savedFlags.map(flag => (
+            <article key={flag.id} className="space-y-3">
+              <Link href={`/dashboard/referrals/new?flag=${flag.id}`} className="inline-flex text-sm font-semibold text-pine">Referral &amp; follow-up</Link>
+              <GradeVerdict grade={flag.confidence_grade}>
+                <p className="mt-3 text-sm">{domainLabel(flag.domain) ?? flag.domain}</p>
+                <time className="mt-1 block text-xs text-ink-soft" dateTime={flag.created_at}>{flag.created_at.replace("T", " ")}</time>
+              </GradeVerdict>
+              {flag.explanation_text && <p dir="auto" className="record-text whitespace-pre-wrap text-sm">{flag.explanation_text}</p>}
+              {flag.reasoning_trail.length > 0 ? <ReasoningTrail entries={flag.reasoning_trail} /> : <p className="text-sm text-ink-soft">No evidence entries were returned with this saved result.</p>}
+            </article>
+          ))}
+        </section>
+      )}
       <section
         aria-label="Session conversation"
-        className="mt-6 rounded-xl border border-line bg-surface"
+        className="screening-chat"
       >
         <header className="flex flex-wrap items-center gap-2 border-b border-line p-5">
           <div className="mr-auto">
             <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
-              Conversation
+              Chat with SIGNAL
             </h2>
-            <p className="mt-1 max-w-prose text-xs leading-relaxed text-ink-soft">
-              Everything here is the record for this session, and everything
-              here is what SIGNAL reads when it screens.
-            </p>
+              <p className="mt-1 max-w-prose text-xs leading-relaxed text-ink-soft">
+                Share what you noticed. SIGNAL will ask one focused question at a time.
+              </p>
           </div>
           {/* The budget the backend enforces, shown before it runs out
               instead of surfacing as a sudden refusal at the sixth turn. */}
           <Badge tone={turnsLeft <= 1 ? "warning" : "neutral"}>
-            {turnsUsed} of {MAX_TURNS} turns used
+            {concluded ? "Result saved" : `${turnsUsed} / ${MAX_TURNS} messages used`}
           </Badge>
         </header>
 
-        <div className="p-5">
+        <div className="chat-body">
+        <div className="chat-thread" ref={threadRef} role="log" aria-label="Conversation messages" aria-live="polite">
           {turns.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-line px-5 py-8 text-center">
-              <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-moss text-pine">
+            <div className="chat-welcome">
+              <span className="brand-mark">
                 <Icon name="children" className="h-5 w-5" />
               </span>
-              <p className="mt-3 text-sm font-semibold text-ink">Nothing recorded yet</p>
+              <p className="chat-sender">SIGNAL · Observation assistant</p>
+              <h3>What have you noticed about {childName || "the child"}?</h3>
+              <p>Tell me what you have seen or heard, and when it happens. I may ask a follow-up to understand it better.</p>
+              <p className="chat-welcome-note">It is okay to say “I don’t know”. You do not need to guess.</p>
               <p className="mt-1 text-xs text-ink-soft">
                 {voiceMode
                   ? "Speak or type the first turn below."
-                  : "Type the first turn below."}
+                  : "Write naturally—there is no form to complete."}
               </p>
             </div>
           ) : (
@@ -309,17 +354,17 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
                     key={turn.id}
                     className={
                       fromSignal
-                        ? "mr-auto max-w-[88%] rounded-xl rounded-bl-sm border border-line bg-surface px-4 py-3"
-                        : "ml-auto max-w-[88%] rounded-xl rounded-br-sm border border-line bg-moss/50 px-4 py-3"
+                        ? "chat-message chat-message-signal"
+                        : "chat-message chat-message-user"
                     }
                   >
-                    <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] text-ink-soft uppercase">
+                    <p className="flex items-center gap-1.5 text-xs font-bold tracking-[0.12em] text-ink-soft uppercase">
                       {fromSignal && (
                         <Icon name="shield" className="h-3.5 w-3.5 text-pine" />
                       )}
                       {fromSignal ? "SIGNAL asks" : "You"}
                     </p>
-                    <p className="mt-1 text-sm leading-relaxed whitespace-pre-wrap text-ink">
+                    <p dir="auto" className="record-text mt-1 text-sm leading-relaxed whitespace-pre-wrap text-ink">
                       {turn.raw_input}
                     </p>
                   </li>
@@ -327,9 +372,11 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
               })}
             </ol>
           )}
+          {pending === "ask" && <div className="chat-message chat-message-signal" role="status"><p className="chat-sender">SIGNAL</p><ThinkingBar /></div>}
+        </div>
 
           {active && !concluded && (
-            <div className="mt-5 border-t border-line pt-5">
+            <div className="chat-composer">
               {voiceMode && !sttDown && (
                 <div className="mb-4">
                   <VoiceRecorder disabled={busy} onRecorded={handleRecorded} />
@@ -353,14 +400,14 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
                   screening depends on that answer arriving. */}
               {pendingQuestion && (
                 <div className="mb-3 rounded-xl border border-pine/30 bg-moss/50 p-4">
-                  <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] text-pine-deep uppercase">
+                  <p className="flex items-center gap-1.5 text-xs font-bold tracking-[0.12em] text-pine-deep uppercase">
                     <Icon name="shield" className="h-3.5 w-3.5 text-pine" />
                     SIGNAL is waiting for this answer
                   </p>
                   <p className="mt-1.5 text-sm leading-relaxed text-ink">
                     {pendingQuestion}
                   </p>
-                  <p className="mt-2 text-[11px] leading-relaxed text-ink-soft">
+                  <p className="mt-2 text-xs leading-relaxed text-ink-soft">
                     Without it there is nothing to grade — the result comes back
                     as &ldquo;not enough information&rdquo;.
                   </p>
@@ -377,13 +424,20 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
                     : "What did you notice?"}
               </label>
               <textarea
+                dir="auto"
                 id="turn-input"
                 ref={draftRef}
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
-                rows={3}
+                rows={2}
                 maxLength={10_000}
-                disabled={!active}
+                disabled={busy || exhausted}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing && !busy && !exhausted) {
+                    event.preventDefault();
+                    void ask();
+                  }
+                }}
                 placeholder={
                   pendingQuestion
                     ? "Answer the question above"
@@ -394,18 +448,18 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
 
               {/* One input, two intents — weighted, because asking is what a
                   worried caretaker came to do. */}
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <Button
+              <div className="chat-actions">
+              <Button
                   onClick={() => void ask()}
                   disabled={busy || empty || exhausted}
-                  aria-label="Ask SIGNAL to screen this turn"
+                  aria-label={pendingQuestion ? "Send answer to SIGNAL" : "Send observation to SIGNAL"}
                 >
-                  {pending === "ask" ? "Thinking…" : "Ask SIGNAL"}
+                  {pending === "ask" ? "Thinking…" : pendingQuestion ? "Send answer" : "Ask SIGNAL"}
                 </Button>
                 <Button
-                  variant="secondary"
+                  variant="ghost"
                   onClick={() => void saveOnly()}
-                  disabled={busy || empty || exhausted}
+                  disabled={busy || empty || exhausted || !!pendingQuestion}
                   aria-label="Save this turn without screening it"
                 >
                   {pending === "save" ? "Saving…" : "Just save it"}
@@ -413,7 +467,7 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
                 <Button
                   variant="ghost"
                   onClick={() => void complete()}
-                  disabled={busy}
+                  disabled={busy || !empty}
                   className="ml-auto"
                   aria-label="Complete this observation session"
                 >
@@ -425,7 +479,7 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
                   text — the caretaker's own words stay fenced as data, so a
                   preference has to arrive as a structured field rather than
                   an instruction typed into the box. */}
-              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3">
+              <div className="chat-language flex flex-wrap items-center gap-2">
                 <span className="text-xs font-medium text-ink-soft">
                   SIGNAL replies in
                 </span>
@@ -452,23 +506,14 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
                     </button>
                   ))}
                 </div>
-                <span className="text-[11px] text-ink-soft">
+                <span className="text-xs text-ink-soft">
                   Remembered on this device.
                 </span>
               </div>
 
-              {pending === "ask" && (
-                <div className="mt-3">
-                  <ThinkingBar />
-                </div>
-              )}
 
-              <p className="mt-2 text-[11px] leading-relaxed text-ink-soft">
-                <span className="font-semibold">Ask SIGNAL</span> records the turn
-                and screens it — a graded result with its knowledge-base basis.{" "}
-                <span className="font-semibold">Just save it</span> only records,
-                with no grading and no provider cost. Either way it counts as one
-                of your {MAX_TURNS} turns.
+              <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+                {!empty ? "Your draft is not saved yet. Send or save it before completing the session." : "Ask SIGNAL saves and screens your observation. Just save it records without screening. Both use one turn."}
               </p>
               {exhausted && (
                 <div className="mt-3">
@@ -497,7 +542,7 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
             <div className="overflow-hidden rounded-xl border border-red/30 bg-red-soft">
               <div aria-hidden="true" className="h-1 w-full bg-red" />
               <div className="p-5">
-                <p className="text-[11px] font-bold tracking-[0.14em] text-red uppercase">
+                <p className="text-xs font-bold tracking-[0.14em] text-red uppercase">
                   Handled separately
                 </p>
                 <p className="mt-1.5 font-display text-2xl leading-tight font-bold tracking-tight text-ink">
@@ -531,9 +576,11 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
                 </p>
               )}
 
+              {result.flag_id && <Link href={`/dashboard/referrals/new?flag=${result.flag_id}`} className="inline-flex text-sm font-semibold text-pine">Referral &amp; follow-up</Link>}
+
               {(trail !== null || result.citations.length > 0) && (
                 <div className="rounded-xl border border-line bg-surface p-4">
-                  <p className="text-[11px] font-bold tracking-[0.12em] text-ink-soft uppercase">
+                  <p className="text-xs font-bold tracking-[0.12em] text-ink-soft uppercase">
                     Why — the knowledge-base basis
                   </p>
                   <p className="mt-1 mb-3 text-xs text-ink-soft">
@@ -550,6 +597,16 @@ export function SessionConversation({ session, childName, initialTurns }: Props)
           )}
         </div>
       )}
+
+      </div>
+      <details className="chat-help">
+        <summary>Writing an observation · Help and guidance</summary>
+        <h2>A useful observation</h2>
+        <ul className="mt-4"><li>Describe something you have personally seen or heard.</li><li>Include when it happens and whether it has changed.</li><li>If you do not know an answer, say so. You do not need to guess.</li></ul>
+        <div className="mt-5 border-t border-line pt-5"><h2>What happens next?</h2><p className="mt-2">SIGNAL may ask a follow-up question. Any saved screening result and its evidence remain on the child’s profile.</p></div>
+        <Link href="/dashboard/guide" className="mt-5 inline-flex text-xs font-semibold text-pine">Read the screening guide →</Link>
+      </details>
+      </div>
 
       <div className="mt-6">
         <Link href="/dashboard" className="text-sm font-medium text-pine hover:underline">

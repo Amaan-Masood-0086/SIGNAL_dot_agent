@@ -262,7 +262,7 @@ function ProviderCard({
             </Button>
           )}
         </div>
-        <p className="text-[11px] leading-relaxed text-ink-soft">
+        <p className="text-xs leading-relaxed text-ink-soft">
           Test connection fires one real, billed call against whichever
           credential is currently active. It is rate-limited to five attempts
           every five minutes.

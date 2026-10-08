@@ -36,7 +36,7 @@ export function GradeVerdict({
       <div aria-hidden="true" className={`h-1 w-full ${tone.rule}`} />
       <div className="p-5">
         <p
-          className={`text-[11px] font-bold tracking-[0.14em] uppercase ${tone.label}`}
+          className={`text-xs font-bold tracking-[0.14em] uppercase ${tone.label}`}
         >
           {meta ? `${meta.label} concern` : "Screening result"}
         </p>

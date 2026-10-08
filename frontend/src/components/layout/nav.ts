@@ -36,8 +36,9 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Care",
     caretakerOnly: true,
     items: [
-      { href: "/dashboard", label: "Children", icon: "children", exact: true },
+      { href: "/dashboard", label: "Care overview", icon: "overview", exact: true },
       { href: "/dashboard/children/new", label: "Register a child", icon: "add-child" },
+      { href: "/dashboard/referrals", label: "Referrals & follow-up", icon: "audit" },
     ],
   },
   {
@@ -51,6 +52,8 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard/admin/children", label: "All children", icon: "children" },
       { href: "/dashboard/admin/audit", label: "Audit log", icon: "audit" },
       { href: "/dashboard/admin/usage", label: "Usage & cost", icon: "usage" },
+      { href: "/dashboard/admin/knowledge", label: "Knowledge review", icon: "audit" },
+      { href: "/dashboard/admin/knowledge/preview", label: "KB preview sandbox", icon: "overview" },
     ],
   },
 ];

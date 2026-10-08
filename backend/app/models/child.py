@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime
 import uuid
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, String, Text
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, String, Text, Integer
 from sqlalchemy import Uuid as UuidType
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -30,6 +30,10 @@ class Child(IdMixin, TimestampMixin, Base):
     dob: Mapped[datetime.date | None] = mapped_column(Date, nullable=True)
     estimated_age_range: Mapped[str | None] = mapped_column(String(50), nullable=True)
     estimated_age_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    estimated_age_lower_months: Mapped[int | None] = mapped_column(Integer)
+    estimated_age_upper_months: Mapped[int | None] = mapped_column(Integer)
+    age_reference_date: Mapped[datetime.date | None] = mapped_column(Date)
+    prematurity_context: Mapped[str | None] = mapped_column(Text)
 
     is_synthetic: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 

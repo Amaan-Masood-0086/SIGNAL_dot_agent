@@ -32,7 +32,7 @@ const GRADES: Record<Grade, GradeMeta> = {
     label: "High",
     headline: "See a clinician soon",
     meaning:
-      "The pattern described matches milestones that are usually met by this age. This is a referral prompt, not a diagnosis.",
+      "What was described includes warning signs that are not expected at this age. This is a referral prompt, not a diagnosis.",
     tone: "danger",
   },
   moderate: {

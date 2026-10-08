@@ -4,9 +4,15 @@
 import { backendFetch } from "@/src/lib/api/client";
 import {
   reasoningEnvelopeSchema,
+  reasoningResultSchema,
   type ReasoningInput,
   type ReasoningResult,
 } from "@/src/lib/api/schemas";
+import { z } from "zod";
+
+export async function getSavedResult(token: string, sessionId: string): Promise<ReasoningResult | null> {
+  return z.object({ data: reasoningResultSchema.nullable() }).parse(await backendFetch(`/api/v1/sessions/${sessionId}/result`, token)).data;
+}
 
 export async function reasonSession(
   token: string,

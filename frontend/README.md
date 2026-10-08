@@ -1,4 +1,18 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SIGNAL frontend
+
+Next.js 16 / React 19 workspace for institution caretakers and system administrators.
+See the [UI redesign notes](../docs/technical/SIGNAL_UI_Redesign_2026-09-11.md) for the updated screens, role boundaries and remaining product work.
+
+## Verification
+
+```powershell
+npm.cmd run lint
+npm.cmd run test
+npm.cmd run build
+npm.cmd run test:ui
+```
+
+Browser tests use installed Chrome and an isolated synthetic fixture API. They start their own servers on ports 3015 and 18119, without connecting to the configured real backend or making paid provider calls. Screenshots are generated in `test-results/`.
 
 ## Getting Started
 
@@ -18,7 +32,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The interface uses Bricolage Grotesque and Noto Sans through `next/font`. Configure `BACKEND_URL` using `.env.example` before signing in to the normal application.
 
 ## Learn More
 

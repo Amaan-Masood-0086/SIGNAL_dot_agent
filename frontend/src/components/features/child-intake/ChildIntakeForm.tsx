@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { Badge } from "@/src/components/ui/Badge";
-import { Button } from "@/src/components/ui/Button";
+import { Button, buttonClass } from "@/src/components/ui/Button";
 import { Card, CardBody, CardTitle } from "@/src/components/ui/Card";
 import { Input } from "@/src/components/ui/Input";
 import {
@@ -47,6 +47,7 @@ export function ChildIntakeForm() {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<ChildCreateInput>({
     resolver: zodResolver(childCreateSchema),
@@ -83,9 +84,7 @@ export function ChildIntakeForm() {
             </Badge>
           </div>
           <div className="mt-4 flex gap-3">
-            <Link href={`/dashboard/children/${success.id}`}>
-              <Button aria-label="View child profile">View profile</Button>
-            </Link>
+            <Link href={`/dashboard/children/${success.id}`} className={buttonClass()} aria-label="View child profile">View profile</Link>
             <Button variant="secondary" onClick={() => setSuccess(null)}>
               Register another child
             </Button>
@@ -97,7 +96,7 @@ export function ChildIntakeForm() {
 
   return (
     <Card>
-      <CardTitle>Register a child</CardTitle>
+      <CardTitle>Child details</CardTitle>
       <CardBody>
         <form
           onSubmit={handleSubmit((values) => {
@@ -152,7 +151,7 @@ export function ChildIntakeForm() {
                         type="radio"
                         name="dob-mode"
                         checked={field.value === true}
-                        onChange={() => field.onChange(true)}
+                        onChange={() => { setValue("estimated_age_range", ""); setValue("estimated_age_note", ""); field.onChange(true); }}
                         aria-label="Date of birth is confirmed"
                         className="accent-pine"
                       />
@@ -176,7 +175,7 @@ export function ChildIntakeForm() {
                         type="radio"
                         name="dob-mode"
                         checked={field.value === false}
-                        onChange={() => field.onChange(false)}
+                        onChange={() => { setValue("dob", ""); field.onChange(false); }}
                         aria-label="Age is estimated — no confirmed date of birth"
                         className="accent-pine"
                       />
