@@ -10,7 +10,7 @@ export default function AdminUsagePage() {
       <PageHeader
         eyebrow="Administration"
         title="Usage & cost"
-        lede="Paid-provider consumption broken down by staff member and institution, so an unusual pattern is visible long before it becomes an invoice."
+        lede="Understand service usage and estimated costs by provider, staff member and institution."
       />
       <div className="mt-6">
         <UsagePanel />

@@ -10,7 +10,7 @@ export default function AdminChildrenPage() {
       <PageHeader
         eyebrow="Administration"
         title="All children"
-        lede="A read-only oversight roster spanning every institution. This is the only place children are visible across the tenant boundary — every caretaker-facing surface stays scoped to a single institution."
+        lede="Review child records across institutions, manage assignments and keep each roster up to date."
       />
       <div className="mt-6">
         <AdminChildrenPanel />

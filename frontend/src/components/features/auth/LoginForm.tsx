@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
 
 import { Button } from "@/src/components/ui/Button";
-import { Card, CardBody, CardTitle } from "@/src/components/ui/Card";
 import { Input } from "@/src/components/ui/Input";
 
 function LoginFormInner() {
@@ -30,23 +29,13 @@ function LoginFormInner() {
         // the operator to re-check working credentials sent them hunting in
         // the wrong place entirely (seen when serving through a dev tunnel).
         if (response.status === 403) {
-          const body = (await response.json().catch(() => ({}))) as {
-            origin?: string;
-            expected?: string;
-          };
-          setError(
-            `Blocked before your credentials were checked: the browser is on ${
-              body.origin ?? "an unknown origin"
-            } but the server considers itself ${
-              body.expected ?? "a different origin"
-            }. Add the first to APP_ALLOWED_ORIGINS and restart.`,
-          );
+          setError("Sign-in is blocked on this address. Ask your administrator to check the sign-in configuration.");
           return;
         }
         if (response.status === 429) {
           const wait = Number(response.headers.get("Retry-After") ?? 300);
           setError(
-            `Too many sign-in attempts for this account. Your credentials are fine — wait about ${Math.ceil(
+            `Too many sign-in attempts for this account. Wait about ${Math.ceil(
               wait / 60,
             )} minute(s) and try again.`,
           );
@@ -67,15 +56,16 @@ function LoginFormInner() {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardTitle>Sign in</CardTitle>
-      <CardBody>
-        <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
+    <div>
+      <h2>Welcome back</h2>
+      <p className="mt-2 text-sm leading-relaxed text-ink-soft">Sign in to your SIGNAL workspace.</p>
+        <form onSubmit={onSubmit} className="flex flex-col gap-5">
           <Input
             id="login-email"
             label="Email"
             type="email"
             autoComplete="email"
+            maxLength={320}
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -85,6 +75,7 @@ function LoginFormInner() {
             label="Password"
             type="password"
             autoComplete="current-password"
+            maxLength={256}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -98,11 +89,11 @@ function LoginFormInner() {
             {submitting ? "Signing in…" : "Sign in"}
           </Button>
           <p className="text-center text-xs text-ink-soft">
-            Synthetic-data-only build — use any synthetic staff credentials.
+            Use your assigned synthetic staff account. Your access is set by your administrator.
           </p>
         </form>
-      </CardBody>
-    </Card>
+      <p className="mt-8 border-t border-line pt-5 text-xs leading-relaxed text-ink-soft">This workspace currently supports synthetic records only.</p>
+    </div>
   );
 }
 

@@ -1,165 +1,57 @@
 "use client";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-
+import { useEffect, useRef, useState } from "react";
 import { LogoutButton } from "@/src/components/features/auth/LogoutButton";
 import { GrowthCurve } from "@/src/components/ui/GrowthCurve";
 import { Icon } from "@/src/components/ui/Icon";
 import { isActive, type NavGroup } from "@/src/components/layout/nav";
 
-interface ShellUser {
-  email: string | null;
-  role: string;
-  institutionName: string | null;
-  isAdmin: boolean;
-}
+interface ShellUser { email: string | null; role: string; institutionName: string | null; isAdmin: boolean; }
 
-/**
- * The dashboard's persistent navigation: a fixed rail on desktop, a slide-in
- * drawer on mobile. `groups` arrives already filtered by role from the
- * server — this component never decides who may see what.
- */
 export function SidebarNav({ groups, user }: { groups: NavGroup[]; user: ShellUser }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-
-  // Escape closes the drawer; navigating closes it from the link's own
-  // click handler below. (Closing from a pathname effect would fire a
-  // cascading render on every route change, including on desktop where the
-  // drawer state is irrelevant.)
+  const dialog = useRef<HTMLDialogElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const home = user.isAdmin ? "/dashboard/admin" : "/dashboard";
   useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+    const node = dialog.current;
+    const returnFocus = trigger.current;
+    if (!node || !open) return;
+    node.showModal();
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const media = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => { if (media.matches) setOpen(false); };
+    media.addEventListener("change", closeOnDesktop);
+    return () => {
+      node.close();
+      document.body.style.overflow = previous;
+      media.removeEventListener("change", closeOnDesktop);
+      returnFocus?.focus();
     };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
   }, [open]);
-
-  return (
-    <>
-      {/* Mobile top bar — the only nav affordance below lg. */}
-      <div className="flex items-center gap-3 border-b border-line bg-surface px-4 py-3 lg:hidden">
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Open navigation"
-          aria-expanded={open}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line text-ink-soft hover:bg-moss hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine"
-        >
-          <Icon name="menu" />
-        </button>
-        <Link href="/dashboard" className="flex items-center gap-2" aria-label="SIGNAL dashboard">
-          <GrowthCurve className="h-5 w-16 text-pine" />
-          <span className="font-display text-base font-bold tracking-tight text-pine-deep">
-            SIGNAL
-          </span>
+  function content(mobile = false) {
+    return <div className="sidebar-inner">
+      <div className="sidebar-brand">
+        <Link href={home} onClick={() => setOpen(false)} className="flex items-center gap-3" aria-label="SIGNAL home">
+          <span className="brand-mark"><GrowthCurve className="h-5 w-7" /></span>
+          <span><span className="brand-name">SIGNAL</span><span className="brand-caption">Every observation matters</span></span>
         </Link>
-        {user.isAdmin && (
-          <span className="ml-auto rounded-full bg-pine px-2.5 py-1 text-[10px] font-bold tracking-wide text-white uppercase">
-            Admin
-          </span>
-        )}
+        {mobile && <button className="ml-auto p-2" aria-label="Close navigation" onClick={() => setOpen(false)}><Icon name="close" /></button>}
       </div>
-
-      {open && (
-        <div
-          className="fixed inset-0 z-40 bg-ink/40 lg:hidden"
-          aria-hidden="true"
-          onClick={() => setOpen(false)}
-        />
-      )}
-
-      <nav
-        aria-label="Dashboard"
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-line bg-surface transition-transform duration-200 lg:sticky lg:top-0 lg:z-auto lg:h-svh lg:w-64 lg:translate-x-0 ${
-          open ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="flex items-center gap-2.5 border-b border-line px-5 py-4">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2.5"
-            aria-label="SIGNAL dashboard"
-          >
-            <GrowthCurve className="h-6 w-16 text-pine" />
-            <span className="font-display text-lg font-bold tracking-tight text-pine-deep">
-              SIGNAL
-            </span>
-          </Link>
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            aria-label="Close navigation"
-            className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-lg text-ink-soft hover:bg-moss hover:text-ink lg:hidden"
-          >
-            <Icon name="close" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-3 py-4">
-          {groups.map((group) => (
-            <div key={group.id} className="mb-5 last:mb-0">
-              <p className="px-3 pb-2 text-[10px] font-bold tracking-[0.14em] text-ink-soft/80 uppercase">
-                {group.label}
-              </p>
-              <ul className="space-y-0.5">
-                {group.items.map((item) => {
-                  const active = isActive(pathname, item);
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        onClick={() => setOpen(false)}
-                        aria-current={active ? "page" : undefined}
-                        className={`flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine ${
-                          active
-                            ? "bg-moss font-semibold text-pine-deep"
-                            : "text-ink-soft hover:bg-moss/60 hover:text-ink"
-                        }`}
-                      >
-                        <Icon
-                          name={item.icon}
-                          className={`h-5 w-5 shrink-0 ${active ? "text-pine" : "text-ink-soft/70"}`}
-                        />
-                        <span className="truncate">{item.label}</span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="border-t border-line px-5 py-4">
-          <p className="text-[10px] font-bold tracking-[0.14em] text-ink-soft/80 uppercase">
-            Signed in
-          </p>
-          <p className="mt-1.5 truncate text-sm font-semibold text-ink" title={user.email ?? undefined}>
-            {user.email ?? "Synthetic staff account"}
-          </p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-            <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase ${
-                user.isAdmin ? "bg-pine text-white" : "bg-moss text-pine-deep"
-              }`}
-            >
-              {user.isAdmin ? "Admin" : user.role}
-            </span>
-            {user.institutionName && (
-              <span className="truncate text-xs text-ink-soft" title={user.institutionName}>
-                {user.institutionName}
-              </span>
-            )}
-          </div>
-          <div className="mt-3">
-            <LogoutButton className="w-full" />
-          </div>
-        </div>
+      <div className="sidebar-workspace"><Icon name={user.isAdmin ? "overview" : "children"} className="h-5 w-5 shrink-0 text-pine" /><div className="min-w-0"><strong title={user.institutionName ?? undefined}>{user.isAdmin ? "System workspace" : user.institutionName ?? "Care workspace"}</strong><small>{user.isAdmin ? "All institutions" : "Institution care team"}</small></div></div>
+      <nav className="sidebar-links" aria-label="Dashboard">
+        {groups.map(group => <div key={group.id}><p className="sidebar-label">{group.label}</p>{group.items.map(item => <Link key={item.href} href={item.href} className="nav-link" onClick={() => setOpen(false)} aria-current={isActive(pathname, item) ? "page" : undefined}><Icon name={item.icon} className="h-[18px] w-[18px] shrink-0" /><span>{item.label}</span></Link>)}</div>)}
       </nav>
-    </>
-  );
+      <div className="sidebar-note"><Link href="/dashboard/guide" onClick={() => setOpen(false)}>Workspace guide <Icon name="chevron-right" className="h-4 w-4" /></Link></div>
+      <div className="sidebar-user"><div className="mb-3 flex items-center gap-3"><span className="initial-avatar" aria-hidden="true">{(user.email?.slice(0, 2) ?? "ST").toUpperCase()}</span><div className="min-w-0"><p className="truncate text-xs font-semibold" title={user.email ?? undefined}>{user.email ?? "Staff account"}</p><p className="mt-1 text-xs text-ink-soft">{user.isAdmin ? "System administrator" : "Caretaker"}</p></div></div><LogoutButton className="w-full" /></div>
+    </div>;
+  }
+  return <>
+    <aside className="sidebar">{content()}</aside>
+    <div className="mobile-bar"><Link href={home} className="brand-name">SIGNAL</Link><button ref={trigger} type="button" onClick={() => setOpen(true)} aria-label="Open navigation" aria-expanded={open} aria-controls="mobile-navigation" className="rounded-lg border border-line p-2.5"><Icon name="menu" /></button></div>
+    <dialog ref={dialog} id="mobile-navigation" className="mobile-nav-dialog" aria-label="Workspace navigation" onCancel={() => setOpen(false)} onClick={event => { if (event.target === event.currentTarget) setOpen(false); }}>{open && content(true)}</dialog>
+  </>;
 }

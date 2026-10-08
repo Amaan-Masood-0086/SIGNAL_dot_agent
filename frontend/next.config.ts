@@ -20,6 +20,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  distDir: process.env.SIGNAL_UI_TEST === "1" ? ".next-ui-test" : ".next",
   reactStrictMode: true,
   // Remove the framework banner — free reconnaissance for an attacker
   // (OWASP A02 information disclosure).

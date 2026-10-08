@@ -13,7 +13,7 @@ export default async function AdminStaffPage() {
       <PageHeader
         eyebrow="Administration"
         title="Staff & roles"
-        lede="The system-level staff directory across every institution. Role changes and deactivations take effect immediately — the database row, not the signed token, decides privilege — and each one is written to the audit chain."
+        lede="Manage staff accounts, institution membership and access. Role changes take effect immediately and are recorded."
       />
       <div className="mt-6">
         <StaffPanel currentStaffId={me.staff_id} />

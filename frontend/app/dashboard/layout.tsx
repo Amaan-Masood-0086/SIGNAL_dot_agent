@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 import { SidebarNav } from "@/src/components/layout/SidebarNav";
 import { navGroupsFor } from "@/src/components/layout/nav";
@@ -15,7 +16,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
   return (
     <QueryProvider>
-      <div className="flex min-h-svh flex-col lg:flex-row">
+      <a href="#main-content" className="skip-link">Skip to content</a>
+      <div className="app-shell">
         <SidebarNav
           groups={navGroupsFor(me.is_admin)}
           user={{
@@ -25,7 +27,13 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             isAdmin: me.is_admin,
           }}
         />
-        <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+        <div className="app-content">
+          <header className="workspace-header">
+            <div><p>{me.is_admin ? "Administration" : "Care workspace"}</p><small>{me.is_admin ? "Manage teams, access and services" : me.institution_name ?? "Your institution"}</small></div>
+            <div className="flex items-center gap-5"><span className="rounded-md bg-amber-soft px-2.5 py-1 text-xs text-amber">Synthetic data only</span><Link href="/dashboard/guide" className="hidden sm:inline-flex">Help & guidance</Link></div>
+          </header>
+          <div id="main-content" tabIndex={-1}>{children}</div>
+        </div>
       </div>
     </QueryProvider>
   );

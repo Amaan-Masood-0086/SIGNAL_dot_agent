@@ -50,7 +50,7 @@ export function ThinkingBar({
         <div className="signal-sweep h-full w-1/4 rounded-full bg-pine" />
       </div>
       {seconds >= patienceAfter && (
-        <p className="mt-1.5 text-[11px] leading-relaxed text-ink-soft">
+        <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">
           SIGNAL is checking this against the knowledge base. A turn can take up
           to a minute — the answer is still coming, and nothing is lost if you
           wait.

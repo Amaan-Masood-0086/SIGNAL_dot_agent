@@ -63,7 +63,7 @@ export function ArchiveChild({
   if (archived) {
     return (
       <div className="rounded-xl border border-amber/30 bg-amber-soft p-5">
-        <p className="text-[11px] font-bold tracking-[0.14em] text-amber uppercase">
+        <p className="text-xs font-bold tracking-[0.14em] text-amber uppercase">
           Archived
         </p>
         <p className="mt-1.5 text-sm leading-relaxed text-ink">

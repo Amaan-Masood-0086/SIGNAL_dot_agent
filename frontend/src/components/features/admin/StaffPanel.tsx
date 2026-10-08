@@ -162,7 +162,7 @@ export function StaffPanel({ currentStaffId }: { currentStaffId: string }) {
                 description={
                   query
                     ? "Clear the filter to see everyone on this page."
-                    : "Staff accounts are created by the seeding script; roles are then managed here."
+                    : "Use Add staff account to create a new member’s account."
                 }
               />
             </div>
@@ -186,7 +186,7 @@ export function StaffPanel({ currentStaffId }: { currentStaffId: string }) {
                           <p className="truncate font-semibold text-ink" title={staff.email}>
                             {staff.email}
                             {isSelf && (
-                              <span className="ml-2 text-[10px] font-bold tracking-wide text-pine uppercase">
+                              <span className="ml-2 text-xs font-bold tracking-wide text-pine uppercase">
                                 You
                               </span>
                             )}

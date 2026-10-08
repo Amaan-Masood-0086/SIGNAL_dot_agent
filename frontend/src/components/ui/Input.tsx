@@ -10,7 +10,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 // structured error/hint wiring for screen readers.
 export function Input({ label, error, hint, id, className = "", ...props }: InputProps) {
   const describedBy =
-    [error ? `${id}-error` : null, hint ? `${id}-hint` : null]
+    [error ? `${id}-error` : null, hint && !error ? `${id}-hint` : null]
       .filter(Boolean)
       .join(" ") || undefined;
 

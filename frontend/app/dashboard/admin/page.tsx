@@ -81,15 +81,20 @@ export default async function AdminOverviewPage() {
   const configured = providers?.filter((provider) => provider.configured).length ?? 0;
   const providerCount = providers?.length ?? 0;
   const institutions = usage?.by_institution.length ?? 0;
-  const cost = usage?.total.estimated_cost ?? 0;
+  const cost = usage?.total.estimated_cost;
 
   return (
     <main className="mx-auto w-full max-w-6xl p-5 sm:p-8">
       <PageHeader
         eyebrow="Administration"
         title="System overview"
-        lede="System-level state across every institution. Caretaker-facing surfaces stay strictly institution-scoped — the cross-institution views live only under Administration."
+        lede="Keep your institutions, teams and services ready to support care."
       />
+
+      <section className="welcome-panel mt-7">
+        <div><h2>Your organisation, connected.</h2><p>Manage staff access, check service configuration and review activity across institutions from one workspace.</p></div>
+        <Link href="/dashboard/admin/staff" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-pine px-4 text-sm font-semibold text-white hover:bg-pine-deep">Manage your team <Icon name="chevron-right" className="h-4 w-4" /></Link>
+      </section>
 
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatTile
@@ -108,8 +113,8 @@ export default async function AdminOverviewPage() {
           value={providerCount ? `${configured}/${providerCount}` : "—"}
           hint={
             configured === providerCount && providerCount > 0
-              ? "Both providers hold an active credential"
-              : "An unconfigured provider falls back to synthetic behaviour"
+                ? "Credentials configured"
+              : "Review service configuration"
           }
           tone={providerCount > 0 && configured < providerCount ? "amber" : "pine"}
         />
@@ -157,7 +162,7 @@ export default async function AdminOverviewPage() {
               {providers.map((provider) => (
                 <li
                   key={provider.provider}
-                  className="flex flex-wrap items-center gap-2 rounded-lg border border-line p-3"
+                  className="flex flex-wrap items-center gap-2 border-b border-line py-4 last:border-0"
                 >
                   <span className="mr-auto text-sm font-semibold text-ink">
                     {provider.provider === "stt" ? "Speech-to-text" : "LLM"}
@@ -198,7 +203,7 @@ export default async function AdminOverviewPage() {
                   reads as two levels of hierarchy where there is only one. */}
               <dl className="mt-3 flex flex-wrap gap-x-10 gap-y-4">
                 <div>
-                  <dt className="text-[11px] font-semibold tracking-[0.12em] text-ink-soft uppercase">
+                  <dt className="text-xs font-semibold tracking-[0.12em] text-ink-soft uppercase">
                     Calls
                   </dt>
                   <dd className="mt-1 font-display text-3xl leading-none font-bold tracking-tight text-ink">
@@ -206,21 +211,20 @@ export default async function AdminOverviewPage() {
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-[11px] font-semibold tracking-[0.12em] text-ink-soft uppercase">
+                  <dt className="text-xs font-semibold tracking-[0.12em] text-ink-soft uppercase">
                     Estimated cost
                   </dt>
                   <dd
                     className={`mt-1 font-display text-3xl leading-none font-bold tracking-tight ${
-                      cost > 0 ? "text-amber" : "text-ink"
+                      cost != null && cost > 0 ? "text-amber" : "text-ink"
                     }`}
                   >
-                    ${cost.toFixed(4)}
+                    {cost == null ? "Not recorded" : `$${cost.toFixed(4)}`}
                   </dd>
                 </div>
               </dl>
               <p className="mt-3 text-xs leading-relaxed text-ink-soft">
-                Cost visibility is the reporting half of the cost-abuse control —
-                rate limits cap the damage, these numbers make it visible.
+                {usage.total.unpriced_calls > 0 ? `${usage.total.unpriced_calls} calls have no recorded price. This is a partial estimate.` : "Estimated costs for recorded provider activity."}
               </p>
             </>
           )}

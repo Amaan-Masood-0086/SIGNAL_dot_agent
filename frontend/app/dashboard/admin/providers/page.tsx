@@ -10,7 +10,7 @@ export default function AdminProvidersPage() {
       <PageHeader
         eyebrow="Administration"
         title="Providers & keys"
-        lede="Keys are encrypted at rest and write-only: once saved, only the last four characters are ever shown again. A stored key takes precedence over the environment variable; deactivating it falls back to the environment."
+        lede="Configure speech and reasoning services. Saved credentials are encrypted; only their last four characters remain visible."
       />
       <div className="mt-6">
         <ProvidersPanel />
