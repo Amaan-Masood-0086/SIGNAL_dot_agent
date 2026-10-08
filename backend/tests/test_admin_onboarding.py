@@ -32,7 +32,6 @@ from fastapi.testclient import TestClient
 from app.api.deps import get_current_verified_staff, get_db, get_tenant_db
 from app.core.config import Settings, get_settings
 from app.core.security import create_access_token
-from app.main import create_app
 from app.models.institution import Institution
 from app.models.staff import Staff
 
@@ -88,6 +87,10 @@ def caretaker(db_session, institution) -> Staff:
 
 @pytest.fixture()
 def client(db_session, settings) -> TestClient:
+    # Imported here, not at module level: app.main builds the uvicorn `app` at import,
+    # which needs JWT keys that CI (no .env) only has through the fixtures.
+    from app.main import create_app
+
     app = create_app(settings)
     app.dependency_overrides[get_db] = lambda: db_session
     app.dependency_overrides[get_tenant_db] = lambda: db_session

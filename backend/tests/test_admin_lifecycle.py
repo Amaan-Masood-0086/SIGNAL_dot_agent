@@ -35,7 +35,6 @@ from sqlalchemy import select
 from app.api.deps import get_db, get_tenant_db
 from app.core.config import Settings
 from app.core.security import create_access_token
-from app.main import create_app
 from app.models.audit_log import AuditLogEntry
 from app.models.child import Child
 from app.models.institution import Institution
@@ -105,6 +104,10 @@ def child(db_session, institution) -> Child:
 
 @pytest.fixture()
 def client(db_session, settings) -> TestClient:
+    # Imported here, not at module level: app.main builds the uvicorn `app` at import,
+    # which needs JWT keys that CI (no .env) only has through the fixtures.
+    from app.main import create_app
+
     app = create_app(settings)
     app.dependency_overrides[get_db] = lambda: db_session
     app.dependency_overrides[get_tenant_db] = lambda: db_session
