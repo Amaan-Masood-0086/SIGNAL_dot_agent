@@ -8,7 +8,9 @@ export const metadata: Metadata = {
     "Early language-development screening for children in institutional care. Synthetic-data-only build.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+// Plain props type: the generated global LayoutProps only exists after `next build`,
+// so a clean checkout would fail `tsc --noEmit` (CI typechecks before it builds).
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${fontVariables} h-full antialiased`}>
       {/*
